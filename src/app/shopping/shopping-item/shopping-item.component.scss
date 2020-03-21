@@ -1,0 +1,71 @@
+@import '../../../base';
+
+.list-item{
+  padding: 0px 0px 15px 0px;
+  float: left;
+
+  .item-body{
+    padding: 5px 30px;
+
+    .image-body{
+      padding:0px;
+      img{
+        width:100%;
+        border-radius: 10px;
+      }    
+    }
+
+    .notify-badge{
+      position: absolute;
+      left:-5px;
+      top:5px;
+      padding-bottom: 0px;
+      text-align: center;
+      border-radius: 30px;
+      color:white;
+      padding:3px 5px 0px 5px;
+      font-size: 12px;
+    }
+  
+    .new, .promotion{
+      background-color: $red;
+      color: white;
+      .text-sm{
+        color: white;
+      }
+    }
+
+    .text-body{
+      padding:0px 0px 0px 10px;
+
+      .title-bg{
+        font-size:18px;
+        font-weight:500;
+      }
+
+      .order-row{
+        padding-top: 6px;
+
+        .price-col{
+          padding-left: 0px;
+          padding-right: 0px;
+          font-size:18px;
+          font-weight:400;
+          color: $red;
+        }
+
+        .quantity-col{
+          padding: 0px 2px;
+
+          .quantity{
+            text-align: right;
+          }
+        }
+      }
+    }
+  }
+}
+
+.grid-item:hover{
+  background-color: #eee;
+}

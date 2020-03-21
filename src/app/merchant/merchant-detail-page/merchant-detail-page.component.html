@@ -1,0 +1,26 @@
+<div class="page">
+  <div class="row title-block">
+    <div class="col-12 title-bg">{{merchant.name}}</div>
+  </div>
+
+  <div class="page-body">
+    <!-- <div class="cat-list">
+      <app-vertical-tab [selected]="category" [items]="categories" (select)="onCategorySelect($event)"></app-vertical-tab>
+    </div> -->
+    <!-- <div #list class="list">
+        <app-product-list [products]="products" [bHasAddress]="bHasAddress"
+        (select)="onSelect($event)"
+        (add)="onAddProduct($event)"
+        (remove)="onRemoveProduct($event)"
+        ></app-product-list>
+    </div> -->
+    <app-shopping-list [items]="items" (selectItem)="onSelectShoppingItem($event)"></app-shopping-list>
+  </div>
+  <app-footer [type]="'next'" [amount]="amount" (next)="onNext()"></app-footer>
+</div>
+
+<!-- <app-modal id="custom-modal-1">
+  <h1>A Custom Modal!</h1>
+  <p>Home page text</p>
+  <button (click)="closeModal('custom-modal-1');">Close</button>
+</app-modal> -->

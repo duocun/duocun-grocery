@@ -1,0 +1,5 @@
+<div class="list">
+  <app-shopping-item *ngFor="let it of items" [item]="it"
+    (select)="onSelect($event)">
+  </app-shopping-item>
+</div>

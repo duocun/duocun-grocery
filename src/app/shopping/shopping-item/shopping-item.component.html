@@ -1,0 +1,22 @@
+<div class="col-12 list-item" (click)="onSelect(product, quantity)">
+  <div class="row item-body">
+    <div class="col-6 image-body">
+      <img [src]="getProductImage(product)" alt="{{product.name}}">
+      <div *ngIf="product.status && product.status===Status.NEW" class="new notify-badge">
+        <div class="text-sm" i18n="@@New">New</div>
+      </div>
+      <div *ngIf="product.status && product.status===Status.PROMOTE" class="promotion notify-badge">
+        <div class="text-sm" i18n="@@Promotion">Promotion</div>
+      </div>
+    </div>
+    <div class="col-6 text-body">
+      <div class="title-bg">{{product.name}}</div>
+      <div class="row order-row">
+        <div class="col-4 price-col">${{product.price}}</div>
+        <div class="col-8 button-col">
+          <div class="quantity" *ngIf="quantity && quantity>0"> x{{quantity}}</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,33 @@
+@import '../../../base';
+
+$quantity-w:148px;
+
+.delivery-item{
+  width: 100%;
+  height: 60px;
+  margin: 0px;
+  padding: 10px;
+
+  .date-col{
+    width: calc(100% - #{$quantity-w});
+    height: $input-h;
+    float: left;
+
+    .date-item{
+      width: 100%;
+    
+      .date-col{
+        float: left;
+        width: 60%;
+      }
+      .time-col{
+        float: left;
+        width: 40%;
+      }
+    }
+  }
+  .quantity-col{
+    width: $quantity-w;
+    float: left;
+  }
+}

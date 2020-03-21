@@ -1,0 +1,12 @@
+<div class="page">
+  <div class="title-block" *ngIf="product">{{product.name}}&nbsp;${{product.price}}</div>
+  <div class="page-body">
+    <div *ngIf="inRange" class="text-md note-row">请选择送货时间和数量</div>
+
+    <div *ngIf="inRange" class="delivery-list">
+      <app-delivery-item *ngFor="let d of deliveries" [delivery]="d" (change)="onDeliveryItemChange($event)"></app-delivery-item>
+    </div>
+  </div>
+  <div class="warning-text"*ngIf="!inRange">您的地址不在服务范围内。</div>
+  <app-footer [type]="'next'" [amount]="amount" (next)="onNext()"></app-footer>
+</div>

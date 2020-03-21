@@ -1,0 +1,77 @@
+<div class="charge-list">
+  <div class="row text-sm">
+    <div class="col-12">
+      <div class="title-xs">
+        <span>商品总额</span>:
+      </div>
+      <div class="text-xs">&nbsp;${{charge.price}}</div>
+    </div>
+
+    <div class="col-12">
+      <div class="title-xs">
+        <span>运费</span>:
+      </div>
+      <div class="text-xs">&nbsp;${{charge.deliveryCost}}</div>
+    </div>
+
+    <!-- <div class="col-12">
+        <div class="title-xs">
+          <span>小计</span>:
+        </div>
+        <div class="text-xs">&nbsp;${{charge.price}}</div>
+      </div> -->
+
+    <div class="col-12">
+      <div class="title-xs">
+        <span>税费</span>:
+      </div>
+      <div class="text-xs">&nbsp;${{charge.tax}}</div>
+    </div>
+
+    <div class="col-12">
+      <div class="title-xs">
+        <span>小费</span>:
+      </div>
+      <div class="text-xs">&nbsp;${{charge.tips}}</div>
+    </div>
+
+    <div class="col-12">
+      <div class="title-xs">
+        <span>运费折扣</span>:</div>
+      <div class="text-xs">-${{charge.deliveryDiscount}}</div>
+    </div>
+
+    <div class="col-12" *ngIf="charge.overRangeCharge > 0">
+      <div class="title-xs">
+        <span>超范围服务费</span>:</div>
+      <div class="text-xs">&nbsp;${{charge.overRangeCharge}}</div>
+    </div>
+
+    <div class="col-12 total-row">
+      <div class="title-xs">
+        <span>总计</span>:</div>
+      <div class="text-xs">&nbsp;${{charge.total}}</div>
+    </div>
+
+    <div class="col-12" *ngIf="bShowBalance && charge.balance !== 0">
+      <div class="title-xs">
+        <span>当前余额</span>:
+      </div>
+
+      <div class="text-xs">
+        <span *ngIf="charge.balance > 0">&nbsp;${{charge.balance}}</span>
+        <span *ngIf="charge.balance < 0">
+          <span>-</span>${{abs(charge.balance)}}
+        </span>
+      </div>
+    </div>
+
+
+    <div *ngIf="bShowBalance" class="col-12 total-row">
+      <div class="title-xs">
+        <span>总共应付</span>:
+      </div>
+      <div class="text-xs">&nbsp;${{charge.payable}}</div>
+    </div>
+  </div>
+</div>

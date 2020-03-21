@@ -1,0 +1,30 @@
+
+
+  .charge-list{
+    display: flex;
+    align-items: flex-end;
+    padding: 0px;
+
+    .col-12{
+      padding:0px 0px 3px 0px;
+    }
+
+    .title-xs{
+      width: 73px;
+      float: left;
+      font-size: 12px;
+      font-weight: 500;
+    }
+
+    .text-xs{
+      float: left;
+      font-size: 13px;
+      margin-left: 4px;
+    }
+
+    .total-row{
+      margin-top: 3px;
+      padding-top: 5px;
+      border-top: solid 1px #eee;
+    }
+  }

@@ -1,0 +1,11 @@
+<div class="delivery-item">
+  <div class="date-col">
+    <div class="date-item">
+      <div class="date-col">{{delivery.date}}</div>
+      <div class="time-col">{{toWeek(delivery.date)}}</div>
+    </div>
+  </div>
+  <div class="quantity-col">
+    <app-quantity-input [quantity]="quantity" (change)="onChange($event)"></app-quantity-input>
+  </div>
+</div>
