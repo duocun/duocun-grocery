@@ -39,7 +39,6 @@ export class AddressFormPageComponent implements OnInit, OnDestroy {
   mapCenter;
   suggestAddressList;
   historyAddressList;
-  bUpdateLocationList = true;
   malls: IMall[];
   availableRanges: IRange[];
   lang = environment.language;

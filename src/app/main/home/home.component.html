@@ -41,7 +41,7 @@
 </div>
 
 <div class="map-block" [class.range]="!inRange" *ngIf="!loading && !(places && places.length > 0) && !inRange">
-  <app-map [location]="location" [center]="mapCenter" [zoom]="mapZoom" [places]="places" [ranges]="mapRanges" [areas]="areas"></app-map>
+  <app-map [location]="location" [center]="mapCenter" [zoom]="mapZoom" [places]="places" [areas]="areas"></app-map>
   <div class="map-info-row">
     <div class="map-info-text" i18n="@@MapHint">Sorry, the address is not in our service range.</div>
   </div>

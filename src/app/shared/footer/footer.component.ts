@@ -139,16 +139,19 @@ export class FooterComponent implements OnInit, OnDestroy {
   }
 
   toOrder() {
-    if (this.account) {
-      this.selected = 'order';
-      this.router.navigate(['order/history']);
-    } else {
-      const hint = this.lang === 'en' ? 'Require login, please try place an order, we will bring you to signup process' :
-      '登陆用户才能访问订单历史，请尝试重新进入并完成微信登陆';
-      alert(hint);
-    }
-    // this.selected = 'order';
-    // window.location.href = 'http://localhost:3001/history';
+    this.accountSvc.getCurrentAccount().pipe(takeUntil(this.onDestroy$)).subscribe((account1: IAccount) => {
+      this.account = account1;
+      if (this.account) {
+        this.selected = 'order';
+        this.router.navigate(['order/history']);
+      } else {
+        const hint = this.lang === 'en' ? 'Require login, please try place an order, we will bring you to signup process' :
+        '登陆用户才能访问订单历史，请尝试重新进入并完成微信登陆';
+        alert(hint);
+      }
+      // this.selected = 'order';
+      // window.location.href = 'http://localhost:3001/history';
+    });
   }
 
   // toCart() {
@@ -160,16 +163,17 @@ export class FooterComponent implements OnInit, OnDestroy {
   }
 
   toAccount() {
-    if (this.account) {
-      this.selected = 'account';
-      this.router.navigate(['account/settings']);
-    } else {
-      const hint = this.lang === 'en' ? 'Require login, please try place an order, we will bring you to signup process' :
-      '登陆用户才能访问订单历史，请尝试重新进入并完成微信登陆';
-      alert(hint);
-    }
-    // this.selected = 'account';
-    // window.location.href = 'http://localhost:3001/account';
+    this.accountSvc.getCurrentAccount().pipe(takeUntil(this.onDestroy$)).subscribe((account1: IAccount) => {
+      this.account = account1;
+      if (this.account) {
+        this.selected = 'account';
+        this.router.navigate(['account/settings']);
+      } else {
+        const hint = this.lang === 'en' ? 'Require login, please try place an order, we will bring you to signup process' :
+        '登陆用户才能访问订单历史，请尝试重新进入并完成微信登陆';
+        alert(hint);
+      }
+    });
   }
 
   getColor(menu) {

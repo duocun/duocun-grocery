@@ -13,7 +13,12 @@ import { AreaService } from '../../area/area.service';
 
 const baseTimeList = ['11:00'];
 const ADVANCE_OFFSET = 2; // 2 days
-
+export const AppType = {
+  FOOD_DELIVERY: 'F',
+  GROCERY: 'G',
+  FRESH: 'F',
+  TELECOM: 'T'
+};
 @Component({
   selector: 'app-delivery-page',
   templateUrl: './delivery-page.component.html',
@@ -28,6 +33,8 @@ export class DeliveryPageComponent implements OnInit {
   amount;
   location;
   inRange = true;
+  areas;
+  schedule;
 
   constructor(
     private productSvc: ProductService,
@@ -40,6 +47,13 @@ export class DeliveryPageComponent implements OnInit {
   ) {
     this.rx.select('cart').pipe(takeUntil(this.onDestroy$)).subscribe((cart: any) => {
       this.cart = cart;
+      // following for quantity input change
+      if (this.schedule && this.product) {
+        const productId = this.product._id;
+        this.deliveries = this.mergeQuantity(this.schedule, cart, productId);
+        this.amount = this.cartSvc.getTotalPrice(cart);
+      }
+
     });
     this.rx.select('delivery').pipe(takeUntil(this.onDestroy$)).subscribe((d: any) => {
       this.location = d.origin;
@@ -49,23 +63,21 @@ export class DeliveryPageComponent implements OnInit {
   ngOnInit() {
     this.route.params.pipe(takeUntil(this.onDestroy$)).subscribe(params => {
       const productId = params['id'];
-      this.monunt(productId, this.cart);
-      this.amount = this.cartSvc.getTotalPrice(this.cart);
+      this.monunt(productId, this.cart).then(() => {
+
+      });
     });
   }
-
-
-
 
   // baseList --- moment object
   // baseTimeList eg. ['11:20']
   // return [{ date, time, quantity }];
-  getDeliverySchedule(baseList) {
-    // const baseList = baseDateList.map(baseDate => baseDate + 'T' + baseTimeList[0] + ':00.000Z');
+  getDeliverySchedule(bs) {
+    const baseList = bs.map(baseDate => baseDate.format('YYYY-MM-DD'));
     const list = [];
     if (baseList && baseList.length > 0) {
       for (let i = 0; i < 30; i++) {
-        const dateList = baseList.map(m => m.add(7 * i, 'days').toISOString().split('T')[0]);
+        const dateList = baseList.map(b => moment(b).add(7 * i, 'days').toISOString().split('T')[0]);
         dateList.map(d => {
           baseTimeList.map(t => {
             // const taxRate = product.taxRate !== null ? product.taxRate : 0;
@@ -125,13 +137,16 @@ export class DeliveryPageComponent implements OnInit {
           if (rs && rs.length > 0) {
 
             const dows = rs && rs.length > 0 ? rs.map(r => +r.deliver.dow) : [];
-            const bs = dows.length > 0 ? dows.map(dow => this.getBaseDate(+dow)) : [];
+            const bs = dows.length > 0 ? dows.map(dow => this.getBaseDate(dow)) : [];
             this.inRange = true;
-            const ds = this.getDeliverySchedule(bs);
-            this.deliveries = this.mergeQuantity(ds, cart, productId);
+            this.schedule = this.getDeliverySchedule(bs);
+            this.deliveries = this.mergeQuantity(this.schedule, cart, productId);
             this.amount = this.cartSvc.getTotalPrice(cart);
           } else {
-            this.inRange = false;
+            this.areaSvc.quickFind({ appType: AppType.GROCERY }).then(areas => {
+              this.inRange = false;
+              this.areas = areas;
+            });
           }
         });
       });

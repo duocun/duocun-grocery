@@ -1,6 +1,5 @@
 import { Injectable } from '@angular/core';
 import * as Cookies from 'js-cookie';
-import { ILocation } from '../location/location.model';
 
 const COOKIE_EXPIRY_DAYS = 365;
 
@@ -13,10 +12,6 @@ export class AuthService {
   }
 
   setAccessTokenId(token: string) {
-    const oldToken = this.getAccessTokenId();
-    if (oldToken) {
-      Cookies.remove('duocun-token-id');
-    }
     if (token) {
       Cookies.set('duocun-token-id', token, { expires: COOKIE_EXPIRY_DAYS });
     }
@@ -26,17 +21,6 @@ export class AuthService {
     const tokenId = Cookies.get('duocun-token-id');
     return tokenId ? tokenId : null;
   }
-
-
-  // setLocation(loc: ILocation) {
-  //   Cookies.remove('duocun-location');
-  //   Cookies.set('duocun-location', JSON.stringify(loc));
-  // }
-
-  // getLocation(): ILocation {
-  //   const s = Cookies.get('duocun-location');
-  //   return s ? JSON.parse(s) : null;
-  // }
 
 
   removeCookies() {

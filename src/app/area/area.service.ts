@@ -22,4 +22,9 @@ export class AreaService extends EntityService {
     const url = this.url + '/nearest';
     return this.doPost(url, { origin: origin });
   }
+
+  getMyArea(location: any) {
+    const url = this.url + '/my';
+    return this._get(url, { location });
+  }
 }

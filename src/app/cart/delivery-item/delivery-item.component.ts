@@ -2,6 +2,8 @@ import { Component, OnInit, Input, EventEmitter, Output } from '@angular/core';
 import * as moment from 'moment';
 import { environment } from '../../../environments/environment.prod';
 
+const WeekDayMap = ['日', '一', '二', '三', '四', '五', '六'];
+
 @Component({
   selector: 'app-delivery-item',
   templateUrl: './delivery-item.component.html',
@@ -24,13 +26,13 @@ export class DeliveryItemComponent implements OnInit {
 
   onChange(e) {
     const quantity = e.quantity;
-    const delivery = { ...this.delivery, ...{quantity} };
+    const delivery = { ...this.delivery, ...{ quantity } };
     this.change.emit(delivery);
   }
 
   toWeek(date) {
     const m = moment(date);
-    const n = m.day();
-    return this.lang === 'en' ? m.format('dddd') : '周' + n;
+    const n = m.weekday();
+    return this.lang === 'en' ? m.format('dddd') : '周' + WeekDayMap[n % 7];
   }
 }

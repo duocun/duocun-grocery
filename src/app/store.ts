@@ -4,7 +4,7 @@ import { accountReducer } from './account/account.reducer';
 // import { locationReducer } from './location/location.reducer';
 // import { ILocation } from './location/location.model';
 // import { IPicture, DEFAULT_PICTURE } from './commerce/commerce.actions';
-import { pageReducer } from './main/main.reducers';
+import { pageReducer, AppState, appStateReducer } from './main/main.reducers';
 import { commandReducer, ICommand } from './shared/command.reducers';
 import { DEFAULT_MALL } from './mall/mall.actions';
 import { IMall } from './mall/mall.model';
@@ -26,7 +26,7 @@ import { merchantReducer } from './merchant/merchant.reducer';
 export interface IAppState {
     cart: any; // ICart;
     account: Account;
-    // picture: IPicture;
+    appState: string;
     // location: ILocation;
     page: string;
     cmd: ICommand;
@@ -43,7 +43,7 @@ export interface IAppState {
 export const INITIAL_STATE: IAppState = {
     cart: DEFAULT_CART,
     account: null,
-    // picture: DEFAULT_PICTURE,
+    appState: AppState.NOT_READY,
     // location: null,
     page: 'home',
     cmd: {name: '', args: ''},
@@ -70,7 +70,7 @@ export const INITIAL_STATE: IAppState = {
 export const rootReducer = combineReducers({
     cart: cartReducer,
     account: accountReducer,
-    // picture: pictureReducer,
+    appState: appStateReducer,
     // location: locationReducer,
     page: pageReducer,
     cmd: commandReducer,

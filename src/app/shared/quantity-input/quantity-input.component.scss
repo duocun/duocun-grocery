@@ -9,12 +9,12 @@ $quantity-ctrl-w: 146px;
 .increase-btn, .decrease-btn{
   width: 30px;
   height: 30px;
-  float: left;
+  float: right;
 }
 
 .quantity-input{
   width: calc(100% - 80px);
-  float: left;
+  float: right;
   height: 30px;
   border: 1px solid $border-color;
 }

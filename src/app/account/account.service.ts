@@ -13,7 +13,7 @@ import { AuthService } from './auth.service';
 import { EntityService, HttpStatus } from '../entity.service';
 
 import * as Cookies from 'js-cookie';
-const COOKIE_EXPIRY_DAYS = 365;
+const COOKIE_EXPIRY_DAYS = 7;
 
 export interface IAccessToken {
   'id'?: string;
@@ -101,10 +101,6 @@ export class AccountService extends EntityService {
 
   // v2
   setAccessTokenId(token) {
-    const oldToken = this.getAccessTokenId();
-    if (oldToken) {
-      Cookies.remove('duocun-token-id');
-    }
     if (token) {
       Cookies.set('duocun-token-id', token, { expires: COOKIE_EXPIRY_DAYS });
     }
@@ -119,11 +115,6 @@ export class AccountService extends EntityService {
   wxLogin(authCode) {
     const url = this.url + '/wxLogin?code=' + authCode;
     return this.http.get(url).toPromise();
-    // if (rsp.status === HttpStatus.OK.code) {
-    //   return rsp.data;
-    // } else {
-    //   return null;
-    // }
   }
 
   getAccount() {
