@@ -175,12 +175,12 @@ export class HomeComponent implements OnInit, OnDestroy {
       const clientId = queryParams.get('clientId'); // use for after card pay, could be null
       const page = queryParams.get('page');
 
-      if (page === 'account_settings') { // for wechatpay add credit procedure
+      if (page === 'balance') { // for wechatpay add credit procedure
         self.accountSvc.find({ _id: clientId }).pipe(takeUntil(this.onDestroy$)).subscribe((accounts: IAccount[]) => {
           self.rx.dispatch({ type: AccountActions.UPDATE, payload: accounts[0] });
           self.router.navigate(['account/balance']);
         });
-      } else if (page === 'order_history') { // for wechatpay procedure
+      } else if (page === 'history') { // for wechatpay procedure
         if (clientId) {
           self.bPayment = true;
           self.accountSvc.find({ _id: clientId }).pipe(takeUntil(this.onDestroy$)).subscribe((accounts: IAccount[]) => {
@@ -287,7 +287,7 @@ export class HomeComponent implements OnInit, OnDestroy {
       //   });
       // }
 
-      if (e.input) {
+      if (e && e.input) {
         this.places = this.suggestAddressList;
       } else {
         this.places = this.historyAddressList.map(x => Object.assign({}, x));

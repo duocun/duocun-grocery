@@ -11,8 +11,9 @@ import { CartService } from '../cart.service';
 import { MerchantScheduleService } from '../../merchant/merchant-schedule.service';
 import { AreaService } from '../../area/area.service';
 
+const BASE_TIME = '23:59:00.000Z';
 const baseTimeList = ['11:00'];
-const ADVANCE_OFFSET = 2; // 2 days
+const ADVANCE_OFFSET = -1; // 2 days
 export const AppType = {
   FOOD_DELIVERY: 'F',
   GROCERY: 'G',
@@ -53,7 +54,6 @@ export class DeliveryPageComponent implements OnInit {
         this.deliveries = this.mergeQuantity(this.schedule, cart, productId);
         this.amount = this.cartSvc.getTotalPrice(cart);
       }
-
     });
     this.rx.select('delivery').pipe(takeUntil(this.onDestroy$)).subscribe((d: any) => {
       this.location = d.origin;
@@ -77,7 +77,7 @@ export class DeliveryPageComponent implements OnInit {
     const list = [];
     if (baseList && baseList.length > 0) {
       for (let i = 0; i < 30; i++) {
-        const dateList = baseList.map(b => moment(b).add(7 * i, 'days').toISOString().split('T')[0]);
+        const dateList = baseList.map(b => moment(b).add(7 * i, 'days').format('YYYY-MM-DD'));
         dateList.map(d => {
           baseTimeList.map(t => {
             // const taxRate = product.taxRate !== null ? product.taxRate : 0;
@@ -114,9 +114,12 @@ export class DeliveryPageComponent implements OnInit {
 
   // n -- dow
   getBaseDate(n) {
-    const lastDow = moment().day(n - 7);
-    const dow = moment().day(n);
-    const nextDow = moment().day(n + 7);
+    const today = moment().format('YYYY-MM-DD');
+    const dt = today + 'T' + BASE_TIME;
+    const lastDow = moment(dt).day(n - 7);
+    const dow = moment(dt).day(n);
+    const nextDow = moment(dt).day(n + 7);
+
     const d = moment().add(ADVANCE_OFFSET, 'days');
     if (d.isAfter(lastDow) && d.isSameOrBefore(dow)) {
       return dow;

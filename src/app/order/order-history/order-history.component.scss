@@ -13,6 +13,8 @@
 .order-list{
   padding: 0px 10px 60px 10px;
   margin-top: 70px;
+  overflow: scroll;
+  height: 100%;
 
   .list-item{
     padding: 20px 15px;
@@ -133,6 +135,7 @@
   .order-list{
     margin: 0px;
     padding: 0px 0px 60px 0px;
+
     .list-item{
       .col-6, .col-12{
         padding-left: 0px;

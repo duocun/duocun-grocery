@@ -38,7 +38,8 @@ export class SharedService {
 
   toDateString(s) {
     // s --- dd-mm-yyy:hh:mm:ss.z000
-    return s.split('.')[0].split('T')[0];  }
+    return moment(s).format('YYYY-MM-DD');
+  }
 
   getTotal(items) {
     let total = 0;
