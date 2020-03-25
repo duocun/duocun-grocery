@@ -1,34 +1,30 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, ViewChild, ElementRef } from '@angular/core';
 import { NgRedux } from '../../../../node_modules/@angular-redux/store';
 import { IAppState } from '../../store';
 import { Subject } from '../../../../node_modules/rxjs';
 import { takeUntil } from '../../../../node_modules/rxjs/operators';
-import { ICart, ICartItem } from '../../cart/cart.model';
+import { ICartItem } from '../../cart/cart.model';
 import { IMall } from '../../mall/mall.model';
 import { Router, ActivatedRoute } from '../../../../node_modules/@angular/router';
 import { FormBuilder } from '../../../../node_modules/@angular/forms';
 import { OrderService } from '../order.service';
-import { IOrder, ICharge, OrderItem, OrderType, OrderStatus } from '../order.model';
+import { IOrder, ICharge, OrderType, OrderStatus } from '../order.model';
 import { PageActions } from '../../main/main.actions';
 import { MatSnackBar, MatDialog } from '../../../../node_modules/@angular/material';
 import { IDelivery } from '../../delivery/delivery.model';
-import { OrderActions } from '../order.actions';
 import { IAccount } from '../../account/account.model';
 import { LocationService } from '../../location/location.service';
 
 import { environment } from '../../../environments/environment';
 import { PaymentService } from '../../payment/payment.service';
-import { RangeService } from '../../range/range.service';
 import { AccountService } from '../../account/account.service';
 import { PhoneVerifyDialogComponent, AccountType } from '../phone-verify-dialog/phone-verify-dialog.component';
 import { CartActions } from '../../cart/cart.actions';
 import { IMerchant } from '../../merchant/merchant.model';
-import { IPaymentResponse, ResponseStatus } from '../../transaction/transaction.model';
 import { PaymentMethod, PaymentError, PaymentStatus, AppType } from '../../payment/payment.model';
 import { SharedService } from '../../shared/shared.service';
 import * as moment from 'moment';
 import { ProductService } from '../../product/product.service';
-import { resolve } from '../../../../node_modules/@types/q';
 
 @Component({
   selector: 'app-order-form-page',
@@ -70,6 +66,7 @@ export class OrderFormPageComponent implements OnInit, OnDestroy {
   chargeItems;
   location;
   note;
+  @ViewChild('cc', { static: true }) cc: ElementRef;
 
   constructor(
     private fb: FormBuilder,
@@ -151,28 +148,44 @@ export class OrderFormPageComponent implements OnInit, OnDestroy {
     }
   }
   openPhoneVerifyDialog(): void {
+    const paymentMethod = this.paymentMethod;
     const dialogRef = this.dialogSvc.open(PhoneVerifyDialogComponent, {
       width: '300px',
       data: {
-        title: 'Signup', content: '', buttonTextNo: '取消', buttonTextYes: '删除', account: this.account
+        title: 'Signup', content: '', buttonTextNo: '取消', buttonTextYes: '删除',
+        account: this.account, paymentMethod
       },
       panelClass: 'phone-verify-dialog'
     });
 
-    dialogRef.afterClosed().pipe(takeUntil(this.onDestroy$)).subscribe(account => {
-      this.account = account;
-      if (account) {
-        this.doPay().then(() => {
+    dialogRef.afterClosed().pipe(takeUntil(this.onDestroy$)).subscribe(r => {
+      this.account = r.account;
+      if (r && r.account) {
+        this.doPay().then((rt: any) => {
+          // this.showError(rt.err);
+          this.loading = false;
+          this.bSubmitted = false;
 
+          if (rt.err === PaymentError.NONE) {
+            this.rx.dispatch({ type: CartActions.CLEAR_CART, payload: [] });
+            if (r.paymentMethod === PaymentMethod.WECHAT) {
+              window.location.href = rt.url;
+            } else {
+              this.router.navigate(['order/history']);
+            }
+          }
         });
       }
     });
   }
 
+  onCreditCardInputFocus() {
+    this.cc.nativeElement.scrollIntoView({ behavior: 'smooth', block: 'top' });
+  }
+
   // click button
   onSubmitPay() {
     document.getElementById('btn-submit').click();
-    this.bSubmitted = true;
   }
 
   onPay() {
@@ -185,6 +198,8 @@ export class OrderFormPageComponent implements OnInit, OnDestroy {
     const groupDiscount = 0; // bEligible ? 2 : 0;
     const account = this.account; // get in mount()
 
+    this.bSubmitted = true; // important! block form submit
+
     if (account) {
       this.balance = account.balance;
 
@@ -195,6 +210,7 @@ export class OrderFormPageComponent implements OnInit, OnDestroy {
         this.bSubmitted = false;
         this.openPhoneVerifyDialog();
       } else {
+        this.loading = true;
         self.doPay().then((rt: any) => {
           // this.showError(rt.err);
           this.loading = false;
@@ -206,6 +222,7 @@ export class OrderFormPageComponent implements OnInit, OnDestroy {
             if (paymentMethod === PaymentMethod.WECHAT) {
               window.location.href = rt.url;
             } else {
+              this.loading = false;
               self.router.navigate(['order/history']);
             }
           }
@@ -239,6 +256,7 @@ export class OrderFormPageComponent implements OnInit, OnDestroy {
       merchantName: this.lang === 'zh' ? merchant.name : merchant.nameEN,
       items,
       location,
+      pickupTime: '10:00',
       deliverDate,
       deliverTime,
       type: OrderType.GROCERY,
@@ -405,7 +423,7 @@ export class OrderFormPageComponent implements OnInit, OnDestroy {
     const location = this.location;
     const paymentMethod = this.paymentMethod;
     const note = this.note;
-    const amount = this.summary.total;
+    const amount = Math.round(this.summary.total * 100) / 100;
     const orders = [];
     const overRangeCharge = 0;
     this.groups.map(group => {
@@ -458,5 +476,9 @@ export class OrderFormPageComponent implements OnInit, OnDestroy {
 
   onSelectPaymentMethod(paymentMethod) {
     this.paymentMethod = paymentMethod;
+  }
+
+  getTodayString() {
+    return moment().format('YYYY-MM-DD');
   }
 }

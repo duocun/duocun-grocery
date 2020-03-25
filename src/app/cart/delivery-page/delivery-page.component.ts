@@ -13,7 +13,7 @@ import { AreaService } from '../../area/area.service';
 
 const BASE_TIME = '23:59:00.000Z';
 const baseTimeList = ['11:00'];
-const ADVANCE_OFFSET = -1; // 2 days
+const ADVANCE_OFFSET = 1; // 2 days
 export const AppType = {
   FOOD_DELIVERY: 'F',
   GROCERY: 'G',
@@ -93,6 +93,7 @@ export class DeliveryPageComponent implements OnInit {
 
   // slots [{date, time}...]
   // cart --- { product, deliveries:[{date, time, quantity}]}
+  // return [{date, time, quantity}...]
   mergeQuantity(slots, cart, productId) {
     const ds = [];
     const cartItem = cart.find(it => it.product && it.product._id === productId);
@@ -106,9 +107,21 @@ export class DeliveryPageComponent implements OnInit {
           ds.push(slot);
         }
       });
-      return ds;
+      return ds.sort((a: any, b: any) => {
+        if (moment(a.date).isAfter(moment(b.date))) {
+          return 1;
+        } else {
+          return -1;
+        }
+      });
     } else {
-      return slots;
+      return slots.sort((a: any, b: any) => {
+        if (moment(a.date).isAfter(moment(b.date))) {
+          return 1;
+        } else {
+          return -1;
+        }
+      });
     }
   }
 

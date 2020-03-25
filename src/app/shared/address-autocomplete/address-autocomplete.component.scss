@@ -14,7 +14,10 @@
     width:100%;
     display: inline-block;
   }
-
+  input::placeholder { /* Chrome, Firefox, Opera, Safari 10.1+ */
+    color: red;
+    opacity: 1; /* Firefox */
+  }
   button.clear-btn{
     background: none;
     border: none;

@@ -1,5 +1,4 @@
 import { Component, OnInit, OnDestroy, ViewChild, ChangeDetectorRef, AfterViewInit, ElementRef } from '@angular/core';
-import { FormBuilder } from '@angular/forms';
 import { environment } from '../../../environments/environment';
 import { LocationService } from '../../location/location.service';
 import { AccountService } from '../../account/account.service';
@@ -9,31 +8,29 @@ import { IAppState } from '../../store';
 import { PageActions, AppStateActions } from '../../main/main.actions';
 // import { SocketService } from '../../shared/socket.service';
 import { Router, ActivatedRoute } from '@angular/router';
-import { AuthService } from '../../account/auth.service';
 import { AppState } from '../main.reducers';
 import { Subject } from '../../../../node_modules/rxjs';
 import { takeUntil } from '../../../../node_modules/rxjs/operators';
 import { ICommand } from '../../shared/command.reducers';
-import { Account, IAccount } from '../../account/account.model';
+import { IAccount } from '../../account/account.model';
 import { AccountActions } from '../../account/account.actions';
-import { MatSnackBar, MatTooltip } from '../../../../node_modules/@angular/material';
+import { MatSnackBar } from '../../../../node_modules/@angular/material';
 import { CommandActions } from '../../shared/command.actions';
 import { IAddressAction } from '../../location/address.reducer';
 import { AddressActions } from '../../location/address.actions';
 import { DeliveryActions } from '../../delivery/delivery.actions';
 import { IDeliveryAction } from '../../delivery/delivery.reducer';
 import * as moment from 'moment';
-import { RangeService } from '../../range/range.service';
-import { IRange } from '../../range/range.model';
 import { AreaService } from '../../area/area.service';
 import { MerchantType, IMerchant, MerchantStatus } from '../../merchant/merchant.model';
 import { MerchantService } from '../../merchant/merchant.service';
 import { IDelivery } from '../../delivery/delivery.model';
-import { resolve } from 'url';
 import { AppType } from '../../payment/payment.model';
 
 const WECHAT_APP_ID = environment.WECHAT.APP_ID;
 const WECHAT_REDIRCT_URL = environment.WECHAT.REDIRECT_URL;
+const QRCODE_PICTURE = '8740e1f1-986c-4b70-81c2-63ec3462713d.jpg';
+
 
 @Component({
   selector: 'app-home',
@@ -58,7 +55,7 @@ export class HomeComponent implements OnInit, OnDestroy {
   loading = false;
   merchants;
   location: ILocation;
-  
+
   bInputLocation = false;
   // placeForm;
   historyAddressList = [];
@@ -79,26 +76,18 @@ export class HomeComponent implements OnInit, OnDestroy {
   date = { code: 'L', type: 'today' }; // default value
   menu = 'home';
   state;  // manage default location
-
-  @ViewChild('tooltip', { static: true }) tooltip: MatTooltip;
-
+  QRCODE_URL = environment.MEDIA_URL + QRCODE_PICTURE;
   constructor(
     private accountSvc: AccountService,
     private locationSvc: LocationService,
-    private authSvc: AuthService,
-    private rangeSvc: RangeService,
     private areaSvc: AreaService,
     private merchantSvc: MerchantService,
-    // private socketSvc: SocketService,
     private router: Router,
     private route: ActivatedRoute,
     private rx: NgRedux<IAppState>,
     private snackBar: MatSnackBar,
-    // private fb: FormBuilder
   ) {
     const self = this;
-
-    // this.placeForm = this.fb.group({ addr: [''] });
 
     this.rx.dispatch({ type: PageActions.UPDATE_URL, payload: { name: 'home' } });
 
@@ -130,7 +119,6 @@ export class HomeComponent implements OnInit, OnDestroy {
         }
       }
     });
-
 
     this.rx.select<ICommand>('cmd').pipe(takeUntil(this.onDestroy$)).subscribe((x: ICommand) => {
       if (x.name === 'clear-location-list') {
@@ -165,22 +153,21 @@ export class HomeComponent implements OnInit, OnDestroy {
     });
   }
 
-
   ngOnInit() {
     const self = this;
     this.places = []; // clear address list
     this.loading = true;
     self.route.queryParamMap.pipe(takeUntil(this.onDestroy$)).subscribe(queryParams => {
       // if url has format '...?clientId=x&page=y', it is some procedure that re-enter the home page
-      const clientId = queryParams.get('clientId'); // use for after card pay, could be null
-      const page = queryParams.get('page');
+      const clientId = queryParams.get('cId'); // use for after card pay, could be null
+      const page = queryParams.get('p');
 
-      if (page === 'balance') { // for wechatpay add credit procedure
+      if (page === 'b') { // for wechatpay add credit procedure
         self.accountSvc.find({ _id: clientId }).pipe(takeUntil(this.onDestroy$)).subscribe((accounts: IAccount[]) => {
           self.rx.dispatch({ type: AccountActions.UPDATE, payload: accounts[0] });
           self.router.navigate(['account/balance']);
         });
-      } else if (page === 'history') { // for wechatpay procedure
+      } else if (page === 'h') { // for wechatpay procedure
         if (clientId) {
           self.bPayment = true;
           self.accountSvc.find({ _id: clientId }).pipe(takeUntil(this.onDestroy$)).subscribe((accounts: IAccount[]) => {

@@ -9,6 +9,7 @@ declare var Stripe;
 })
 export class CreditCardFormComponent implements OnInit {
   @Output() init = new EventEmitter();
+  @Output() focus = new EventEmitter();
   constructor() { }
 
   ngOnInit() {
@@ -54,6 +55,9 @@ export class CreditCardFormComponent implements OnInit {
       }
     });
 
+    card.on('focus', () => {
+      this.focus.emit();
+    });
     return { stripe, card };
   }
 }

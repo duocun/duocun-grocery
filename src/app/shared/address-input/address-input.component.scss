@@ -21,6 +21,10 @@ $btn-width: 39px;
     padding-left: 0px;
     padding-right: 0px;
   }
+  ::placeholder { /* Chrome, Firefox, Opera, Safari 10.1+ */
+    color: red;
+    opacity: 1; /* Firefox */
+  }
 }
 
 button:focus {

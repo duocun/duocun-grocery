@@ -20,21 +20,18 @@
       </app-location-list>
 
       <div class="ad-block" *ngIf="!(places && places.length > 0)">
-        <!-- <img src="assets/images/fengcha.jpeg" /> -->
-      </div>
 
-      <!-- <app-date-select *ngIf="inRange && !(places && places.length > 0)" [bOrderEnded]="bOrderEnded" [selected]="date.code" (dateChange)="onDateChange($event)"></app-date-select> -->
+      </div>
     </div>
 
     <div class="right-col">
-      <img src="assets/qrcode.jpg">
+      <img src="QRCODE_URL">
       <div class="text-xs">Wechat QR Code for Chinese</div>
     </div>
   </div>
 </div>
 
 <div class="merchant-list" *ngIf="!loading && !bPayment && !(places && places.length > 0) && inRange">
-  <!-- <app-merchant-grid [merchants]="merchants" [origin]="location"></app-merchant-grid> -->
   <app-merchant-list *ngIf="!loading && !bPayment && !(places && places.length > 0) && inRange"
     [merchants]="merchants" [origin]="location">
   </app-merchant-list>
@@ -45,13 +42,6 @@
   <div class="map-info-row">
     <div class="map-info-text" i18n="@@MapHint">Sorry, the address is not in our service range.</div>
   </div>
-  <button mat-raised-button *ngIf="!inRange" class="row option-item no-free not-in-range-item" (click)="resetAddress()">
-    <div class="col-12">
-      <div class="text-md">
-        <span i18n="@@NotInServiceRangeHint">Your address is not in our service range, please try another</span>
-      </div>
-    </div>
-  </button>
 </div>
 
 <app-footer [type]="'menu'" [menu]="'home'"></app-footer>

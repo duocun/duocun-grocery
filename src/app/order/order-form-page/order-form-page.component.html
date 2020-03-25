@@ -11,7 +11,7 @@
     <div class="contact-block" *ngIf="account">
       <div class="title-md">
         <div class="label">
-          <span i18n="@@DeliverDate">Delivery Date</span>:
+          <span i18n="@@OrderDate">Order Date</span>:
         </div>
         <span class="date">{{ delivery.date | date: 'yyyy-MM-dd'}} </span>
         <!-- <span class="time">11:45~13:00</span> -->
@@ -47,7 +47,7 @@
       </div>
     </div>
 
-    <div class="payment-method-block">
+    <div class="payment-method-block" #cc>
       <div class="row label-sm">
         <span i18n="@@PaymentMethod">Payment Method</span>:
       </div>
@@ -57,7 +57,8 @@
 
       <div class="cash-note" *ngIf="paymentMethod===PaymentMethod.CASH" i18n="@@PayCashNote">*Pay in cash upon delivery</div>
 
-      <app-credit-card-form *ngIf="paymentMethod===PaymentMethod.CREDIT_CARD" (init)="onCreditCardFormInit($event)"></app-credit-card-form>
+      <app-credit-card-form *ngIf="paymentMethod===PaymentMethod.CREDIT_CARD" 
+        (init)="onCreditCardFormInit($event)" (focus)="onCreditCardInputFocus()"></app-credit-card-form>
     </div>
 
     <div class="row warning-block">
@@ -75,7 +76,7 @@
         <textarea name="note" formControlName="note"></textarea>
       </div>
     </div>
-    <input id="btn-submit" [disabled]="!bSubmitted" type="submit" name="submitBtn" value="Submit">
+    <input id="btn-submit" [disabled]="bSubmitted" type="submit" name="submitBtn" value="Submit">
   </form>
 </div>
 

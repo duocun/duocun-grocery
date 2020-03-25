@@ -1582,7 +1582,7 @@
       </trans-unit>
       <trans-unit id="DeliverWarning" datatype="html">
         <source>If you are in condo or office building, Please pickup the food at the hall, we will not enter the building. For downtown we will stop at the road side near the building.</source>
-        <target>*如果你在公寓楼或办公楼请在大楼门口取餐，我们无法上楼送货。</target>
+        <target>*如果你在公寓楼请在大楼门口取，我们不送上楼。</target>
         <context-group purpose="location">
           <context context-type="sourcefile">app/account/account-page.component.ts</context>
           <context context-type="linenumber">19</context>
@@ -1590,7 +1590,7 @@
       </trans-unit>
       <trans-unit id="PhoneWarning" datatype="html">
         <source>Please turn on your phone to answering status.</source>
-        <target>**请将您的电话保持在接听状态，以便联系。</target>
+        <target>**电话请保持接听状态。</target>
         <context-group purpose="location">
           <context context-type="sourcefile">app/account/account-page.component.ts</context>
           <context context-type="linenumber">19</context>

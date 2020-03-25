@@ -7,11 +7,6 @@ import { MatTableModule } from '@angular/material/table';
 import { MatSortModule } from '@angular/material/sort';
 import { MatButtonToggleModule } from '@angular/material/button-toggle';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
-
-import { LoginFormComponent } from './login-form/login-form.component';
-import { SignupComponent } from './signup/signup.component';
-import { ForgetPasswordComponent } from './forget-password/forget-password.component';
-import { ProfileFormComponent } from './profile-form/profile-form.component';
 import { AccountRoutingModule } from './account-routing.module';
 import { AccountService } from './account.service';
 import { AuthService } from './auth.service';
@@ -46,10 +41,6 @@ import { PaymentModule } from '../payment/payment.module';
   exports: [
   ],
   declarations: [
-    LoginFormComponent,
-    SignupComponent,
-    ForgetPasswordComponent,
-    ProfileFormComponent,
     AccountPageComponent,
     BalancePageComponent,
     AddCreditPageComponent,

@@ -2,15 +2,17 @@ const http = require('http');
 const express = require('express')
 const path = require('path')
 const fs = require('fs');
-const cfg = JSON.parse(fs.readFileSync('../../duocun.cfg.json','utf8'));
+const compression = require('compression')
+
+const cfg = JSON.parse(fs.readFileSync('../duocun.cfg.json','utf8'));
 const APP_SERVER = cfg.GROCERY_SERVER;
 
 const app = express()
-
+// app.use(compression())
 
 // body-parser does not handle multipart bodies
 var bodyParser = require('body-parser');
-var cookieParser = require('cookie-parser');
+// var cookieParser = require('cookie-parser');
 
 //parse application/x-www-form-urlencoded
 app.use(bodyParser.urlencoded({ extended: false, limit: '1mb' }));

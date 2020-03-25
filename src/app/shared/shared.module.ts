@@ -8,7 +8,6 @@ import { MatDialogModule } from '@angular/material/dialog';
 import { MatButtonModule } from '@angular/material/button';
 
 import { ImageViewerComponent } from './image-viewer/image-viewer.component';
-import { FeedbackComponent } from './feedback/feedback.component';
 import { MapComponent } from './map/map.component';
 
 import { SharedService } from './shared.service';
@@ -18,7 +17,6 @@ import { WarningDialogComponent } from './warning-dialog/warning-dialog.componen
 import { AddressInputComponent } from './address-input/address-input.component';
 import { ProgressSpinnerComponent } from './progress-spinner/progress-spinner.component';
 import { LocationService } from '../location/location.service';
-import { DateSelectComponent } from './date-select/date-select.component';
 import { PaymentSelectComponent } from './payment-select/payment-select.component';
 import { VerticalTabComponent } from './vertical-tab/vertical-tab.component';
 import { FooterComponent } from './footer/footer.component';
@@ -35,13 +33,11 @@ import { QuantityInputComponent } from './quantity-input/quantity-input.componen
   ],
   declarations: [
     ImageViewerComponent,
-    FeedbackComponent,
     MapComponent,
     AddressAutocompleteComponent,
     WarningDialogComponent,
     AddressInputComponent,
     ProgressSpinnerComponent,
-    DateSelectComponent,
     PaymentSelectComponent,
     VerticalTabComponent,
     FooterComponent,
@@ -55,13 +51,11 @@ import { QuantityInputComponent } from './quantity-input/quantity-input.componen
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
   exports: [
     ImageViewerComponent,
-    FeedbackComponent,
     MapComponent,
     AddressAutocompleteComponent,
     WarningDialogComponent,
     AddressInputComponent,
     ProgressSpinnerComponent,
-    DateSelectComponent,
     PaymentSelectComponent,
     VerticalTabComponent,
     FooterComponent,

@@ -206,8 +206,9 @@ export class PhoneVerifyDialogComponent implements OnInit, OnDestroy {
         self.verified = r.verified;
         if (r.err === VerificationError.NONE) {
           const account = r.account;
+          const paymentMethod = this.data.paymentMethod;
           self.authSvc.setAccessTokenId(r.tokenId);
-          self.dialogRef.close(account);
+          self.dialogRef.close({account, paymentMethod});
         } else if (r.err === VerificationError.REQUIRE_SIGNUP) {
           self.phoneMatchedAccount = r.account; // display signup button
         } else {
@@ -295,13 +296,14 @@ export class PhoneVerifyDialogComponent implements OnInit, OnDestroy {
     const self = this;
     const phone = this.form.value.phone;
     const code = this.form.value.verificationCode;
+    const paymentMethod = this.data.paymentMethod;
     if (phone && code) {
       this.accountSvc.signup(phone, code).pipe(takeUntil(this.onDestroy$)).subscribe((tokenId: any) => {
         if (tokenId) {
           self.authSvc.setAccessTokenId(tokenId);
           self.accountSvc.getCurrentAccount().pipe(takeUntil(this.onDestroy$)).subscribe((account: IAccount) => {
             if (account) {
-              self.dialogRef.close(account);
+              self.dialogRef.close({account, paymentMethod});
               // self.rx.dispatch({ type: AccountActions.UPDATE, payload: account });
             }
             this.snackBar.open('', 'Signup successful', { duration: 1000 });
