@@ -11,7 +11,7 @@ import { LocationService } from '../../location/location.service';
 import { AuthService } from '../auth.service';
 import { IAccount } from '../account.model';
 
-declare var WeixinJSBridge;
+
 
 @Component({
   selector: 'app-account-page',
@@ -79,11 +79,7 @@ export class AccountPageComponent implements OnInit, OnDestroy {
   }
 
   logout() {
-    this.authSvc.removeCookies();
-    if (WeixinJSBridge) {
-      WeixinJSBridge.call('closeWindow');
-    }
-    // this.rx.dispatch({ type: AccountActions.LOGOUT, payload: null });
+    this.accountSvc.quitSystem();
   }
 
   toBalancePage() {

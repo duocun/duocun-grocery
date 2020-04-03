@@ -18,7 +18,6 @@ import { OrderService } from '../order/order.service';
 import { TransactionService } from '../transaction/transaction.service';
 import { AddCreditPageComponent } from './add-credit-page/add-credit-page.component';
 import { PaginatePipe, NgxPaginationModule } from '../../../node_modules/ngx-pagination';
-import { AddressFormDialogComponent } from './address-form-dialog/address-form-dialog.component';
 import { PaymentModule } from '../payment/payment.module';
 
 @NgModule({
@@ -44,7 +43,6 @@ import { PaymentModule } from '../payment/payment.module';
     AccountPageComponent,
     BalancePageComponent,
     AddCreditPageComponent,
-    AddressFormDialogComponent
   ],
   providers: [
     AccountService,

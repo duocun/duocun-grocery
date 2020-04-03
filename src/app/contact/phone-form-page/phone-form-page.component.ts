@@ -142,31 +142,31 @@ export class PhoneFormPageComponent implements OnInit, OnDestroy {
   }
 
   onVerificationCodeInput(e) {
-    const self = this;
-    let phone: string = this.form.value.phone;
-    phone = phone.substring(0, 2) === '+1' ? phone.substring(2) : phone;
-    phone = phone.match(/\d+/g).join('');
+    // const self = this;
+    // let phone: string = this.form.value.phone;
+    // phone = phone.substring(0, 2) === '+1' ? phone.substring(2) : phone;
+    // phone = phone.match(/\d+/g).join('');
 
-    if (e.target.value && e.target.value.length === 4) {
-      const code = e.target.value;
-      this.accountSvc.verifyCode(phone, code).pipe(takeUntil(this.onDestroy$)).subscribe(verified => {
-        this.verified = verified;
-        if (verified) {
-          // if (self.countDown) {
-          //   clearInterval(self.countDown);
-          // }
-          setTimeout(() => {
-            if (self.verified) {
-              self.router.navigate(['account/settings']);
-            } else {
-              // pass
-            }
-          }, 1200);
-        }
-      });
-    } else {
-      this.verified = false;
-    }
+    // if (e.target.value && e.target.value.length === 4) {
+    //   const code = e.target.value;
+    //   this.accountSvc.verifyCode(phone, code).pipe(takeUntil(this.onDestroy$)).subscribe(verified => {
+    //     this.verified = verified;
+    //     if (verified) {
+    //       // if (self.countDown) {
+    //       //   clearInterval(self.countDown);
+    //       // }
+    //       setTimeout(() => {
+    //         if (self.verified) {
+    //           self.router.navigate(['account/settings']);
+    //         } else {
+    //           // pass
+    //         }
+    //       }, 1200);
+    //     }
+    //   });
+    // } else {
+    //   this.verified = false;
+    // }
   }
 
   sendVerify() {
@@ -202,7 +202,7 @@ export class PhoneFormPageComponent implements OnInit, OnDestroy {
     // tslint:disable-next-line:no-shadowed-variable
     return new Promise((resolve, reject) => {
       // First time there is not token, api call do not allowed
-      this.accountSvc.sendVerifyMsg(accountId, phone, lang).pipe(takeUntil(this.onDestroy$)).subscribe((tokenId: string) => {
+      this.accountSvc.sendVerifyMsg(accountId, phone, lang).toPromise().then((tokenId: string) => {
         this.snackBar.open('', successHint, { duration: 1000 });
         this.bGettingCode = true;
         if (tokenId) { // to allow api call

@@ -12,9 +12,7 @@ import * as Cookies from 'js-cookie';
 import { MatSnackBar } from '../../../../node_modules/@angular/material';
 import { DeliveryActions } from '../../delivery/delivery.actions';
 import { IDeliveryAction } from '../../delivery/delivery.reducer';
-import { IMerchant } from '../../merchant/merchant.model';
-import { IMall } from '../../mall/mall.model';
-import { IRange } from '../../range/range.model';
+
 import { CommandActions } from '../../shared/command.actions';
 import { IAccount } from '../../account/account.model';
 import { environment } from '../../../environments/environment';
@@ -39,8 +37,6 @@ export class AddressFormPageComponent implements OnInit, OnDestroy {
   mapCenter;
   suggestAddressList;
   historyAddressList;
-  malls: IMall[];
-  availableRanges: IRange[];
   lang = environment.language;
   onSchedule;
 
@@ -162,12 +158,6 @@ export class AddressFormPageComponent implements OnInit, OnDestroy {
     });
   }
 
-
-
-  getDistance(ds: IDistance[], mall: IMall) {
-    const d = ds.find(r => r.destinationPlaceId === mall.placeId);
-    return d ? d.element.distance.value : 0;
-  }
 
   onCancel() {
     const self = this;

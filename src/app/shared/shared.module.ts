@@ -13,12 +13,10 @@ import { MapComponent } from './map/map.component';
 import { SharedService } from './shared.service';
 import { AddressAutocompleteComponent } from './address-autocomplete/address-autocomplete.component';
 import { EntityService } from '../entity.service';
-import { WarningDialogComponent } from './warning-dialog/warning-dialog.component';
 import { AddressInputComponent } from './address-input/address-input.component';
 import { ProgressSpinnerComponent } from './progress-spinner/progress-spinner.component';
 import { LocationService } from '../location/location.service';
 import { PaymentSelectComponent } from './payment-select/payment-select.component';
-import { VerticalTabComponent } from './vertical-tab/vertical-tab.component';
 import { FooterComponent } from './footer/footer.component';
 import { QuantityInputComponent } from './quantity-input/quantity-input.component';
 @NgModule({
@@ -35,11 +33,9 @@ import { QuantityInputComponent } from './quantity-input/quantity-input.componen
     ImageViewerComponent,
     MapComponent,
     AddressAutocompleteComponent,
-    WarningDialogComponent,
     AddressInputComponent,
     ProgressSpinnerComponent,
     PaymentSelectComponent,
-    VerticalTabComponent,
     FooterComponent,
     QuantityInputComponent
   ],
@@ -53,11 +49,9 @@ import { QuantityInputComponent } from './quantity-input/quantity-input.componen
     ImageViewerComponent,
     MapComponent,
     AddressAutocompleteComponent,
-    WarningDialogComponent,
     AddressInputComponent,
     ProgressSpinnerComponent,
     PaymentSelectComponent,
-    VerticalTabComponent,
     FooterComponent,
     QuantityInputComponent
   ]

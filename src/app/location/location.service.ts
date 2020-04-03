@@ -283,7 +283,7 @@ export class LocationService extends EntityService {
 
   // ---------------------------------
   // return --- km
-  // get surface distance between current location and restaurant
+  // get surface distance between current location and merchant
   getDirectDistance(center: ILatLng, location: ILatLng) {
     const lat1 = center.lat;
     const lng1 = center.lng;

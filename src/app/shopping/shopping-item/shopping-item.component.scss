@@ -43,6 +43,10 @@
         font-weight:500;
       }
 
+      .product-name{
+        font-size: 16px;
+        font-weight:300;
+      }
       .order-row{
         padding-top: 6px;
 
@@ -51,13 +55,15 @@
           padding-right: 0px;
           font-size:18px;
           font-weight:400;
-          color: $red;
+          // color: $red;
         }
 
         .quantity-col{
-          padding: 0px 2px;
+          padding: 0px 15px 0px 0px;
 
           .quantity{
+            color: $red;
+            font-size: 24px;
             text-align: right;
           }
         }

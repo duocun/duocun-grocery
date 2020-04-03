@@ -1,5 +1,4 @@
 import { Product } from '../product/product.model';
-import { Picture } from '../picture.model';
 import { Address } from '../account/account.model';
 import { GeoPoint } from '../location/location.model';
 import { Order } from '../order/order.model';
@@ -44,7 +43,7 @@ export interface IMerchant {
   order?: number;
   products?: Product[];
   orders?: Order[];
-  pictures?: Picture[];
+  pictures?: any[];
   address?: Address;
   onSchedule?: boolean;
 
@@ -68,7 +67,7 @@ export class Restaurant implements IMerchant {
   isClosed?: boolean; // do not save to database
   dow?: string; // day of week opening, eg. '1,2,3,4,5'
   products: Product[];
-  pictures: Picture[];
+  pictures: any[];
   address: Address;
   order?: number;
 

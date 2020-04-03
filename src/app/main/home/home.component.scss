@@ -30,27 +30,7 @@ $spinner-opacity: 0.8;
 }
 
 
-// global
-.loading-spinner{
-  // width: 100%;
-  // height: 100%;
-  // position: absolute;
-  // top: 0px;
-  // left: 0px;
-  // z-index: 9999;
 
-  mat-spinner{
-    margin-left: auto;
-    margin-right: auto;
-  }
-
-  .loading-text{
-    width: 90px;
-    font-size: 14px;
-    padding-top: 25px;
-    margin: auto;
-  }
-}
 
 .map-info-row{
   height: $map-info-height;
@@ -78,6 +58,10 @@ $spinner-opacity: 0.8;
   }
 }
 
+.location-list{
+  padding:5px 10px;
+}
+
 .option-item{
   width: 100%;
   height: 85px;
@@ -99,68 +83,20 @@ $spinner-opacity: 0.8;
   }
 }
 
-.header-block{
-  position: fixed;
-  top: 0px;
-  left: 0px;
+img{
+  width: 120px;
+  height: 120px;
+}
+.text-xs{
+  font-size: 9px;
+  color: #333;
+  padding-top:4px;
+}
+
+.address-search-block {
+  margin: 0px;
+  padding: 10px;
   width: 100%;
-  background: white;
-
-  .left-col{
-    float: left;
-    width: 60%;
-  }
-  .right-col{
-    float: left;
-    width: 40%;
-    display: block;
-    padding-left: 50px;
-    img{
-      width: 120px;
-      height: 120px;
-    }
-    .text-xs{
-      font-size: 9px;
-      color: #333;
-      padding-top:4px;
-    }
-  }
-
-  .banner, .banner-up{
-    background: #aaa;
-
-    .address-search-block {
-      margin: 0px;
-      width: 100%;
-    }
-
-    .ad-block{
-      padding: 8px 14px;
-      width: 100%;
-      height: $ad-height;
-      font-size: 14px;
-      img {
-        width: 100%;
-        height: $ad-height;
-      }
-    }
-
-    .date-block{
-      width: 100%;
-      margin: 0px;
-      padding: 0px 10px;
-    }
-  }
-
-  .banner{
-    height: $banner-height;
-    // height: $address-search-h + $ad-height + $date-btn-height;
-  }
-
-  .banner-up{
-    height: $banner-height;
-    // height: $address-search-h + $ad-height;
-  }
 }
 
 .merchant-list{
@@ -177,31 +113,6 @@ app-location-list{
   height: calc(100% - 58px - 61px);
 }
 
-
-.branding-block{
-  padding-top: 180px;
-  width: 50%;
-  float: left;
-
-  .background-img{
-    width: 126px;
-    margin-left: auto;
-    margin-right: auto;
-    img {
-      width: 126px;
-    }
-  }
-}
-
-.qrcode-block{
-  float: left;
-  width: 50%;
-  padding-top: 170px;
-
-  img {
-    width: 200px;
-  }
-}
 
 .slogan{
   width: 100%;
@@ -294,47 +205,6 @@ and (orientation: landscape) {
     top: $address-search-h;
     width: 100%;
     height: calc(100% - #{$navbar-h} - #{$address-search-h} - #{$bottom-bar-h});
-  }
-
-  .header-block{
-    .left-col{
-      width: 100%;
-      height: 100%;
-    }
-    .right-col{
-      width: 0px;
-      display: none;
-    }
-    .banner, .banner-up{
-      background:white;
-      padding: 8px;
-
-      .ad-block{
-        height: 0px;
-        padding: 4px 14px;
-      }
-    }
-
-    .banner{
-      height: $address-search-h + $ad-height + $date-btn-height;
-    }
-    .banner-up{
-      height: $address-search-h + $ad-height;
-    }
-  }
-
-  .branding-block{
-    width: 100%;
-    .background-img{
-      width: 70px;
-      img {
-        width: 70px;
-      }
-    }
-  }
-
-  .qrcode-block{
-    display: none;
   }
 
   .pac-container{

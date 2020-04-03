@@ -1,4 +1,4 @@
-<div class="place-option-list" *ngIf="places && places.length>0">
+<div class="option-list" *ngIf="places && places.length>0">
   <div class="list-content">
     <div *ngFor="let place of places" class="row option-item" (click)="onSelectPlace(place)">
       <div class="col-11" *ngIf="place">

@@ -10,10 +10,11 @@ import { CartActions } from '../cart.actions';
 import { CartService } from '../cart.service';
 import { MerchantScheduleService } from '../../merchant/merchant-schedule.service';
 import { AreaService } from '../../area/area.service';
+import { DeliveryService } from '../../delivery/delivery.service';
+import { MerchantService } from '../../merchant/merchant.service';
+import { resolve } from '../../../../node_modules/@types/q';
 
-const BASE_TIME = '23:59:00.000Z';
 const baseTimeList = ['11:00'];
-const ADVANCE_OFFSET = 1; // 2 days
 export const AppType = {
   FOOD_DELIVERY: 'F',
   GROCERY: 'G',
@@ -36,12 +37,14 @@ export class DeliveryPageComponent implements OnInit {
   inRange = true;
   areas;
   schedule;
-
+  loading = false;
   constructor(
     private productSvc: ProductService,
+    private merchantSvc: MerchantService,
     private merchantScheduleSvc: MerchantScheduleService,
     private cartSvc: CartService,
     private areaSvc: AreaService,
+    private deliverySvc: DeliveryService,
     private router: Router,
     private route: ActivatedRoute,
     private rx: NgRedux<IAppState>
@@ -61,33 +64,24 @@ export class DeliveryPageComponent implements OnInit {
   }
 
   ngOnInit() {
+    this.loading = true;
     this.route.params.pipe(takeUntil(this.onDestroy$)).subscribe(params => {
       const productId = params['id'];
       this.monunt(productId, this.cart).then(() => {
-
+        this.loading = false;
       });
     });
   }
 
-  // baseList --- moment object
+  // baseList --- ['2020-03-24']
   // baseTimeList eg. ['11:20']
   // return [{ date, time, quantity }];
-  getDeliverySchedule(bs) {
-    const baseList = bs.map(baseDate => baseDate.format('YYYY-MM-DD'));
-    const list = [];
-    if (baseList && baseList.length > 0) {
-      for (let i = 0; i < 30; i++) {
-        const dateList = baseList.map(b => moment(b).add(7 * i, 'days').format('YYYY-MM-DD'));
-        dateList.map(d => {
-          baseTimeList.map(t => {
-            // const taxRate = product.taxRate !== null ? product.taxRate : 0;
-            list.push({ date: d, time: t, quantity: 0 }); // , quantity:0, price: product.price, cost: product.cost, taxRate });
-          });
-        });
-      }
-      return list;
+  getDeliverySchedule(merchant, baseList, deliverTimeList) {
+    if (merchant.delivers) {
+      const myDateTime = moment.utc().format('YYYY-MM-DD HH:mm:ss');
+      return this.deliverySvc.getSpecialSchedule(myDateTime, merchant.delivers);
     } else {
-      return list;
+      return this.deliverySvc.getDeliverySchedule(baseList, deliverTimeList);
     }
   }
 
@@ -126,44 +120,41 @@ export class DeliveryPageComponent implements OnInit {
   }
 
   // n -- dow
-  getBaseDate(n) {
-    const today = moment().format('YYYY-MM-DD');
-    const dt = today + 'T' + BASE_TIME;
-    const lastDow = moment(dt).day(n - 7);
-    const dow = moment(dt).day(n);
-    const nextDow = moment(dt).day(n + 7);
+  getBaseDateList(orderEndList, deliverDowList) {
+    const myDateTime = moment().format('YYYY-MM-DDTHH:mm:ss') + '.000Z';
 
-    const d = moment().add(ADVANCE_OFFSET, 'days');
-    if (d.isAfter(lastDow) && d.isSameOrBefore(dow)) {
-      return dow;
-    } else if (d.isAfter(dow) && d.isSameOrBefore(nextDow)) {
-      return nextDow;
-    } else {
-      return nextDow;
-    }
+    const bs = this.deliverySvc.getBaseDateList(myDateTime, orderEndList, deliverDowList);
+    return bs.map(b => b.toISOString());
+    // return this.deliverySvc.getBaseDate(n, BASE_TIME, ADVANCE_OFFSET, myDateTime);
   }
 
   monunt(productId, cart) {
     return new Promise((_resolve, reject) => {
       this.productSvc.getById(productId, ['_id', 'name', 'price', 'cost', 'taxRate', 'merchantId']).then((product: any) => {
         const merchantId = product.merchantId;
-        const location = this.location;
-        this.product = product;
-        this.merchantScheduleSvc.getAvailableSchedules(merchantId, location).then((rs: any[]) => {
-          if (rs && rs.length > 0) {
-
-            const dows = rs && rs.length > 0 ? rs.map(r => +r.deliver.dow) : [];
-            const bs = dows.length > 0 ? dows.map(dow => this.getBaseDate(dow)) : [];
-            this.inRange = true;
-            this.schedule = this.getDeliverySchedule(bs);
-            this.deliveries = this.mergeQuantity(this.schedule, cart, productId);
-            this.amount = this.cartSvc.getTotalPrice(cart);
-          } else {
-            this.areaSvc.quickFind({ appType: AppType.GROCERY }).then(areas => {
-              this.inRange = false;
-              this.areas = areas;
-            });
-          }
+        this.merchantSvc.quickFind({ _id: merchantId }).then((ms) => {
+          const merchant = ms[0];
+          const orderEndList = merchant.rules.map(r => r.orderEnd);
+          const location = this.location;
+          this.product = product;
+          this.merchantScheduleSvc.getAvailableSchedules(merchantId, location).then((schedules: any[]) => {
+            if (schedules && schedules.length > 0) {
+              const dows = schedules[0].rules.map(r => +r.deliver.dow);
+              // const bs = dows.length > 0 ? dows.map(dow => this.getBaseDate(dow)) : [];
+              const bs = this.getBaseDateList(orderEndList, dows);
+              this.inRange = true;
+              this.schedule = this.getDeliverySchedule(merchant, bs, baseTimeList);
+              this.deliveries = this.mergeQuantity(this.schedule, cart, productId);
+              this.amount = this.cartSvc.getTotalPrice(cart);
+              _resolve();
+            } else {
+              this.areaSvc.quickFind({ appType: AppType.GROCERY }).then(areas => {
+                this.inRange = false;
+                this.areas = areas;
+                _resolve();
+              });
+            }
+          });
         });
       });
     });

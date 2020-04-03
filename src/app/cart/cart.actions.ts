@@ -4,7 +4,7 @@ export class CartActions {
   static REMOVE_FROM_CART = 'REMOVE_FROM_CART';
   static UPDATE_QUANTITY = 'UPDATE_QUANTITY';
   static CLEAR_CART = 'CLEAR_CART';
-  static UPDATE_FROM_CHANGE_ORDER = 'UPDATE_CART_FROM_CHANGE_ORDER'; // clear the items from the same restaurant and re-add items
+  static UPDATE_FROM_CHANGE_ORDER = 'UPDATE_CART_FROM_CHANGE_ORDER'; // clear the items from the same merchant and re-add items
 
 }
 

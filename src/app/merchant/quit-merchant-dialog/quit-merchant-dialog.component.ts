@@ -5,6 +5,7 @@ import { IAppState } from '../../store';
 import { CartActions } from '../../cart/cart.actions';
 import { Router} from '@angular/router';
 import { Subject } from '../../../../node_modules/rxjs';
+import { MerchantActions } from '../merchant.actions';
 
 export interface IDialogData {
   merchantId: string;
@@ -14,16 +15,16 @@ export interface IDialogData {
 }
 
 @Component({
-  selector: 'app-quit-restaurant-dialog',
-  templateUrl: './quit-restaurant-dialog.component.html',
-  styleUrls: ['./quit-restaurant-dialog.component.scss']
+  selector: 'app-quit-merchant-dialog',
+  templateUrl: './quit-merchant-dialog.component.html',
+  styleUrls: ['./quit-merchant-dialog.component.scss']
 })
-export class QuitRestaurantDialogComponent implements OnInit, OnDestroy {
+export class QuitMerchantDialogComponent implements OnInit, OnDestroy {
   onDestroy$ = new Subject();
   constructor(
     private rx: NgRedux<IAppState>,
     private router: Router,
-    public dialogRef: MatDialogRef<QuitRestaurantDialogComponent>,
+    public dialogRef: MatDialogRef<QuitMerchantDialogComponent>,
     @Inject(MAT_DIALOG_DATA) public data: IDialogData
   ) { }
 
@@ -38,7 +39,8 @@ export class QuitRestaurantDialogComponent implements OnInit, OnDestroy {
   onLeave() {
     this.dialogRef.close({action: 'leave'});
     this.rx.dispatch({ type: CartActions.CLEAR_CART, payload: [] });
-    this.router.navigate(['merchant/list/' + this.data.merchantId + '/' + this.data.onSchedule]); // !!! used for close dialog
+    this.rx.dispatch({ type: MerchantActions.CLEAR_MERCHANT, payload: null});
+    this.router.navigate(['merchant/list/' + this.data.merchantId]); // !!! used for close dialog
 
     setTimeout(() => {
       this.router.navigate(['main/home']);
@@ -55,8 +57,8 @@ export class QuitRestaurantDialogComponent implements OnInit, OnDestroy {
   }
 
   onStay() {
-    this.dialogRef.close({action: 'stay', targetUrl: this.data.targetUrl});
-    this.router.navigate(['merchant/list/' + this.data.merchantId + '/' + this.data.onSchedule]);
+    this.dialogRef.close({action: 'stay'});
+    this.router.navigate(['merchant/list/' + this.data.merchantId]);
   }
 }
 

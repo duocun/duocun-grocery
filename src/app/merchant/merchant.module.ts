@@ -7,11 +7,10 @@ import { ProductModule } from '../product/product.module';
 import { MatTabsModule } from '@angular/material/tabs';
 import { MatDialogModule } from '../../../node_modules/@angular/material';
 import { CartModule } from '../cart/cart.module';
-import { QuitRestaurantDialogComponent } from './quit-restaurant-dialog/quit-restaurant-dialog.component';
+import { QuitMerchantDialogComponent } from './quit-merchant-dialog/quit-merchant-dialog.component';
 import { SharedModule } from '../shared/shared.module';
 import { AreaModule } from '../area/area.module';
 import { AreaService } from '../area/area.service';
-import { MerchantGridComponent } from './merchant-grid/merchant-grid.component';
 import { MerchantListComponent } from './merchant-list/merchant-list.component';
 import { ShoppingModule } from '../shopping/shopping.module';
 
@@ -19,8 +18,7 @@ import { ShoppingModule } from '../shopping/shopping.module';
 @NgModule({
   declarations: [
     MerchantDetailPageComponent,
-    QuitRestaurantDialogComponent,
-    MerchantGridComponent,
+    QuitMerchantDialogComponent,
     MerchantListComponent
   ],
   imports: [
@@ -38,10 +36,9 @@ import { ShoppingModule } from '../shopping/shopping.module';
     AreaService,
   ],
   exports: [
-    MerchantGridComponent,
     MerchantListComponent
   ],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
-  entryComponents: [QuitRestaurantDialogComponent]
+  entryComponents: [QuitMerchantDialogComponent]
 })
 export class MerchantModule { }

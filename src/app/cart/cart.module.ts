@@ -9,6 +9,7 @@ import { CartService } from './cart.service';
 import { DeliveryPageComponent } from './delivery-page/delivery-page.component';
 import { DeliveryItemComponent } from './delivery-item/delivery-item.component';
 import { AreaService } from '../area/area.service';
+import { DeliveryService } from '../delivery/delivery.service';
 
 @NgModule({
   imports: [
@@ -26,7 +27,8 @@ import { AreaService } from '../area/area.service';
   providers: [
     AccountService,
     CartService,
-    AreaService
+    AreaService,
+    DeliveryService,
   ]
 })
 export class CartModule { }

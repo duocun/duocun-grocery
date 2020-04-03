@@ -15,6 +15,8 @@ import { EntityService, HttpStatus } from '../entity.service';
 import * as Cookies from 'js-cookie';
 const COOKIE_EXPIRY_DAYS = 7;
 
+declare var WeixinJSBridge;
+
 export interface IAccessToken {
   'id'?: string;
   'ttl'?: number;
@@ -43,14 +45,9 @@ export class AccountService extends EntityService {
     return this.doPost(url, { accountId: accountId, phone: phone, lang: lang });
   }
 
-  verifyAndLogin(phone: string, code: string, accountId: string): Observable<any> {
-    const url = this.url + '/verifyAndLogin';
+  verifyPhoneNumber(phone: string, code: string, accountId: string): Observable<any> {
+    const url = this.url + '/verifyPhoneNumber';
     return this.doPost(url, { code: code, phone: phone, accountId: accountId });
-  }
-
-  verifyCode(phone: string, code: string): Observable<any> {
-    const url = this.url + '/verifyCode';
-    return this.doPost(url, { code: code, phone: phone });
   }
 
   signup(phone: string, verificationCode: string): Observable<any> {
@@ -128,6 +125,13 @@ export class AccountService extends EntityService {
         }
       });
     });
+  }
+
+  quitSystem() {
+    this.authSvc.removeCookies();
+    if (WeixinJSBridge) {
+      WeixinJSBridge.call('closeWindow');
+    }
   }
 }
 

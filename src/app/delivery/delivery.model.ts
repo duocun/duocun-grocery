@@ -1,6 +1,5 @@
 import { IAccount } from '../account/account.model';
 import { ILocation } from '../location/location.model';
-import { IRange } from '../range/range.model';
 
 export interface IDeliveryTime {
   text?: string;
@@ -11,7 +10,7 @@ export interface IDeliveryTime {
 export interface IDelivery {
   origin?: ILocation; // client location
   destination?: ILocation; // mall location
-  availableRanges?: IRange[];
+  availableRanges?: any[];
   distance?: number; // m
   date?: any; // moment object
   dateType?: string;
@@ -21,7 +20,7 @@ export class Delivery implements IDelivery {
   id?: string;
   origin: ILocation;
   destination: ILocation;
-  availableRanges?: IRange[];
+  availableRanges?: any[];
   distance: number; // m
   date?: any; // moment object
   created?: Date;

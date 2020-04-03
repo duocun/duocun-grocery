@@ -1,7 +1,6 @@
-$bg-color: white;
-$border-color: #b1b1b1;
-$input-height: 39px;
-$icon-height: 24px;
+@import '../../../base';
+
+$icon-height: 30px;
 $btn-width: 39px;
 
 // Bootstrap's .modal z-index is by default 1050.
@@ -13,13 +12,15 @@ $btn-width: 39px;
 .address-input{
   input{
     width: calc(100% - #{$btn-width} - #{$btn-width});
-    height: $input-height;
+    height: $input-h;
     display: inline-block;
     border-right: none;
     border-left: none;
     background-color: $bg-color;
     padding-left: 0px;
     padding-right: 0px;
+    padding-top: 11px;
+    font-size: 14px;
   }
   ::placeholder { /* Chrome, Firefox, Opera, Safari 10.1+ */
     color: red;
@@ -33,8 +34,8 @@ button:focus {
 
 .back-btn, .clear-btn{
   width: $btn-width;
-  height: $input-height;
-  padding-top: 4px; // ($input-height - $icon-height)/2;
+  height: $input-h;
+  padding-top: ($input-h - $icon-height)/2;
   border: 1px solid $border-color;
   background-color: $bg-color;
 }

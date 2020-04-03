@@ -1,15 +1,17 @@
-
+<div class="loading-spinner" *ngIf="loading">
+  <app-progress-spinner></app-progress-spinner>
+</div>
 <app-map *ngIf="!inRange" [location]="location" [center]="location" [zoom]="9" [areas]="areas"></app-map>
 
 <div class="page">
   <div class="title-block" *ngIf="product">{{product.name}}&nbsp;${{product.price}}</div>
   <div class="page-body">
-    <div *ngIf="inRange" class="text-md note-row">请选择送货时间和数量</div>
+    <div *ngIf="inRange && deliveries.length > 0" class="text-md note-row">请选择送货时间和数量</div>
 
-    <div *ngIf="inRange" class="delivery-list">
+    <div *ngIf="inRange && deliveries.length > 0" class="delivery-list">
       <app-delivery-item *ngFor="let d of deliveries" [delivery]="d" (change)="onDeliveryItemChange($event)"></app-delivery-item>
     </div>
   </div>
-  <!-- <div class="warning-text"*ngIf="!inRange">您的地址不在服务范围内。</div> -->
+  <div class="warning-text" *ngIf="!inRange || deliveries.length === 0">此商家暂停供应。</div>
   <app-footer [type]="'next'" [amount]="amount" (next)="onNext()"></app-footer>
 </div>

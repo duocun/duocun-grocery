@@ -67,6 +67,8 @@ export class BalancePageComponent implements OnInit, OnDestroy {
       return (this.lang === 'en' ? 'Cancel' : '取消') + toName;
     } else if (t.actionCode === TransactionAction.PAY_BY_CARD.code ) { // 'pay by card') {
       return (this.lang === 'en' ? 'by bank card' : '银行卡付款');
+    } else if (t.actionCode === TransactionAction.DECLINE_CREDIT_CARD.code ) { // 'bank card pay fail') {
+      return (this.lang === 'en' ? 'bank card pay fail' : '银行卡付款失败');
     } else if (t.actionCode === TransactionAction.PAY_BY_WECHAT.code ) { // 'pay by wechat') {
       return (this.lang === 'en' ? 'wechat pay' : '微信付款');
     } else if (t.actionCode === TransactionAction.ADD_CREDIT_BY_CASH.code ) { // 'client add credit by cash') {

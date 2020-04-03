@@ -17,14 +17,12 @@ import { RemoveOrderDialogComponent } from './remove-order-dialog/remove-order-d
 import { PaymentService } from '../payment/payment.service';
 import { MerchantService } from '../merchant/merchant.service';
 import { TransactionService } from '../transaction/transaction.service';
-import { MallService } from '../mall/mall.service';
 import { PaginatePipe, NgxPaginationModule } from '../../../node_modules/ngx-pagination';
 import { PhoneVerifyDialogComponent } from './phone-verify-dialog/phone-verify-dialog.component';
 import { CartService } from '../cart/cart.service';
 import { PaymentModule } from '../payment/payment.module';
 import { ChargeItemListComponent } from './charge-item-list/charge-item-list.component';
 import { ChargeSummaryComponent } from './charge-summary/charge-summary.component';
-
 @NgModule({
   imports: [
     CommonModule,
@@ -50,7 +48,6 @@ import { ChargeSummaryComponent } from './charge-summary/charge-summary.componen
     MerchantService,
     TransactionService,
     CartService,
-    MallService,
     PaginatePipe
   ],
   declarations: [

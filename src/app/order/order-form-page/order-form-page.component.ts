@@ -4,7 +4,6 @@ import { IAppState } from '../../store';
 import { Subject } from '../../../../node_modules/rxjs';
 import { takeUntil } from '../../../../node_modules/rxjs/operators';
 import { ICartItem } from '../../cart/cart.model';
-import { IMall } from '../../mall/mall.model';
 import { Router, ActivatedRoute } from '../../../../node_modules/@angular/router';
 import { FormBuilder } from '../../../../node_modules/@angular/forms';
 import { OrderService } from '../order.service';
@@ -18,13 +17,15 @@ import { LocationService } from '../../location/location.service';
 import { environment } from '../../../environments/environment';
 import { PaymentService } from '../../payment/payment.service';
 import { AccountService } from '../../account/account.service';
-import { PhoneVerifyDialogComponent, AccountType } from '../phone-verify-dialog/phone-verify-dialog.component';
+import { PhoneVerifyDialogComponent, AccountType, VerificationError } from '../phone-verify-dialog/phone-verify-dialog.component';
 import { CartActions } from '../../cart/cart.actions';
 import { IMerchant } from '../../merchant/merchant.model';
 import { PaymentMethod, PaymentError, PaymentStatus, AppType } from '../../payment/payment.model';
 import { SharedService } from '../../shared/shared.service';
 import * as moment from 'moment';
 import { ProductService } from '../../product/product.service';
+import { IApp } from '../../main/main.reducers';
+import { AuthService } from '../../account/auth.service';
 
 @Component({
   selector: 'app-order-form-page',
@@ -33,7 +34,6 @@ import { ProductService } from '../../product/product.service';
 })
 export class OrderFormPageComponent implements OnInit, OnDestroy {
   private onDestroy$ = new Subject<any>();
-  malls: IMall[] = [];
   form;
   account: IAccount;
   items: ICartItem[];
@@ -66,6 +66,19 @@ export class OrderFormPageComponent implements OnInit, OnDestroy {
   chargeItems;
   location;
   note;
+  appCode;
+
+  verified;
+  phoneMatchedAccount;
+  phoneForm;
+  bAllowVerify = false;
+  verifing = false;
+
+  get phone() { return this.phoneForm.get('phone'); }
+  get verificationCode() { return this.phoneForm.get('verificationCode'); }
+
+
+  @ViewChild('submitBtn', { static: true }) submitBtn: ElementRef;
   @ViewChild('cc', { static: true }) cc: ElementRef;
 
   constructor(
@@ -75,18 +88,25 @@ export class OrderFormPageComponent implements OnInit, OnDestroy {
     private route: ActivatedRoute,
     private productSvc: ProductService,
     private orderSvc: OrderService,
+    private authSvc: AuthService,
     private sharedSvc: SharedService,
     private locationSvc: LocationService,
     private accountSvc: AccountService,
     private paymentSvc: PaymentService,
     private snackBar: MatSnackBar,
-    public dialogSvc: MatDialog
+    public dialogSvc: MatDialog,
   ) {
     const self = this;
 
     this.form = this.fb.group({
       note: ['']
     });
+
+    this.phoneForm = this.fb.group({
+      phone: [''],
+      verificationCode: ['']
+    });
+
     this.fromPage = this.route.snapshot.queryParamMap.get('fromPage');
     this.action = this.route.snapshot.queryParamMap.get('action');
 
@@ -107,8 +127,12 @@ export class OrderFormPageComponent implements OnInit, OnDestroy {
       this.summary = this.getSummary(this.groups, 0);
     });
 
-    this.rx.select<IMerchant>('merchant').pipe(takeUntil(this.onDestroy$)).subscribe((m: IMerchant) => {
+    this.rx.select('merchant').pipe(takeUntil(this.onDestroy$)).subscribe((m: IMerchant) => {
       this.merchant = m;
+    });
+
+    this.rx.select('appState').pipe(takeUntil(this.onDestroy$)).subscribe((x: IApp) => {
+      self.appCode = x.code;
     });
   }
 
@@ -143,49 +167,27 @@ export class OrderFormPageComponent implements OnInit, OnDestroy {
       this.snackBar.open('', dupInfoHint, { duration: 1000 });
     } else if (err === PaymentError.BANK_CARD_FAIL || err === PaymentError.WECHATPAY_FAIL) {
       alert(payAlert);
-    } else {
-      // pass
+    } else if (err === PaymentError.BANK_AUTHENTICATION_REQUIRED) {
+      alert('此卡需要额外的认证');
+    } else if (err === PaymentError.BANK_INSUFFICIENT_FUND) {
+      alert('余额不足, 无法完成支付');
+    } else if (err === PaymentError.BANK_CARD_DECLIEND) {
+      alert('支付网关拒收');
     }
-  }
-  openPhoneVerifyDialog(): void {
-    const paymentMethod = this.paymentMethod;
-    const dialogRef = this.dialogSvc.open(PhoneVerifyDialogComponent, {
-      width: '300px',
-      data: {
-        title: 'Signup', content: '', buttonTextNo: '取消', buttonTextYes: '删除',
-        account: this.account, paymentMethod
-      },
-      panelClass: 'phone-verify-dialog'
-    });
-
-    dialogRef.afterClosed().pipe(takeUntil(this.onDestroy$)).subscribe(r => {
-      this.account = r.account;
-      if (r && r.account) {
-        this.doPay().then((rt: any) => {
-          // this.showError(rt.err);
-          this.loading = false;
-          this.bSubmitted = false;
-
-          if (rt.err === PaymentError.NONE) {
-            this.rx.dispatch({ type: CartActions.CLEAR_CART, payload: [] });
-            if (r.paymentMethod === PaymentMethod.WECHAT) {
-              window.location.href = rt.url;
-            } else {
-              this.router.navigate(['order/history']);
-            }
-          }
-        });
-      }
-    });
   }
 
   onCreditCardInputFocus() {
-    this.cc.nativeElement.scrollIntoView({ behavior: 'smooth', block: 'top' });
+    try {
+      this.cc.nativeElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    } catch (e) {
+
+    }
   }
 
   // click button
   onSubmitPay() {
-    document.getElementById('btn-submit').click();
+    // document.getElementById('btn-submit').click();
+    this.submitBtn.nativeElement.click();
   }
 
   onPay() {
@@ -205,14 +207,15 @@ export class OrderFormPageComponent implements OnInit, OnDestroy {
 
       // self.rangeSvc.getOverRange(origin).pipe(takeUntil(this.onDestroy$)).subscribe((r: any) => {
       // this.charge = this.getSummary(cart, merchant, (r.distance * r.rate), groupDiscount);
-      if (account.type === AccountType.TEMP || !account.phone) {
-        // For no logged in user who get the verification code, but didn't finish verify
+      if (account.type === AccountType.TEMP || !account.phone || !account.verified) {
         this.bSubmitted = false;
-        this.openPhoneVerifyDialog();
+        this.loading = false;
+        // setTimeout(() => {
+        self.openPhoneVerifyDialog(self.account, self.paymentMethod);
+        // }, 300);
       } else {
-        this.loading = true;
         self.doPay().then((rt: any) => {
-          // this.showError(rt.err);
+          this.showError(rt.err);
           this.loading = false;
           this.bSubmitted = false;
 
@@ -231,7 +234,7 @@ export class OrderFormPageComponent implements OnInit, OnDestroy {
     } else { // didn't login
       this.loading = false;
       this.bSubmitted = false;
-      this.openPhoneVerifyDialog();
+      this.openPhoneVerifyDialog(account, paymentMethod);
     }
   }
 
@@ -286,7 +289,7 @@ export class OrderFormPageComponent implements OnInit, OnDestroy {
         this.loading = true;
         const merchantId = this.merchant._id;
         const fields = ['_id', 'name', 'price', 'taxRate'];
-        this.productSvc.quickFind({ merchantId }, fields).then(products => {
+        this.productSvc.quickFind({ merchantId, status: 1 }, fields).then(products => {
           this.accountSvc.getCurrentAccount().pipe(takeUntil(this.onDestroy$)).subscribe(account => {
             const amount = this.summary.total;
             const paymentMethod = (account.balance >= amount) ? PaymentMethod.PREPAY : this.paymentMethod;
@@ -434,9 +437,11 @@ export class OrderFormPageComponent implements OnInit, OnDestroy {
 
     // tslint:disable-next-line:no-shadowed-variable
     return new Promise((resolve, reject) => {
+      this.loading = true;
       this.orderSvc.placeOrders(orders).pipe(takeUntil(this.onDestroy$)).subscribe(newOrders => {
         const balance = account && account.balance ? account.balance : 0;
         const payable = Math.round((amount - balance) * 100) / 100;
+
         if (payable > 0) {
           if (this.paymentMethod === PaymentMethod.CREDIT_CARD) {
             this.stripe.createPaymentMethod({
@@ -445,34 +450,37 @@ export class OrderFormPageComponent implements OnInit, OnDestroy {
               billing_details: { name: account.username }
             }).then(result => {
               if (result.error) {
+                this.loading = false;
                 // An error happened when collecting card details, show `result.error.message` in the payment form.
                 resolve({ err: PaymentError.INVALID_BANK_CARD });
               } else {
-                this.paymentSvc.payByCreditCard(AppType.GROCERY, account._id, account.username, newOrders, payable, note)
+                const paymentMethodId = result.paymentMethod.id;
+                this.paymentSvc.payByCreditCard(AppType.GROCERY, paymentMethodId, account._id, account.username, newOrders, payable, note)
                   .pipe(takeUntil(this.onDestroy$)).subscribe(rsp => {
+                    this.loading = false;
                     resolve(rsp);
                   });
               }
             });
           } else if (this.paymentMethod === PaymentMethod.WECHAT) {
-            this.paymentSvc.payBySnappay(AppType.GROCERY, account._id, account.username, newOrders, payable, note)
+            this.loading = false;
+            this.paymentSvc.payBySnappay(this.appCode, account._id, account.username, newOrders, payable, note)
               .pipe(takeUntil(this.onDestroy$)).subscribe(rsp => {
                 resolve(rsp);
               });
           } else { // PaymentMethod.CASH || PaymentMethod.PREPAY
+            this.loading = false;
             resolve({ err: PaymentError.NONE });
           }
         } else { // PaymentMethod.PREPAY
+          this.loading = false;
           resolve({ err: PaymentError.NONE });
         }
       });
     });
   }
 
-  onClosePhoneVerifyDialog() {
-    // this.setState({ bModal: false });
-    // this.submitOrder();
-  }
+
 
   onSelectPaymentMethod(paymentMethod) {
     this.paymentMethod = paymentMethod;
@@ -481,4 +489,216 @@ export class OrderFormPageComponent implements OnInit, OnDestroy {
   getTodayString() {
     return moment().format('YYYY-MM-DD');
   }
+
+
+  openPhoneVerifyDialog(account, paymentMethod): void {
+    // this.modalSvc.getModal('myModal').open();
+    const dialogRef = this.dialogSvc.open(PhoneVerifyDialogComponent, {
+      width: '300px',
+      data: {
+        title: 'Signup', content: '', buttonTextNo: '取消', buttonTextYes: '删除',
+        account, paymentMethod
+      },
+      panelClass: 'phone-verify-dialog'
+    });
+
+    dialogRef.afterClosed().pipe(takeUntil(this.onDestroy$)).subscribe(r => {
+      if (r && r.account) {
+        this.account = r.account;
+        this.doPay().then((rt: any) => {
+          this.showError(rt.err);
+          this.loading = false;
+          this.bSubmitted = false;
+
+          if (rt.err === PaymentError.NONE) {
+            this.rx.dispatch({ type: CartActions.CLEAR_CART, payload: [] });
+            if (r.paymentMethod === PaymentMethod.WECHAT) {
+              window.location.href = rt.url;
+            } else {
+              this.router.navigate(['order/history']);
+            }
+          }
+        });
+      } else {
+        alert('账号注册失败,下单没成功,请联系客服');
+      }
+    });
+  }
+
+
+  // verifyPhoneNumber(accountId: string, account: IAccount) {
+  //   if (accountId) {
+  //     if (account) {
+  //       // if (account.type === AccountType.TEMP) {
+  //       //   if (accountId === account._id) {
+  //       //     return VerificationError.NONE;
+  //       //   } else {
+  //       //     return VerificationError.PHONE_NUMBER_OCCUPIED;
+  //       //   }
+  //       // } else {
+  //       if (accountId === account._id) {
+  //         return VerificationError.NONE;
+  //       } else {
+  //         return VerificationError.PHONE_NUMBER_OCCUPIED;
+  //       }
+  //       // }
+  //     } else {
+  //       return VerificationError.NONE;
+  //     }
+  //   } else {
+  //     return VerificationError.NONE;
+  //   }
+  // }
+
+  // onPhoneInput(e) {
+  //   const self = this;
+  //   this.verified = false;
+  //   this.verificationCode.patchValue('');
+
+  //   if (e.target.value && e.target.value.length >= 10) {
+  //     let phone: string = this.phoneForm.value.phone;
+  //     phone = phone.substring(0, 2) === '+1' ? phone.substring(2) : phone;
+  //     phone = phone.match(/\d+/g).join('');
+
+  //     this.accountSvc.find({ phone: phone }).pipe(takeUntil(this.onDestroy$)).subscribe(accounts => {
+  //       const account = (accounts && accounts.length > 0) ? accounts[0] : null;
+  //       const accountId = this.account ? this.account._id : '';
+  //       const err = this.verifyPhoneNumber(accountId, account);
+
+  //       if (err === VerificationError.PHONE_NUMBER_OCCUPIED) {
+  //         const s = this.lang === 'en' ? 'This phone number has already bind to an wechat account, please try use wechat to login.' :
+  //           '该号码已经被一个英文版的账号使用，请使用英文版登陆; 如果想更改账号请联系客服。';
+  //         alert(s);
+  //         this.bAllowVerify = false;
+  //       } else {
+  //         this.bAllowVerify = true;
+  //       }
+  //     });
+  //   } else { // input less than 10 chars
+  //     this.bAllowVerify = false;
+  //     this.phoneMatchedAccount = null; // if phoneMatchedAccount.type === tmp,  display signup button
+  //   }
+  // }
+
+  // showErrorAlert(err) {
+  //   let s = '';
+  //   if (err === VerificationError.PHONE_NUMBER_OCCUPIED) {
+  //     s = this.lang === 'en' ? 'This phone number has already bind to an wechat account, please try use wechat to login.' :
+  //       '该号码已经被一个英文版的账号使用，请使用英文版登陆; 如果想更改账号请联系客服。';
+  //   } else if (err === VerificationError.WRONG_CODE) {
+  //     s = this.lang === 'en' ? 'verification code is wrong, please try again.' : '验证码错误，请重新尝试';
+  //   } else if (err === VerificationError.NO_PHONE_NUMBER_BIND) {
+  //     s = this.lang === 'en' ? 'login with phone number failed, please contact our customer service' :
+  //       '使用该电话号码登陆失败，请退出重新从公众号登陆';
+  //   }
+
+  //   if (s) {
+  //     alert(s);
+  //     // this.snackBar.open('', s, { duration: 1500 });
+  //   }
+  // }
+
+  // onVerificationCodeInput(e) {
+  //   const self = this;
+  //   let phone: string = this.phoneForm.value.phone;
+  //   phone = phone.substring(0, 2) === '+1' ? phone.substring(2) : phone;
+  //   phone = phone.match(/\d+/g).join('');
+
+  //   if (e.target.value && e.target.value.length === 4) {
+  //     const code = e.target.value;
+  //     const accountId = self.account ? self.account._id : '';
+  //     this.verifing = true;
+  //     this.accountSvc.verifyPhoneNumber(phone, code, accountId).pipe(takeUntil(this.onDestroy$)).subscribe((r: any) => {
+  //       self.verifing = false;
+  //       self.verified = r.verified;
+
+  //       if (r.err === VerificationError.NONE) {
+  //         const account = r.account;
+  //         const paymentMethod = this.paymentMethod;
+  //         self.authSvc.setAccessTokenId(r.tokenId);
+  //         self.onClosePhoneVerifyDialog({ account, paymentMethod });
+  //       } else if (r.err === VerificationError.REQUIRE_SIGNUP) {
+  //         self.phoneMatchedAccount = r.account; // display signup button
+  //       } else {
+  //         self.showErrorAlert(r.err);
+  //       }
+  //     });
+  //   } else {
+  //     this.verified = false;
+  //   }
+  // }
+
+  // sendVerify() {
+  //   if (this.bAllowVerify) {
+  //     const accountId: string = this.account ? this.account._id : '';
+  //     const successHint = this.lang === 'en' ? 'SMS Verification Code sent' : '短信验证码已发送';
+  //     const failedHint = this.lang === 'en' ? 'Account issue, please contact our customer service。' : '账号有问题，请联系客服';
+  //     const lang = this.lang;
+  //     let phone: string = this.phoneForm.value.phone;
+  //     phone = phone.substring(0, 2) === '+1' ? phone.substring(2) : phone;
+  //     phone = phone.match(/\d+/g).join('');
+  //     // this.resendVerify(phone).then(tokenId => {
+  //     //   this.bAllowVerify = true;
+  //     // });
+  //     this.accountSvc.sendVerifyMsg(accountId, phone, lang).toPromise().then((tokenId: string) => {
+  //       this.snackBar.open('', successHint, { duration: 1000 });
+  //       // this.bGettingCode = true;
+  //       if (tokenId) { // to allow api call
+  //         this.authSvc.setAccessTokenId(tokenId);
+  //       } else {
+  //         alert(failedHint);
+  //       }
+  //       this.bAllowVerify = true;
+  //     });
+  //   }
+  // }
+
+
+  // signup() {
+  //   const self = this;
+  //   const phone = this.phoneForm.value.phone;
+  //   const code = this.phoneForm.value.verificationCode;
+  //   const paymentMethod = this.paymentMethod;
+  //   if (phone && code) {
+  //     this.accountSvc.signup(phone, code).pipe(takeUntil(this.onDestroy$)).subscribe((tokenId: any) => {
+  //       if (tokenId) {
+  //         self.authSvc.setAccessTokenId(tokenId);
+  //         self.accountSvc.getCurrentAccount().pipe(takeUntil(this.onDestroy$)).subscribe((account: IAccount) => {
+  //           if (account) {
+  //             self.onClosePhoneVerifyDialog({ account, paymentMethod });
+  //             // self.rx.dispatch({ type: AccountActions.UPDATE, payload: account });
+  //           }
+  //           this.snackBar.open('', 'Signup successful', { duration: 1000 });
+  //         });
+  //       } else {
+
+  //       }
+  //     });
+  //   } else {
+  //     // fail to signup
+  //   }
+  // }
+
+  // onClosePhoneVerifyDialog(r) {
+  //   if (r && r.account) {
+  //     this.account = r.account;
+  //     this.doPay().then((rt: any) => {
+  //       this.showError(rt.err);
+  //       this.loading = false;
+  //       this.bSubmitted = false;
+
+  //       if (rt.err === PaymentError.NONE) {
+  //         this.rx.dispatch({ type: CartActions.CLEAR_CART, payload: [] });
+  //         if (r.paymentMethod === PaymentMethod.WECHAT) {
+  //           window.location.href = rt.url;
+  //         } else {
+  //           this.router.navigate(['order/history']);
+  //         }
+  //       }
+  //     });
+  //   } else {
+  //     alert('账号注册失败,下单没成功,请联系客服');
+  //   }
+  //   this.modalSvc.close('myModal');
+  // }
 }

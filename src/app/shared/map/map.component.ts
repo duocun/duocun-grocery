@@ -1,5 +1,4 @@
 import { Component, OnInit, Input, OnChanges } from '@angular/core';
-import { IRange } from '../../range/range.model';
 
 declare let google: any;
 
@@ -15,7 +14,7 @@ export class MapComponent implements OnInit, OnChanges {
   @Input() center: any;
   @Input() zoom: any;
   @Input() places: any[];
-  @Input() ranges: IRange[];
+  @Input() ranges: any[];
   @Input() areas: any[];
 
   constructor() { }

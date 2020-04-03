@@ -1,4 +1,3 @@
-import { Picture } from '../picture.model';
 import { IMerchant } from '../merchant/merchant.model';
 import { IAccount } from '../account/account.model';
 
@@ -21,8 +20,8 @@ export interface IProduct {
 
   openDays?: number[];
   restaurant?: IMerchant; // ??
-  category?: ICategory;
-  pictures?: Picture[];
+  category?: any;
+  pictures?: any[];
   dow?: string[];
   order?: number;
   status?: ProductStatus;
@@ -42,7 +41,7 @@ export class Product implements IProduct {
   cost?: number;
   merchantId: string;
   categoryId: string;
-  pictures: Picture[];
+  pictures: any[];
   dow?: string[];
   order?: number;
   status?: ProductStatus;

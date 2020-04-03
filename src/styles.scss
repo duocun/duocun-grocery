@@ -2,6 +2,7 @@
 @import "../node_modules/bootstrap/scss/bootstrap.scss";
 @import "~@angular/material/prebuilt-themes/deeppurple-amber.css";
 
+
 $cellphone: "(max-width:480px)";
 $mobile: "(max-width: 767px)";
 $tablet: "(min-width: 768px) and (max-width: 1199px)";
@@ -419,17 +420,16 @@ $content-padding: 300px;
     width: calc(100% - #{$content-padding} - #{$content-padding});
   }
 
-  .option-list{
-    margin-top: 46px;
-    padding: 10px;
+  // .option-list{
+  //   padding: 10px;
   
-    .option-item{
-      margin: 0px;
-      padding: 10px 0px;
-      height: 70px;
-      border-bottom: solid 1px #ddd;
-    }
-  }
+  //   .option-item{
+  //     margin: 0px;
+  //     padding: 10px 0px;
+  //     height: 70px;
+  //     border-bottom: solid 1px #ddd;
+  //   }
+  // }
 }
 
 .search-box{

@@ -5,4 +5,5 @@ export class PageActions {
 
 export class AppStateActions {
   static UPDATE_APP_STATE = 'UPDATE_APP_STATE';
+  static UPDATE_APP_CODE = 'UPDATE_APP_CODE';
 }

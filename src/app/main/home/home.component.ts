@@ -1,5 +1,6 @@
 import { Component, OnInit, OnDestroy, ViewChild, ChangeDetectorRef, AfterViewInit, ElementRef } from '@angular/core';
 import { environment } from '../../../environments/environment';
+import { Location } from '@angular/common';
 import { LocationService } from '../../location/location.service';
 import { AccountService } from '../../account/account.service';
 import { ILocationHistory, IPlace, ILocation, GeoPoint } from '../../location/location.model';
@@ -8,7 +9,7 @@ import { IAppState } from '../../store';
 import { PageActions, AppStateActions } from '../../main/main.actions';
 // import { SocketService } from '../../shared/socket.service';
 import { Router, ActivatedRoute } from '@angular/router';
-import { AppState } from '../main.reducers';
+import { AppState, IApp } from '../main.reducers';
 import { Subject } from '../../../../node_modules/rxjs';
 import { takeUntil } from '../../../../node_modules/rxjs/operators';
 import { ICommand } from '../../shared/command.reducers';
@@ -26,6 +27,9 @@ import { MerchantType, IMerchant, MerchantStatus } from '../../merchant/merchant
 import { MerchantService } from '../../merchant/merchant.service';
 import { IDelivery } from '../../delivery/delivery.model';
 import { AppType } from '../../payment/payment.model';
+import { CartActions } from '../../cart/cart.actions';
+import { MerchantScheduleService } from '../../merchant/merchant-schedule.service';
+import { MerchantActions } from '../../merchant/merchant.actions';
 
 const WECHAT_APP_ID = environment.WECHAT.APP_ID;
 const WECHAT_REDIRCT_URL = environment.WECHAT.REDIRECT_URL;
@@ -66,7 +70,6 @@ export class HomeComponent implements OnInit, OnDestroy {
   mapCenter;
   areas; // for display downtown in map
 
-  availableRanges;
   sOrderDeadline;
   bAddressList = false;
   bPayment = false;
@@ -77,11 +80,17 @@ export class HomeComponent implements OnInit, OnDestroy {
   menu = 'home';
   state;  // manage default location
   QRCODE_URL = environment.MEDIA_URL + QRCODE_PICTURE;
+
+  cart;
+  locationSubscription;
+
   constructor(
     private accountSvc: AccountService,
     private locationSvc: LocationService,
     private areaSvc: AreaService,
     private merchantSvc: MerchantService,
+    private merchantSchduleSvc: MerchantScheduleService,
+    private location$: Location,
     private router: Router,
     private route: ActivatedRoute,
     private rx: NgRedux<IAppState>,
@@ -91,10 +100,13 @@ export class HomeComponent implements OnInit, OnDestroy {
 
     this.rx.dispatch({ type: PageActions.UPDATE_URL, payload: { name: 'home' } });
 
-    this.rx.select('appState').pipe(takeUntil(this.onDestroy$)).subscribe((d: string) => {
-      this.state = d;
+    this.rx.select('appState').pipe(takeUntil(this.onDestroy$)).subscribe((d: IApp) => {
+      this.state = d.state;
     });
 
+    this.rx.select('cart').pipe(takeUntil(this.onDestroy$)).subscribe(cart => {
+      this.cart = cart;
+    });
     // receive delivery from merchant detail page click brower back button event
     this.rx.select('delivery').pipe(takeUntil(this.onDestroy$)).subscribe((d: IDelivery) => {
       if (d && d.dateType) {
@@ -123,6 +135,18 @@ export class HomeComponent implements OnInit, OnDestroy {
     this.rx.select<ICommand>('cmd').pipe(takeUntil(this.onDestroy$)).subscribe((x: ICommand) => {
       if (x.name === 'clear-location-list') {
         this.places = [];
+      }
+    });
+
+    this.locationSubscription = this.location$.subscribe((x) => {
+      if (window.location.pathname.indexOf('merchant/list') !== -1) {
+        if (this.cart && this.cart.length > 0) {
+          this.rx.dispatch({ type: CartActions.CLEAR_CART, payload: [] });
+          this.rx.dispatch({ type: MerchantActions.CLEAR_MERCHANT, payload: null});
+          // this.accountSvc.quitSystem();
+          this.router.navigate(['/']);
+        }
+      } else if (window.location.pathname.endsWith('order/history')) {
       }
     });
   }
@@ -156,11 +180,11 @@ export class HomeComponent implements OnInit, OnDestroy {
   ngOnInit() {
     const self = this;
     this.places = []; // clear address list
-    this.loading = true;
     self.route.queryParamMap.pipe(takeUntil(this.onDestroy$)).subscribe(queryParams => {
       // if url has format '...?clientId=x&page=y', it is some procedure that re-enter the home page
       const clientId = queryParams.get('cId'); // use for after card pay, could be null
       const page = queryParams.get('p');
+
 
       if (page === 'b') { // for wechatpay add credit procedure
         self.accountSvc.find({ _id: clientId }).pipe(takeUntil(this.onDestroy$)).subscribe((accounts: IAccount[]) => {
@@ -176,18 +200,34 @@ export class HomeComponent implements OnInit, OnDestroy {
           });
         }
       } else {
-        const code = queryParams.get('code');
-        this.login(code).then((account: IAccount) => {
-          self.account = account;
-          // use for manage default location
-          this.rx.dispatch({ type: AppStateActions.UPDATE_APP_STATE, payload: AppState.READY });
-          self.mount(account);
-        });
+        const tokenId = queryParams.get('token'); // from proxy
+        const appCode = queryParams.get('state');
+        if (tokenId) {
+          this.accountSvc.setAccessTokenId(tokenId);
+          this.accountSvc.getAccount().then((account: IAccount) => {
+            self.account = account;
+            this.rx.dispatch({ type: AppStateActions.UPDATE_APP_CODE, payload: appCode });
+            // use for manage default location
+            this.rx.dispatch({ type: AppStateActions.UPDATE_APP_STATE, payload: AppState.READY });
+            self.mount(account);
+          });
+        } else {
+          const code = queryParams.get('code');
+          this.rx.dispatch({ type: AppStateActions.UPDATE_APP_CODE, payload: appCode });
+          this.loading = true;
+          this.login(code).then((account: IAccount) => {
+            self.account = account;
+            // use for manage default location
+            this.rx.dispatch({ type: AppStateActions.UPDATE_APP_STATE, payload: AppState.READY });
+            self.mount(account);
+          });
+        }
       }
     });
   }
 
   ngOnDestroy() {
+    this.locationSubscription.unsubscribe();
     this.onDestroy$.next();
     this.onDestroy$.complete();
   }
@@ -197,7 +237,7 @@ export class HomeComponent implements OnInit, OnDestroy {
     const self = this;
     // tslint:disable-next-line:no-shadowed-variable
     return new Promise((resolve, reject) => {
-      this.areaSvc.find({ appType: AppType.GROCERY }).pipe(takeUntil(this.onDestroy$)).subscribe((areas: any[]) => {
+      this.areaSvc.quickFind({ appType: AppType.GROCERY }).then((areas: any[]) => {
         const farNorth = { lat: 44.2653618, lng: -79.4191007 };
         self.areas = areas;
         self.mapZoom = 9;
@@ -223,13 +263,13 @@ export class HomeComponent implements OnInit, OnDestroy {
 
     const origin = this.location ? this.location : (account ? account.location : null);
     if (origin) {
-      self.areaSvc.getMyArea(origin).then(area => {
+      self.areaSvc.getMyArea(origin).then((area: any) => {
         // self.location = origin;
         // self.deliveryAddress = self.locationSvc.getAddrString(origin); // set address text to input
         self.inRange = area ? true : false;
         self.rx.dispatch<IDeliveryAction>({ type: DeliveryActions.UPDATE_ORIGIN, payload: { origin } });
         if (area) {
-          self.loadMerchants().then(rs => {
+          self.loadMerchants(area._id).then(rs => {
             self.loading = false;
           });
         } else {
@@ -357,10 +397,10 @@ export class HomeComponent implements OnInit, OnDestroy {
       const origin = self.location;
 
       // self.rangeSvc.inDeliveryRange(origin).pipe(takeUntil(this.onDestroy$)).subscribe(inRange => {
-      self.areaSvc.getMyArea(origin).then(area => {
+      self.areaSvc.getMyArea(origin).then((area: any) => {
         self.inRange = area ? true : false;
         if (self.inRange) {
-          self.loadMerchants().then(rs => {
+          self.loadMerchants(area._id).then(rs => {
             self.loading = false;
           });
         } else {
@@ -390,13 +430,26 @@ export class HomeComponent implements OnInit, OnDestroy {
 
   // -----------------------------------------------------
   // dateType --- string 'today', 'tomorrow'
-  loadMerchants() {
+  loadMerchants(areaId?: any) {
     const self = this;
     return new Promise((res, rej) => {
       const query = { status: MerchantStatus.ACTIVE, type: MerchantType.GROCERY };
       this.merchantSvc.quickFind(query).then((rs: IMerchant[]) => {
-        self.merchants = rs;
-        res(rs);
+        if (areaId) {
+          this.merchantSchduleSvc.getAvailableMerchants(areaId).then((merchantIds: any[]) => {
+            if (merchantIds && merchantIds.length > 0) {
+              const availables = rs.filter(m => merchantIds.indexOf(m._id) !== -1);
+              self.merchants = availables;
+              res(availables);
+            } else {
+              self.merchants = [];
+              res([]);
+            }
+          });
+        } else {
+          self.merchants = rs;
+          res(rs);
+        }
       });
     });
   }

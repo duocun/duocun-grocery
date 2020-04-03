@@ -37,8 +37,10 @@ $position-btn-width: 0px;
       height: 100%;
 
       .image-body{
+        height: 100%;
           padding:0px;
-          padding-top:75%;
+          // padding-top:75%;
+
           img{
             width: $imgW;
             height: $imgH;
@@ -89,7 +91,8 @@ $position-btn-width: 0px;
           }
         }
 
-        .text-body{              
+        .text-body{
+          height: 100%;              
           padding:0px 10px;
           .title-bg{
               font-size:16px;
@@ -202,6 +205,7 @@ $position-btn-width: 0px;
       .grid-item{
           .grid-item-body{
               .image-body{
+                height: 100%;
                   padding-top:0px;
               }
           }

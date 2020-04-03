@@ -1,7 +1,7 @@
 import { Component, OnInit, OnDestroy, ViewChild, ElementRef } from '@angular/core';
 import { Location } from '@angular/common';
 import { ActivatedRoute, Router, ActivatedRouteSnapshot } from '../../../../node_modules/@angular/router';
-import { Subject } from '../../../../node_modules/rxjs';
+import { Subject, Observable } from '../../../../node_modules/rxjs';
 import { takeUntil } from '../../../../node_modules/rxjs/operators';
 import { MerchantService } from '../merchant.service';
 import { IMerchant } from '../../merchant/merchant.model';
@@ -10,7 +10,7 @@ import { NgRedux } from '../../../../node_modules/@angular-redux/store';
 import { ICart, ICartItem } from '../../cart/cart.model';
 import { PageActions } from '../../main/main.actions';
 import { MatDialog } from '../../../../node_modules/@angular/material';
-import { QuitRestaurantDialogComponent } from '../quit-restaurant-dialog/quit-restaurant-dialog.component';
+import { QuitMerchantDialogComponent } from '../quit-merchant-dialog/quit-merchant-dialog.component';
 import { IDelivery } from '../../delivery/delivery.model';
 import { environment } from '../../../environments/environment';
 import { CartActions } from '../../cart/cart.actions';
@@ -24,10 +24,7 @@ import { CartService } from '../../cart/cart.service';
 })
 export class MerchantDetailPageComponent implements OnInit, OnDestroy {
   categories: any[];
-  category;
-  groups: any[]; // [ {categoryId: x, categoryName: x, items: [{product: p, quantity: q} ...]} ... ]
-  restaurant: IMerchant;
-  subscription;
+
   onDestroy$ = new Subject<any>();
   locationSubscription;
   dow: number; // day of week
@@ -41,10 +38,10 @@ export class MerchantDetailPageComponent implements OnInit, OnDestroy {
   currentUrl;
 
   products;
-  merchant = { name: '' };
+  merchant: IMerchant;
+  subscription;
   amount = 0;
   items;
-
   @ViewChild('list', { static: true }) list: ElementRef;
 
   constructor(
@@ -67,13 +64,12 @@ export class MerchantDetailPageComponent implements OnInit, OnDestroy {
       self.bHasAddress = x.origin ? true : false;
     });
 
-    this.rx.select<ICart>('cart').pipe(takeUntil(this.onDestroy$)).subscribe((cart: ICart) => {
+    this.rx.select('cart').pipe(takeUntil(this.onDestroy$)).subscribe(cart => {
       this.cart = cart;
       // // update quantity of cart items
       // if (self.groups && self.groups.length > 0) {
       //   self.groups = this.mergeQuantityFromCart(self.groups, cart);
       // }
-
       if (cart) {
         // const ds = this.getDeliverySchedule();
         // this.deliveries = this.mergeQuantity(ds, cart, this.product._id);
@@ -81,22 +77,22 @@ export class MerchantDetailPageComponent implements OnInit, OnDestroy {
       }
     });
 
+    this.locationSubscription = this.location.subscribe((x) => {
+      const merchantId = self.merchant._id;
 
-    // this.locationSubscription = this.location.subscribe((x) => {
-    //   const merchantId = self.restaurant._id;
+      if (window.location.pathname.endsWith('main/home') || window.location.pathname.endsWith('/') ||
+        window.location.pathname.endsWith('contact/address-form')
+      ) {
+        if (self.cart && self.cart.length > 0) {
+          self.openQuitMerchantDialog(merchantId, 'restaurant-list');
+        }
+      } else if (window.location.pathname.endsWith('order/history')) {
+        // if (self.restaurant && self.cart && self.cart.items && self.cart.items.length > 0) {
+        //   this.openDialog(merchantId, 'order-history');
+        // }
+      }
+    });
 
-    //   if (window.location.pathname.endsWith('main/home') || window.location.pathname.endsWith('/') ||
-    //     window.location.pathname.endsWith('contact/address-form')
-    //   ) {
-    //     if (self.restaurant && self.cart && self.cart.items && self.cart.items.length > 0) {
-    //       self.openDialog(merchantId, 'restaurant-list');
-    //     }
-    //   } else if (window.location.pathname.endsWith('order/history')) {
-    //     if (self.restaurant && self.cart && self.cart.items && self.cart.items.length > 0) {
-    //       this.openDialog(merchantId, 'order-history');
-    //     }
-    //   }
-    // });
   }
 
   ngOnInit() {
@@ -118,38 +114,6 @@ export class MerchantDetailPageComponent implements OnInit, OnDestroy {
         });
         this.items = this.mergeCart(this.cart, items);
       });
-
-      // if (params['onSchedule'] === 'undefined') {
-      //   this.onSchedule = true; // fix me!!!
-      // } else {
-      //   this.onSchedule = params['onSchedule'] === 'true' ? true : false;
-      // }
-      // const origin = this.delivery.origin; // can be null
-      // const dateType = this.delivery.dateType; // must have
-
-      // self.merchantSvc.load(origin, dateType, { _id: merchantId }).pipe(takeUntil(this.onDestroy$)).subscribe((ms: IMerchant[]) => {
-      //   const merchant = ms.find(m => m._id === merchantId);
-
-      //   if (merchant && this.lang === 'en') {
-      //     merchant.name = merchant.nameEN;
-      //   }
-
-      //   const q = { merchantId: merchantId, status: { $in: [ProductStatus.ACTIVE, ProductStatus.NEW, ProductStatus.PROMOTE] } };
-
-      //   self.productSvc.categorize(q, this.lang).pipe(takeUntil(self.onDestroy$)).subscribe((groups: any[]) => {
-      //     self.restaurant = merchant;
-      //     self.groups = this.mergeQuantityFromCart(groups, this.cart);
-      //     const categories: any[] = [];
-      //     self.groups.map(grp => {
-      //       categories.push({
-      //         _id: grp.categoryId,
-      //         name: grp.categoryName
-      //       });
-      //     });
-      //     self.categories = categories;
-      //     self.category = categories[0];
-      //   });
-      // });
     });
   }
 
@@ -164,18 +128,16 @@ export class MerchantDetailPageComponent implements OnInit, OnDestroy {
   // }
 
   ngOnDestroy() {
-    // this.locationSubscription.unsubscribe();
+    this.locationSubscription.unsubscribe();
     this.onDestroy$.next();
     this.onDestroy$.complete();
   }
 
-  openDialog(merchantId: string, fromPage: string, target?: string): void {
+  openQuitMerchantDialog(merchantId: string, fromPage: string, targetUrl?: string): void {
     const self = this;
-    this.dialogRef = this.dialog.open(QuitRestaurantDialogComponent, {
+    this.dialogRef = this.dialog.open(QuitMerchantDialogComponent, {
       width: '300px',
-      data: {
-        merchantId: merchantId, fromPage: fromPage, onSchedule: this.onSchedule, targetUrl: target
-      },
+      data: { merchantId, fromPage },
       closeOnNavigation: true
     });
 
@@ -193,11 +155,6 @@ export class MerchantDetailPageComponent implements OnInit, OnDestroy {
 
   }
 
-  onCategorySelect(e) {
-    this.category = e;
-    this.list.nativeElement.querySelector('#cat' + e._id).scrollIntoView({ behavior: 'smooth', block: 'start' });
-  }
-
   onNext() {
     this.router.navigate(['order/form']); //  { queryParams: { fromPage: 'restaurant-detail' } });
   }
@@ -207,8 +164,12 @@ export class MerchantDetailPageComponent implements OnInit, OnDestroy {
     // tslint:disable-next-line:no-shadowed-variable
     return new Promise((resolve, reject) => {
       this.merchantSvc.getById(merchantId).then(merchant => {
-        this.productSvc.quickFind({ merchantId }, ['_id', 'name', 'description', 'price', 'pictures']).
+        this.productSvc.quickFind({ merchantId, status: 1 }, ['_id', 'name', 'description', 'price', 'pictures', 'order']).
           then((products: any[]) => {
+            const ps = products.sort((a: any, b: any) => {
+              return a.order > b.order ? 1 : -1;
+            });
+
             resolve({ merchant, products });
           });
       });

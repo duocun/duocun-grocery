@@ -1,20 +1,20 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { WarningDialogComponent } from './warning-dialog.component';
+import { QuitMerchantDialogComponent } from './quit-merchant-dialog.component';
 
-describe('WarningDialogComponent', () => {
-  let component: WarningDialogComponent;
-  let fixture: ComponentFixture<WarningDialogComponent>;
+describe('QuitMerchantDialogComponent', () => {
+  let component: QuitMerchantDialogComponent;
+  let fixture: ComponentFixture<QuitMerchantDialogComponent>;
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ WarningDialogComponent ]
+      declarations: [ QuitMerchantDialogComponent ]
     })
     .compileComponents();
   }));
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(WarningDialogComponent);
+    fixture = TestBed.createComponent(QuitMerchantDialogComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

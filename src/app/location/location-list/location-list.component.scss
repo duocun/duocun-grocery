@@ -1,7 +1,11 @@
-.place-option-list{
+@import '../../../base';
+
+.option-list{
+  border: 1px solid $border-color;
+  border-radius: 3px;
+  margin-top: 0px;
 
   .list-content{
-    border: 1px solid #aaa;
     height: 480px;
     overflow: scroll;
   }
@@ -36,7 +40,7 @@ $tablet: "(min-width: 768px) and (max-width: 1199px)";
 $desktop: "(min-width: 1200px)";
 
 @media #{$mobile}{
-  .place-option-list{
+  .option-list{
     padding: 10px;
 
     .list-content{
