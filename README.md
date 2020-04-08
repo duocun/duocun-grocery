@@ -1,6 +1,6 @@
-# ehetuan
+# duocun-grocery
 
-ehetuan is a food delivery website based on angular 5.
+duocun-grocery is a farm grocery website based on angular.
 
 ## Install
 
