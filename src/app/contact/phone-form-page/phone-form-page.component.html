@@ -13,12 +13,13 @@
           <span i18n="@@PhoneNumber">Phone Number</span>
           <span>*</span>
         </div>
-        <input class="phone" name="phone" type="tel" [maxlength]="10" pattern="[0-9]*" [formControl]="phone" (keyup)="onPhoneInput($event)" />
-        <div class="btn get-code-btn btn-primary" (click)="sendVerify()" i18n="@@GetVerificationCode" >Send Code</div>
+        <input name="phone" type="tel" [maxlength]="10" pattern="[0-9]*" [formControl]="phone" />
+        <!-- <input class="phone" name="phone" type="tel" [maxlength]="10" pattern="[0-9]*" [formControl]="phone" (keyup)="onPhoneInput($event)" />
+        <div class="btn get-code-btn btn-primary" (click)="sendVerify()" i18n="@@GetVerificationCode" >Send Code</div> -->
       </div>
   
       <!-- [class.warning]="!verified" [ngClass]="bAllowVerify ? 'btn-primary': 'btn-secondary'"-->
-      <div class="row form-group">
+      <!-- <div class="row form-group">
         <div class="row label-sm" >
           <span i18n="@@VerificationCode">Verification Code</span>
           <span>*</span>
@@ -36,6 +37,10 @@
       </div>
       <div class="row form-group signup-block">
         <div *ngIf="phoneMatchedAccount && phoneMatchedAccount.type === 'tmp' && verified" class="btn btn-primary signup-btn" (click)="signup()" i18n="@@SignupAndContinuePay">Signup and Continue Pay</div>
+      </div> -->
+
+      <div class="row form-group signup-block">
+        <div class="btn btn-primary signup-btn" (click)="signupAndPay()" i18n="@@Ok">Ok</div>
       </div>
     </form>
   
