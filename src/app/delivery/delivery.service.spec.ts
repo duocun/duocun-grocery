@@ -45,12 +45,21 @@ describe('DeliveryService', () => {
     const date = service.getLatest(myDateTime, ms);
     expect(date.format('YYYY-MM-DD')).toBe('2020-03-25');
   });
+
   it('getLatest should be 03-27', () => {
     const service: DeliveryService = TestBed.get(DeliveryService);
     const myDateTime = '2020-03-25T23:58:00.000Z';
     const ms = [moment.utc('2020-03-24T23:59:00.000Z'), moment.utc('2020-03-27T23:59:00.000Z')];
     const date = service.getLatest(myDateTime, ms);
     expect(date.format('YYYY-MM-DD')).toBe('2020-03-27');
+  });
+
+  it('getLatest should be 04-07', () => {
+    const service: DeliveryService = TestBed.get(DeliveryService);
+    const myDateTime = '2020-04-07T23:58:00.000Z';
+    const ms = [moment.utc('2020-04-07T23:59:00.000Z'), moment.utc('2020-04-08T23:59:00.000Z')];
+    const date = service.getLatest(myDateTime, ms);
+    expect(date.format('YYYY-MM-DD')).toBe('2020-04-07');
   });
 
   // myDateTime -- '2020-03-23 23:58:00'
@@ -166,6 +175,22 @@ describe('DeliveryService', () => {
     expect(rs[0].date).toBe('2020-04-03');
   });
 
+  it('getBaseDateList should be this Thursday', () => {
+    const service: DeliveryService = TestBed.get(DeliveryService);
+    const myDateTime = '2020-04-08T13:12:00.000Z';
+    const oeList = [
+      { dow: 1, time: '23:59' },
+      { dow: 2, time: '23:59' },
+      { dow: 3, time: '23:59' },
+      { dow: 4, time: '23:59' },
+      { dow: 5, time: '23:59' },
+      { dow: 0, time: '23:59' }
+    ];
+    const baseDates = service.getBaseDateList(myDateTime, oeList, [2, 4, 6]);
+    const dates = baseDates.map(b => b.format('YYYY-MM-DD'));
+    const rs = service.getDeliverySchedule(dates, ['11:20']);
+    expect(rs[0].date).toBe('2020-04-09');
+  });
 
   it('getSpecialSchedule should be this Tuesday', () => {
     const service: DeliveryService = TestBed.get(DeliveryService);

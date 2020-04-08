@@ -83,14 +83,14 @@ export class DeliveryService {
   // return moment object
   getLatest(myDateTime, ms) {
     const now = moment.utc(myDateTime);
-    const a = ms.filter(oe => oe.isAfter(now));
+    const a = ms.filter(oe => oe.isSameOrAfter(now));
 
     if (a.length === 1) {
       return a[0];
     } else {
       let latest = a[0];
       for (let i = 1; i < a.length; i++) {
-        if (a[i].isBefore(latest)) {
+        if (a[i].isSameOrBefore(latest)) {
           latest = a[i];
         }
       }
