@@ -9,16 +9,20 @@ import { BalanceService } from './balance.service';
 import { AccountService } from '../account/account.service';
 import { SharedService } from '../shared/shared.service';
 import { CreditCardFormComponent } from './credit-card-form/credit-card-form.component';
+import { CreditCardPageComponent } from './credit-card-page/credit-card-page.component';
+import { SharedModule } from '../shared/shared.module';
 
 @NgModule({
   imports: [
     CommonModule,
     MatSnackBarModule,
-    PaymentRoutingModule
+    PaymentRoutingModule,
+    SharedModule
   ],
   declarations: [
     PaymentFormComponent,
-    CreditCardFormComponent
+    CreditCardFormComponent,
+    CreditCardPageComponent
   ],
   providers: [
     OrderService,

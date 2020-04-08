@@ -5,7 +5,7 @@ import { OrderFormPageComponent } from './order-form-page/order-form-page.compon
 
 const routes: Routes = [
   { path: 'history', component: OrderHistoryComponent },
-  { path: 'form', component: OrderFormPageComponent },
+  { path: 'form/:action', component: OrderFormPageComponent },
 ];
 
 @NgModule({

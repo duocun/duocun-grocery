@@ -72,8 +72,6 @@ export class AddCreditPageComponent implements OnInit {
     } else {
       this.doPay(received, note).then((rsp: any) => {
         self.loading = false;
-        self.bSubmitted = false;
-
         if (rsp && rsp.err === PaymentError.BANK_CARD_FAIL) {
           alert(inputAlert);
         } else {
@@ -85,12 +83,11 @@ export class AddCreditPageComponent implements OnInit {
               self.snackBar.open('', payAlert, { duration: 2000 });
             }
           } else if (paymentMethod === PaymentMethod.WECHAT) {
-            self.bSubmitted = false;
             self.loading = false;
             if (rsp.status === ResponseStatus.SUCCESS) {
               this.loading = true;
               window.location.href = rsp.url;
-            } else {
+            } else { // fix me !
               self.snackBar.open('', payAlert, { duration: 2000 });
             }
           }

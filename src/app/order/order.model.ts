@@ -137,4 +137,6 @@ export interface ICharge {
   total: number;
   tax: number;
   tips: number;
+  balance?: number;
+  payable?: number;
 }

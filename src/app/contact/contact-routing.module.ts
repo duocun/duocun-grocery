@@ -6,7 +6,7 @@ import { AddressFormPageComponent } from './address-form-page/address-form-page.
 
 const routes: Routes = [
   // { path: 'main', component: ContactPageComponent },
-  { path: 'phone-form', component: PhoneFormPageComponent },
+  { path: 'phone-form/:action', component: PhoneFormPageComponent },
   { path: 'address-form', component: AddressFormPageComponent }
 ];
 

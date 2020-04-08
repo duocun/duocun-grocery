@@ -17,15 +17,25 @@ import { LocationService } from '../../location/location.service';
 import { environment } from '../../../environments/environment';
 import { PaymentService } from '../../payment/payment.service';
 import { AccountService } from '../../account/account.service';
-import { PhoneVerifyDialogComponent, AccountType, VerificationError } from '../phone-verify-dialog/phone-verify-dialog.component';
+import { AccountType, VerificationError, PhoneVerifyDialogComponent } from '../phone-verify-dialog/phone-verify-dialog.component';
 import { CartActions } from '../../cart/cart.actions';
 import { IMerchant } from '../../merchant/merchant.model';
 import { PaymentMethod, PaymentError, PaymentStatus, AppType } from '../../payment/payment.model';
-import { SharedService } from '../../shared/shared.service';
+// import { SharedService } from '../../shared/shared.service';
 import * as moment from 'moment';
 import { ProductService } from '../../product/product.service';
 import { IApp } from '../../main/main.reducers';
-import { AuthService } from '../../account/auth.service';
+// import { AuthService } from '../../account/auth.service';
+import { OrderActions, PaymentActions } from '../order.actions';
+
+declare var Stripe;
+
+export const OrderFormAction = {
+  RESUME_PAY: 'RP',
+  CONTINUE: 'C',
+  NEW: 'N',
+  FAIL_PAY: 'FP'
+};
 
 @Component({
   selector: 'app-order-form-page',
@@ -40,8 +50,6 @@ export class OrderFormPageComponent implements OnInit, OnDestroy {
   order: IOrder; // used for identifing new order or not, now used for updating paymentMethod info
   address: string;    // for display
   balance: number;
-  card;
-  stripe;
   charge: ICharge;
   afterGroupDiscount: number;
   bSubmitted = false;
@@ -73,13 +81,14 @@ export class OrderFormPageComponent implements OnInit, OnDestroy {
   phoneForm;
   bAllowVerify = false;
   verifing = false;
-
+  orders;
+  paymentMethodId;
+  creditcard;
   get phone() { return this.phoneForm.get('phone'); }
   get verificationCode() { return this.phoneForm.get('verificationCode'); }
 
-
-  @ViewChild('submitBtn', { static: true }) submitBtn: ElementRef;
   @ViewChild('cc', { static: true }) cc: ElementRef;
+  @ViewChild('submitBtn', { static: true }) submitBtn: ElementRef;
 
   constructor(
     private fb: FormBuilder,
@@ -88,8 +97,8 @@ export class OrderFormPageComponent implements OnInit, OnDestroy {
     private route: ActivatedRoute,
     private productSvc: ProductService,
     private orderSvc: OrderService,
-    private authSvc: AuthService,
-    private sharedSvc: SharedService,
+    // private authSvc: AuthService,
+    // private sharedSvc: SharedService,
     private locationSvc: LocationService,
     private accountSvc: AccountService,
     private paymentSvc: PaymentService,
@@ -107,8 +116,8 @@ export class OrderFormPageComponent implements OnInit, OnDestroy {
       verificationCode: ['']
     });
 
-    this.fromPage = this.route.snapshot.queryParamMap.get('fromPage');
-    this.action = this.route.snapshot.queryParamMap.get('action');
+    // this.fromPage = this.route.snapshot.queryParamMap.get('fromPage');
+    // this.action = this.route.snapshot.queryParamMap.get('action');
 
     // update footer
     this.rx.dispatch({ type: PageActions.UPDATE_URL, payload: { name: 'order-form' } });
@@ -122,13 +131,29 @@ export class OrderFormPageComponent implements OnInit, OnDestroy {
 
     this.rx.select('cart').pipe(takeUntil(this.onDestroy$)).subscribe((cart: any) => {
       this.cart = cart;
-      this.chargeItems = this.getChargeItems(cart); // [{date, time, quantity, _id, name, price, cost, taxRate}] }]
-      this.groups = this.getOrderGroups(cart);
-      this.summary = this.getSummary(this.groups, 0);
+      this.chargeItems = this.orderSvc.getChargeItems(cart); // [{date, time, quantity, _id, name, price, cost, taxRate}] }]
+      this.groups = this.orderSvc.getOrderGroups(cart);
+      this.summary = this.orderSvc.getSummary(this.groups, 0);
     });
 
     this.rx.select('merchant').pipe(takeUntil(this.onDestroy$)).subscribe((m: IMerchant) => {
       this.merchant = m;
+    });
+
+    this.rx.select('orders').pipe(takeUntil(this.onDestroy$)).subscribe((orders: any[]) => {
+      // if (orders && orders.length > 0) {
+      //   this.paymentMethod = orders[0].paymentMethod;
+      // }
+      this.orders = orders;
+    });
+
+    this.rx.select('payment').pipe(takeUntil(this.onDestroy$)).subscribe((p: any) => {
+      if (p && p.paymentMethodId) {
+        this.paymentMethodId = p.paymentMethodId;
+      }
+      if (p && p.paymentMethod) {
+        this.paymentMethod = p.paymentMethod;
+      }
     });
 
     this.rx.select('appState').pipe(takeUntil(this.onDestroy$)).subscribe((x: IApp) => {
@@ -139,8 +164,64 @@ export class OrderFormPageComponent implements OnInit, OnDestroy {
   ngOnInit() {
     const self = this;
 
-    this.componentDidMount().then(() => {
+    this.route.params.pipe(takeUntil(this.onDestroy$)).subscribe(params => {
+      const action = params['action'];
+      if (action === OrderFormAction.NEW) { // || action === OrderFormAction.CONTINUE
 
+        if (!this.cart || this.cart.length === 0) {
+          this.router.navigate(['/home']);
+        }
+
+        this.componentDidMount().then((r: any) => {
+          if (r) {
+            const account = r.account;
+            const merchant = r.merchant;
+            const paymentMethod = this.paymentMethod;
+            const orders = [];
+            const overRangeCharge = 0;
+            const location = this.location; // from redux
+            const lang = this.lang;
+            this.groups.map(group => {
+              const charge = this.orderSvc.getCharge(group, overRangeCharge);
+              const items = group.items;
+              const date = group.date;
+              const time = group.time;
+              const note = '';
+              const order = this.orderSvc.createOrder(account, merchant, items, location, date, time, charge, note, paymentMethod, lang);
+              orders.push(order);
+            });
+
+            this.rx.dispatch({ type: OrderActions.REPLACE_ORDERS, payload: orders });
+          } else {
+            // process browser back button press
+            this.loading = false;
+            // alert('您已经退出提交订单，请重新下单。');
+            // this.router.navigate(['/home']);
+          }
+        });
+      } else if (action === OrderFormAction.RESUME_PAY) { // from phone verify page
+        this.componentDidMount().then((r: any) => {
+          const account = r.account;
+          const payable = r.payable;
+          // orders from redux
+          self.placeOrdersAndPay(self.appCode, self.orders, self.paymentMethodId, account, payable).then((rt: any) => {
+            this.showError(rt.err);
+            this.loading = false;
+            if (rt.err === PaymentError.NONE) {
+              this.rx.dispatch({ type: CartActions.CLEAR_CART, payload: [] });
+              if (self.paymentMethod === PaymentMethod.WECHAT) {
+                window.location.href = rt.url;
+                this.loading = false;
+              } else {
+                this.loading = false;
+                // set default payment method
+                this.rx.dispatch({type: PaymentActions.UPDATE_PAYMENT_METHOD, payload: {paymentMethod: PaymentMethod.WECHAT}});
+                self.router.navigate(['order/history']);
+              }
+            }
+          });
+        });
+      }
     });
   }
 
@@ -176,131 +257,119 @@ export class OrderFormPageComponent implements OnInit, OnDestroy {
     }
   }
 
-  onCreditCardInputFocus() {
-    try {
-      this.cc.nativeElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    } catch (e) {
-
-    }
-  }
-
   // click button
   onSubmitPay() {
     // document.getElementById('btn-submit').click();
     this.submitBtn.nativeElement.click();
+    // this.onPay();
+  }
+
+  onNoteChange(e) {
+    const note = this.form.value.note;
+    this.rx.dispatch({ type: OrderActions.UPDATE_ORDERS, payload: { note } });
+  }
+
+  async verifyCreditCard(account) {
+    const { stripe, card } = this.creditcard;
+    const result = await stripe.createPaymentMethod({
+      type: 'card',
+      card,
+      billing_details: { name: account.username }
+    });
+
+    if (result.error) {
+      // show error resolve({ err: PaymentError.INVALID_BANK_CARD });
+      alert('Invalid Bank Card or input wrong information.');
+      return false;
+    } else {
+      this.paymentMethodId = result.paymentMethod.id;
+      this.rx.dispatch({ type: PaymentActions.UPDATE_PAYMENT_METHOD, payload: { paymentMethodId: result.paymentMethod.id } });
+      return true;
+    }
+  }
+
+  async validatePayment(account, payable) {
+    if (payable > 0 && this.paymentMethod === PaymentMethod.CREDIT_CARD) {
+      return await this.verifyCreditCard(account);
+    } else {
+      return true;
+    }
   }
 
   onPay() {
     const self = this;
-    const merchant = this.merchant;
-    const delivery = this.delivery;
-    const cart = this.cart;
-    const paymentMethod = this.paymentMethod;
-    const origin = delivery.origin;
-    const groupDiscount = 0; // bEligible ? 2 : 0;
-    const account = this.account; // get in mount()
-
-    this.bSubmitted = true; // important! block form submit
-
-    if (account) {
-      this.balance = account.balance;
-
-      // self.rangeSvc.getOverRange(origin).pipe(takeUntil(this.onDestroy$)).subscribe((r: any) => {
-      // this.charge = this.getSummary(cart, merchant, (r.distance * r.rate), groupDiscount);
-      if (account.type === AccountType.TEMP || !account.phone || !account.verified) {
-        this.bSubmitted = false;
-        this.loading = false;
-        // setTimeout(() => {
-        self.openPhoneVerifyDialog(self.account, self.paymentMethod);
-        // }, 300);
-      } else {
-        self.doPay().then((rt: any) => {
-          this.showError(rt.err);
-          this.loading = false;
-          this.bSubmitted = false;
-
-          if (rt.err === PaymentError.NONE) {
-            this.rx.dispatch({ type: CartActions.CLEAR_CART, payload: [] });
-
-            if (paymentMethod === PaymentMethod.WECHAT) {
-              window.location.href = rt.url;
-            } else {
-              this.loading = false;
-              self.router.navigate(['order/history']);
-            }
+    const account = this.account;
+    const payable = this.charge.payable;
+    this.validatePayment(account, payable).then(bPass => {
+      if (bPass) {
+        if (account) {
+          if (account.type === AccountType.TEMP || !account.phone || !account.verified) {
+            this.loading = false;
+            // this.openPhoneVerifyDialog(account, this.paymentMethod);
+            this.router.navigate(['contact/phone-form/' + OrderFormAction.RESUME_PAY]);
+          } else {
+            this.bSubmitted = true; // important! block form submit
+            self.placeOrdersAndPay(self.appCode, self.orders, self.paymentMethodId, account, payable).then((rt: any) => {
+              this.showError(rt.err);
+              this.bSubmitted = false;
+              if (rt.err === PaymentError.NONE) {
+                this.rx.dispatch({ type: CartActions.CLEAR_CART, payload: [] });
+                if (self.paymentMethod === PaymentMethod.WECHAT) {
+                  this.loading = false;
+                  window.location.href = rt.url;
+                } else {
+                  this.loading = false;
+                  // set default payment method
+                  this.rx.dispatch({type: PaymentActions.UPDATE_PAYMENT_METHOD, payload: {paymentMethod: PaymentMethod.WECHAT}});
+                  self.router.navigate(['order/history']);
+                }
+              }
+            });
           }
-        });
+        } else { // didn't login
+          this.loading = false;
+          // this.openPhoneVerifyDialog(account, paymentMethod);
+          this.router.navigate(['contact/phone-form/' + OrderFormAction.RESUME_PAY]);
+        }
+      } else {
+        // show verify bank card error
+        this.loading = false;
       }
-    } else { // didn't login
-      this.loading = false;
-      this.bSubmitted = false;
-      this.openPhoneVerifyDialog(account, paymentMethod);
-    }
+    });
   }
 
-  onCreditCardFormInit(e) {
-    this.stripe = e.stripe;
-    this.card = e.card;
-  }
 
   // delivery --- only need 'origin' and 'dateType' fields
-  createOrder(account, merchant, items, location, deliverDate, deliverTime, charge, note, paymentMethod) {
-
-    // const sCreated = moment().toISOString();
-    // const { deliverDate, deliverTime } = this.getDeliveryDateTimeByPhase(sCreated, merchant.phases, delivery.dateType);
-    const status = (paymentMethod === PaymentMethod.CREDIT_CARD || paymentMethod === PaymentMethod.WECHAT) ?
-      OrderStatus.TEMP : OrderStatus.NEW; // prepay need Driver to confirm finished
-    const paymentStatus = paymentMethod === PaymentMethod.PREPAY ? PaymentStatus.PAID : PaymentStatus.UNPAID;
-
-    const order = {
-      clientId: account._id,
-      clientName: account.username,
-      merchantId: merchant._id,
-      merchantName: this.lang === 'zh' ? merchant.name : merchant.nameEN,
-      items,
-      location,
-      pickupTime: '10:00',
-      deliverDate,
-      deliverTime,
-      type: OrderType.GROCERY,
-      status,
-      paymentStatus,
-      paymentMethod,
-      note,
-      price: Math.round(charge.price * 100) / 100,
-      cost: Math.round(charge.cost * 100) / 100,
-      deliveryCost: Math.round(charge.deliveryCost * 100) / 100,
-      deliveryDiscount: Math.round(charge.deliveryCost * 100) / 100,
-      groupDiscount: Math.round(charge.groupDiscount * 100) / 100,
-      overRangeCharge: Math.round(charge.overRangeCharge * 100) / 100,
-      total: Math.round(charge.total * 100) / 100,
-      tax: Math.round(charge.tax * 100) / 100,
-      tips: Math.round(charge.tips * 100) / 100,
-      defaultPickupTime: account.pickup ? account.pickup : ''
-    };
-
-    return order;
-  }
 
   componentDidMount() {
     // tslint:disable-next-line:no-shadowed-variable
     return new Promise((resolve, reject) => {
+      const merchant = this.merchant;
       if (this.merchant) {
         this.loading = true;
         const merchantId = this.merchant._id;
         const fields = ['_id', 'name', 'price', 'taxRate'];
         this.productSvc.quickFind({ merchantId, status: 1 }, fields).then(products => {
           this.accountSvc.getCurrentAccount().pipe(takeUntil(this.onDestroy$)).subscribe(account => {
-            const amount = this.summary.total;
+            const amount = Math.round(this.summary.total * 100) / 100;
+            const balance = Math.round((account && account.balance ? account.balance : 0) * 100) / 100;
+            const payable = Math.round((balance >= amount ? 0 : amount - balance) * 100) / 100;
+            this.charge = { ...this.summary, ...{ payable }, ...{ balance } };
+
             const paymentMethod = (account.balance >= amount) ? PaymentMethod.PREPAY : this.paymentMethod;
+            this.paymentMethod = paymentMethod;
+            this.rx.dispatch({ type: PaymentActions.UPDATE_PAYMENT_METHOD, payload: { paymentMethod } });
+
             this.products = products;
             this.account = account;
-            this.paymentMethod = paymentMethod;
-            const balance = Math.round(this.account.balance * 100) / 100;
-            const payable = Math.round((balance >= this.summary.total ? 0 : this.summary.total - balance) * 100) / 100;
-            this.charge = { ...this.summary, ...{ payable }, ...{ balance } };
+
             this.loading = false;
-            resolve();
+
+            // if (paymentMethod === PaymentMethod.CREDIT_CARD && !this.creditcard) {
+            //   this.creditcard = this.initStripe();
+            // }
+
+            resolve({ account, merchant, payable });
           });
         });
       } else {
@@ -309,162 +378,26 @@ export class OrderFormPageComponent implements OnInit, OnDestroy {
     });
   }
 
-  // cart --- [{product, deliveries: [{date, time, quantity}] }]
-  // return --- {date, time, _id, name, quantity, price, cost}
-  getChargeItems(cart) { // group by date time
-    const chargeItems = [];
-    cart.map(it => { //  {product, deliveries:[{date, time, quantity}]}
-      it.deliveries.map(d => {
-        chargeItems.push({ ...d, ...it.product });
-      });
-    });
-    return chargeItems;
-  }
-
-  // cart --- [{product, deliveries: [{date, time, quantity}] }]
-  // return --- [{date, time, items: [{productId, quantity, price, cost}] }]
-  getOrderGroups(cart) { // group by date time
-    const orders = [];
-    cart.map(it => { //  {product, deliveries:[{date, time, quantity }]}
-      it.deliveries.map(d => {
-        const order = orders.find(t => t.date === d.date && t.time === d.time);
-        if (order) {
-          order.items.push({
-            productId: it.product._id, quantity: d.quantity, price: it.product.price, cost: it.product.cost,
-            taxRate: it.product.taxRate
-          });
-        } else {
-          orders.push({
-            date: d.date,
-            time: d.time,
-            items: [{
-              productId: it.product._id, quantity: d.quantity, price: it.product.price, cost: it.product.cost,
-              taxRate: it.product.taxRate
-            }]
-          });
-        }
-      });
-    });
-    return orders;
-  }
-
-  // groups --- [{date, time, items: [{productId, quantity, price, cost, taxRate}] }]
-  getSummary(groups, overRangeCharge) {
-    let totalPrice = 0;
-    let totalCost = 0;
-    let totalTax = 0;
-    const totalTips = 0;
-    let totalOverRangeCharge = 0;
-    let total = 0;
-
-    const tips = 0;
-    const groupDiscount = 0;
-
-    if (groups && groups.length > 0) {
-      groups.map(order => {
-        let price = 0;
-        let cost = 0;
-        let tax = 0;
-        order.items.map(x => {
-          price += x.price * x.quantity;
-          cost += x.cost * x.quantity;
-          tax += Math.ceil(x.price * x.quantity * x.taxRate) / 100;
-        });
-        const subTotal = (price + tax + tips - groupDiscount + overRangeCharge);
-        totalPrice += price;
-        totalCost += cost;
-        totalTax += tax;
-        totalOverRangeCharge += overRangeCharge;
-        total += subTotal;
-      });
-    }
-
-    return {
-      price: Math.round(totalPrice * 100) / 100,
-      cost: Math.round(totalCost * 100) / 100,
-      tips: Math.round(totalTips * 100) / 100,
-      tax: Math.round(totalTax * 100) / 100,
-      overRangeCharge: Math.round(totalOverRangeCharge * 100) / 100,
-      deliveryCost: 0, // merchant.deliveryCost,
-      deliveryDiscount: 0, // merchant.deliveryCost,
-      groupDiscount, // groupDiscount,
-      total: Math.round(total * 100) / 100
-    };
-  }
-
-  getCharge(group, overRangeCharge) {
-    let price = 0;
-    let cost = 0;
-    let tax = 0;
-
-    group.items.map(x => {
-      price += x.price * x.quantity;
-      cost += x.cost * x.quantity;
-      tax += Math.ceil(x.price * x.quantity * x.taxRate) / 100;
-    });
-
-    const tips = 0;
-    const groupDiscount = 0;
-    const overRangeTotal = Math.round(overRangeCharge * 100) / 100;
-
-    return {
-      price, cost, tips, tax,
-      overRangeCharge: overRangeTotal,
-      deliveryCost: 0, // merchant.deliveryCost,
-      deliveryDiscount: 0, // merchant.deliveryCost,
-      groupDiscount, // groupDiscount,
-      total: price + tax + tips - groupDiscount + overRangeTotal
-    };
-  }
-
   // account, self.merchant, self.charge, cart, delivery, paymentMethod
-  doPay() {
-    const v = this.form.value;
-    this.note = v.note;
-    const account = this.account;
-    const merchant = this.merchant;
-    const location = this.location;
-    const paymentMethod = this.paymentMethod;
-    const note = this.note;
-    const amount = Math.round(this.summary.total * 100) / 100;
-    const orders = [];
-    const overRangeCharge = 0;
-    this.groups.map(group => {
-      const charge = this.getCharge(group, overRangeCharge);
-      const order = this.createOrder(account, merchant, group.items, location, group.date, group.time, charge, note, paymentMethod);
-      orders.push(order);
-    });
+  // paymentMethodId --- stripe payment method id
+  placeOrdersAndPay(appCode, orders, paymentMethodId, account, payable) {
+    const accountName = account.username;
+    const paymentNote = '';
 
     // tslint:disable-next-line:no-shadowed-variable
     return new Promise((resolve, reject) => {
       this.loading = true;
       this.orderSvc.placeOrders(orders).pipe(takeUntil(this.onDestroy$)).subscribe(newOrders => {
-        const balance = account && account.balance ? account.balance : 0;
-        const payable = Math.round((amount - balance) * 100) / 100;
-
         if (payable > 0) {
           if (this.paymentMethod === PaymentMethod.CREDIT_CARD) {
-            this.stripe.createPaymentMethod({
-              type: 'card',
-              card: this.card,
-              billing_details: { name: account.username }
-            }).then(result => {
-              if (result.error) {
+            this.paymentSvc.payByCreditCard(AppType.GROCERY, paymentMethodId, account._id, accountName, newOrders, payable, paymentNote)
+              .pipe(takeUntil(this.onDestroy$)).subscribe(rsp => {
                 this.loading = false;
-                // An error happened when collecting card details, show `result.error.message` in the payment form.
-                resolve({ err: PaymentError.INVALID_BANK_CARD });
-              } else {
-                const paymentMethodId = result.paymentMethod.id;
-                this.paymentSvc.payByCreditCard(AppType.GROCERY, paymentMethodId, account._id, account.username, newOrders, payable, note)
-                  .pipe(takeUntil(this.onDestroy$)).subscribe(rsp => {
-                    this.loading = false;
-                    resolve(rsp);
-                  });
-              }
-            });
+                resolve(rsp);
+              });
           } else if (this.paymentMethod === PaymentMethod.WECHAT) {
             this.loading = false;
-            this.paymentSvc.payBySnappay(this.appCode, account._id, account.username, newOrders, payable, note)
+            this.paymentSvc.payBySnappay(appCode, account._id, accountName, newOrders, payable, paymentNote)
               .pipe(takeUntil(this.onDestroy$)).subscribe(rsp => {
                 resolve(rsp);
               });
@@ -481,9 +414,19 @@ export class OrderFormPageComponent implements OnInit, OnDestroy {
   }
 
 
-
   onSelectPaymentMethod(paymentMethod) {
+    const self = this;
     this.paymentMethod = paymentMethod;
+
+    this.rx.dispatch({ type: PaymentActions.UPDATE_PAYMENT_METHOD, payload: { paymentMethod } });
+    this.rx.dispatch({ type: OrderActions.UPDATE_ORDERS, payload: { paymentMethod } });
+
+    if (paymentMethod === PaymentMethod.CREDIT_CARD) {
+      this.router.navigate(['payment/card']);
+      //   setTimeout(() => {
+      //     self.creditcard = self.initStripe();
+      //   }, 300);
+    }
   }
 
   getTodayString() {
@@ -491,7 +434,10 @@ export class OrderFormPageComponent implements OnInit, OnDestroy {
   }
 
 
-  openPhoneVerifyDialog(account, paymentMethod): void {
+  // action --- 's': submit, 'c': change payment method
+  openPhoneVerifyDialog(account, paymentMethod) {
+    // this.router.navigate(['contact/phone-form/' + action]);
+    const self = this;
     // this.modalSvc.getModal('myModal').open();
     const dialogRef = this.dialogSvc.open(PhoneVerifyDialogComponent, {
       width: '300px',
@@ -505,7 +451,9 @@ export class OrderFormPageComponent implements OnInit, OnDestroy {
     dialogRef.afterClosed().pipe(takeUntil(this.onDestroy$)).subscribe(r => {
       if (r && r.account) {
         this.account = r.account;
-        this.doPay().then((rt: any) => {
+        const payable = this.charge.payable;
+        this.placeOrdersAndPay(self.appCode, self.orders, self.paymentMethodId, account, payable).then((rt: any) => {
+          // this.placeOrdersAndPay().then((rt: any) => {
           this.showError(rt.err);
           this.loading = false;
           this.bSubmitted = false;
@@ -515,6 +463,8 @@ export class OrderFormPageComponent implements OnInit, OnDestroy {
             if (r.paymentMethod === PaymentMethod.WECHAT) {
               window.location.href = rt.url;
             } else {
+              // set default payment method
+              this.rx.dispatch({type: PaymentActions.UPDATE_PAYMENT_METHOD, payload: {paymentMethod: PaymentMethod.WECHAT}});
               this.router.navigate(['order/history']);
             }
           }
@@ -526,179 +476,48 @@ export class OrderFormPageComponent implements OnInit, OnDestroy {
   }
 
 
-  // verifyPhoneNumber(accountId: string, account: IAccount) {
-  //   if (accountId) {
-  //     if (account) {
-  //       // if (account.type === AccountType.TEMP) {
-  //       //   if (accountId === account._id) {
-  //       //     return VerificationError.NONE;
-  //       //   } else {
-  //       //     return VerificationError.PHONE_NUMBER_OCCUPIED;
-  //       //   }
-  //       // } else {
-  //       if (accountId === account._id) {
-  //         return VerificationError.NONE;
-  //       } else {
-  //         return VerificationError.PHONE_NUMBER_OCCUPIED;
-  //       }
-  //       // }
-  //     } else {
-  //       return VerificationError.NONE;
-  //     }
-  //   } else {
-  //     return VerificationError.NONE;
-  //   }
-  // }
+  initStripe() {
+    const stripe = Stripe(environment.STRIPE.API_KEY);
+    const elements = stripe.elements();
+    const type = 'card';
 
-  // onPhoneInput(e) {
-  //   const self = this;
-  //   this.verified = false;
-  //   this.verificationCode.patchValue('');
+    // Custom styling can be passed to options when creating an Element.
+    const style = {
+      base: {
+        color: '#32325d',
+        fontFamily: '"Helvetica Neue", Helvetica, sans-serif',
+        fontSmoothing: 'antialiased',
+        fontSize: '16px',
+        '::placeholder': {
+          color: '#aab7c4'
+        }
+      },
+      invalid: {
+        color: '#fa755a',
+        iconColor: '#fa755a'
+      }
+    };
 
-  //   if (e.target.value && e.target.value.length >= 10) {
-  //     let phone: string = this.phoneForm.value.phone;
-  //     phone = phone.substring(0, 2) === '+1' ? phone.substring(2) : phone;
-  //     phone = phone.match(/\d+/g).join('');
+    const card = elements.create(type, { hidePostalCode: true, style: style });
+    card.mount('#card-element');
 
-  //     this.accountSvc.find({ phone: phone }).pipe(takeUntil(this.onDestroy$)).subscribe(accounts => {
-  //       const account = (accounts && accounts.length > 0) ? accounts[0] : null;
-  //       const accountId = this.account ? this.account._id : '';
-  //       const err = this.verifyPhoneNumber(accountId, account);
+    // Handle real-time validation errors from the card Element.
+    card.addEventListener('change', function (event) {
+      const displayError = document.getElementById('payment-result');
+      if (event.error) {
+        displayError.textContent = event.error.message;
+      } else {
+        displayError.textContent = '';
+      }
+    });
 
-  //       if (err === VerificationError.PHONE_NUMBER_OCCUPIED) {
-  //         const s = this.lang === 'en' ? 'This phone number has already bind to an wechat account, please try use wechat to login.' :
-  //           '该号码已经被一个英文版的账号使用，请使用英文版登陆; 如果想更改账号请联系客服。';
-  //         alert(s);
-  //         this.bAllowVerify = false;
-  //       } else {
-  //         this.bAllowVerify = true;
-  //       }
-  //     });
-  //   } else { // input less than 10 chars
-  //     this.bAllowVerify = false;
-  //     this.phoneMatchedAccount = null; // if phoneMatchedAccount.type === tmp,  display signup button
-  //   }
-  // }
-
-  // showErrorAlert(err) {
-  //   let s = '';
-  //   if (err === VerificationError.PHONE_NUMBER_OCCUPIED) {
-  //     s = this.lang === 'en' ? 'This phone number has already bind to an wechat account, please try use wechat to login.' :
-  //       '该号码已经被一个英文版的账号使用，请使用英文版登陆; 如果想更改账号请联系客服。';
-  //   } else if (err === VerificationError.WRONG_CODE) {
-  //     s = this.lang === 'en' ? 'verification code is wrong, please try again.' : '验证码错误，请重新尝试';
-  //   } else if (err === VerificationError.NO_PHONE_NUMBER_BIND) {
-  //     s = this.lang === 'en' ? 'login with phone number failed, please contact our customer service' :
-  //       '使用该电话号码登陆失败，请退出重新从公众号登陆';
-  //   }
-
-  //   if (s) {
-  //     alert(s);
-  //     // this.snackBar.open('', s, { duration: 1500 });
-  //   }
-  // }
-
-  // onVerificationCodeInput(e) {
-  //   const self = this;
-  //   let phone: string = this.phoneForm.value.phone;
-  //   phone = phone.substring(0, 2) === '+1' ? phone.substring(2) : phone;
-  //   phone = phone.match(/\d+/g).join('');
-
-  //   if (e.target.value && e.target.value.length === 4) {
-  //     const code = e.target.value;
-  //     const accountId = self.account ? self.account._id : '';
-  //     this.verifing = true;
-  //     this.accountSvc.verifyPhoneNumber(phone, code, accountId).pipe(takeUntil(this.onDestroy$)).subscribe((r: any) => {
-  //       self.verifing = false;
-  //       self.verified = r.verified;
-
-  //       if (r.err === VerificationError.NONE) {
-  //         const account = r.account;
-  //         const paymentMethod = this.paymentMethod;
-  //         self.authSvc.setAccessTokenId(r.tokenId);
-  //         self.onClosePhoneVerifyDialog({ account, paymentMethod });
-  //       } else if (r.err === VerificationError.REQUIRE_SIGNUP) {
-  //         self.phoneMatchedAccount = r.account; // display signup button
-  //       } else {
-  //         self.showErrorAlert(r.err);
-  //       }
-  //     });
-  //   } else {
-  //     this.verified = false;
-  //   }
-  // }
-
-  // sendVerify() {
-  //   if (this.bAllowVerify) {
-  //     const accountId: string = this.account ? this.account._id : '';
-  //     const successHint = this.lang === 'en' ? 'SMS Verification Code sent' : '短信验证码已发送';
-  //     const failedHint = this.lang === 'en' ? 'Account issue, please contact our customer service。' : '账号有问题，请联系客服';
-  //     const lang = this.lang;
-  //     let phone: string = this.phoneForm.value.phone;
-  //     phone = phone.substring(0, 2) === '+1' ? phone.substring(2) : phone;
-  //     phone = phone.match(/\d+/g).join('');
-  //     // this.resendVerify(phone).then(tokenId => {
-  //     //   this.bAllowVerify = true;
-  //     // });
-  //     this.accountSvc.sendVerifyMsg(accountId, phone, lang).toPromise().then((tokenId: string) => {
-  //       this.snackBar.open('', successHint, { duration: 1000 });
-  //       // this.bGettingCode = true;
-  //       if (tokenId) { // to allow api call
-  //         this.authSvc.setAccessTokenId(tokenId);
-  //       } else {
-  //         alert(failedHint);
-  //       }
-  //       this.bAllowVerify = true;
-  //     });
-  //   }
-  // }
-
-
-  // signup() {
-  //   const self = this;
-  //   const phone = this.phoneForm.value.phone;
-  //   const code = this.phoneForm.value.verificationCode;
-  //   const paymentMethod = this.paymentMethod;
-  //   if (phone && code) {
-  //     this.accountSvc.signup(phone, code).pipe(takeUntil(this.onDestroy$)).subscribe((tokenId: any) => {
-  //       if (tokenId) {
-  //         self.authSvc.setAccessTokenId(tokenId);
-  //         self.accountSvc.getCurrentAccount().pipe(takeUntil(this.onDestroy$)).subscribe((account: IAccount) => {
-  //           if (account) {
-  //             self.onClosePhoneVerifyDialog({ account, paymentMethod });
-  //             // self.rx.dispatch({ type: AccountActions.UPDATE, payload: account });
-  //           }
-  //           this.snackBar.open('', 'Signup successful', { duration: 1000 });
-  //         });
-  //       } else {
-
-  //       }
-  //     });
-  //   } else {
-  //     // fail to signup
-  //   }
-  // }
-
-  // onClosePhoneVerifyDialog(r) {
-  //   if (r && r.account) {
-  //     this.account = r.account;
-  //     this.doPay().then((rt: any) => {
-  //       this.showError(rt.err);
-  //       this.loading = false;
-  //       this.bSubmitted = false;
-
-  //       if (rt.err === PaymentError.NONE) {
-  //         this.rx.dispatch({ type: CartActions.CLEAR_CART, payload: [] });
-  //         if (r.paymentMethod === PaymentMethod.WECHAT) {
-  //           window.location.href = rt.url;
-  //         } else {
-  //           this.router.navigate(['order/history']);
-  //         }
-  //       }
-  //     });
-  //   } else {
-  //     alert('账号注册失败,下单没成功,请联系客服');
-  //   }
-  //   this.modalSvc.close('myModal');
-  // }
+    card.on('focus', () => {
+      // this.focus.emit();
+      try {
+        this.cc.nativeElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      } catch (e) {
+      }
+    });
+    return { stripe, card };
+  }
 }

@@ -84,6 +84,11 @@ export class HomeComponent implements OnInit, OnDestroy {
   cart;
   locationSubscription;
 
+  clientId;
+  page;
+  tokenId;
+  appCode;
+
   constructor(
     private accountSvc: AccountService,
     private locationSvc: LocationService,
@@ -142,7 +147,7 @@ export class HomeComponent implements OnInit, OnDestroy {
       if (window.location.pathname.indexOf('merchant/list') !== -1) {
         if (this.cart && this.cart.length > 0) {
           this.rx.dispatch({ type: CartActions.CLEAR_CART, payload: [] });
-          this.rx.dispatch({ type: MerchantActions.CLEAR_MERCHANT, payload: null});
+          this.rx.dispatch({ type: MerchantActions.CLEAR_MERCHANT, payload: null });
           // this.accountSvc.quitSystem();
           this.router.navigate(['/']);
         }
@@ -181,16 +186,25 @@ export class HomeComponent implements OnInit, OnDestroy {
     const self = this;
     this.places = []; // clear address list
     self.route.queryParamMap.pipe(takeUntil(this.onDestroy$)).subscribe(queryParams => {
-      // if url has format '...?clientId=x&page=y', it is some procedure that re-enter the home page
+      // if url has format '...?cId=x&p=y', it is some procedure that re-enter the home page
       const clientId = queryParams.get('cId'); // use for after card pay, could be null
       const page = queryParams.get('p');
 
+      this.clientId = clientId;
+      this.page = page;
 
       if (page === 'b') { // for wechatpay add credit procedure
-        self.accountSvc.find({ _id: clientId }).pipe(takeUntil(this.onDestroy$)).subscribe((accounts: IAccount[]) => {
-          self.rx.dispatch({ type: AccountActions.UPDATE, payload: accounts[0] });
-          self.router.navigate(['account/balance']);
-        });
+        if (clientId) {
+          self.accountSvc.find({ _id: clientId }).pipe(takeUntil(this.onDestroy$)).subscribe((accounts: IAccount[]) => {
+            self.rx.dispatch({ type: AccountActions.UPDATE, payload: accounts[0] });
+            self.router.navigate(['account/balance']);
+          });
+        } else {
+          self.accountSvc.getCurrentAccount().pipe(takeUntil(this.onDestroy$)).subscribe((account: IAccount) => {
+            self.rx.dispatch({ type: AccountActions.UPDATE, payload: account });
+            self.router.navigate(['account/balance']);
+          });
+        }
       } else if (page === 'h') { // for wechatpay procedure
         if (clientId) {
           self.bPayment = true;
@@ -198,22 +212,30 @@ export class HomeComponent implements OnInit, OnDestroy {
             self.rx.dispatch({ type: AccountActions.UPDATE, payload: accounts[0] });
             self.router.navigate(['order/history']);
           });
+        } else {
+          self.accountSvc.getCurrentAccount().pipe(takeUntil(this.onDestroy$)).subscribe((account: IAccount) => {
+            self.rx.dispatch({ type: AccountActions.UPDATE, payload: account });
+            self.router.navigate(['order/history']);
+          });
         }
       } else {
         const tokenId = queryParams.get('token'); // from proxy
         const appCode = queryParams.get('state');
+
+        this.tokenId = tokenId;
+        this.appCode = appCode ? appCode.toString() : '';
+        this.rx.dispatch({ type: AppStateActions.UPDATE_APP_CODE, payload: appCode });
+
         if (tokenId) {
           this.accountSvc.setAccessTokenId(tokenId);
           this.accountSvc.getAccount().then((account: IAccount) => {
             self.account = account;
-            this.rx.dispatch({ type: AppStateActions.UPDATE_APP_CODE, payload: appCode });
             // use for manage default location
             this.rx.dispatch({ type: AppStateActions.UPDATE_APP_STATE, payload: AppState.READY });
             self.mount(account);
           });
         } else {
           const code = queryParams.get('code');
-          this.rx.dispatch({ type: AppStateActions.UPDATE_APP_CODE, payload: appCode });
           this.loading = true;
           this.login(code).then((account: IAccount) => {
             self.account = account;

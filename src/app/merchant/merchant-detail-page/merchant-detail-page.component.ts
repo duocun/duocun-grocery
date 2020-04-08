@@ -15,6 +15,7 @@ import { IDelivery } from '../../delivery/delivery.model';
 import { environment } from '../../../environments/environment';
 import { CartActions } from '../../cart/cart.actions';
 import { CartService } from '../../cart/cart.service';
+import { OrderFormAction } from '../../order/order-form-page/order-form-page.component';
 
 
 @Component({
@@ -156,7 +157,7 @@ export class MerchantDetailPageComponent implements OnInit, OnDestroy {
   }
 
   onNext() {
-    this.router.navigate(['order/form']); //  { queryParams: { fromPage: 'restaurant-detail' } });
+    this.router.navigate(['order/form/' + OrderFormAction.NEW]); //  { queryParams: { fromPage: 'restaurant-detail' } });
   }
 
 

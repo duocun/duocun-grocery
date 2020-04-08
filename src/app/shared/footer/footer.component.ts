@@ -24,6 +24,7 @@ export class FooterComponent implements OnInit, OnDestroy {
   @Input() type;
   @Input() menu;
   @Input() amount;
+  @Input() enable;
   @Output() next = new EventEmitter();
   @Output() pay = new EventEmitter();
   @Output() cancel = new EventEmitter();

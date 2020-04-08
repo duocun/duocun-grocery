@@ -54,11 +54,13 @@
       <div *ngIf="paymentMethod === PaymentMethod.PREPAY" i18n="@@PayByDeposit">Pay by my deposit</div>
 
       <app-payment-select *ngIf="paymentMethod !== PaymentMethod.PREPAY" [selected]="paymentMethod" (select)="onSelectPaymentMethod($event)"></app-payment-select>
+<!-- 
+      <form id="payment-form" *ngIf="paymentMethod === PaymentMethod.CREDIT_CARD">
+        <div id="card-element">
+        <p id="payment-result">
+      </form> -->
 
       <div class="cash-note" *ngIf="paymentMethod===PaymentMethod.CASH" i18n="@@PayCashNote">*Pay in cash upon delivery</div>
-
-      <app-credit-card-form *ngIf="paymentMethod===PaymentMethod.CREDIT_CARD" 
-        (init)="onCreditCardFormInit($event)" (focus)="onCreditCardInputFocus()"></app-credit-card-form>
     </div>
 
     <div class="row warning-block">
@@ -73,14 +75,14 @@
         <span i18n="@@Notes">Notes</span>:
       </div>
       <div class="row">
-        <textarea name="note" formControlName="note"></textarea>
+        <textarea name="note" formControlName="note" (change)="onNoteChange($event)"></textarea>
       </div>
     </div>
     <input #submitBtn id="btn-submit" [disabled]="bSubmitted" type="submit" name="submitBtn" value="Submit" />
   </form>
 </div>
 
-<app-footer [type]="'order'" (pay)="onSubmitPay()"></app-footer>
+<app-footer [type]="'order'" [enable]="paymentMethod !== PaymentMethod.CREDIT_CARD" (pay)="onSubmitPay()"></app-footer>
 
 </div>
 <!-- 

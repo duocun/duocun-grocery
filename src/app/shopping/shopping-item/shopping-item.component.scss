@@ -1,5 +1,8 @@
 @import '../../../base';
 
+$imgW:130px;
+$imgH:98px;
+
 .list-item{
   padding: 0px 0px 15px 0px;
   float: left;
@@ -10,7 +13,8 @@
     .image-body{
       padding:0px;
       img{
-        width:100%;
+        width: $imgW;
+        height: $imgH;
         border-radius: 10px;
       }    
     }
@@ -36,7 +40,7 @@
     }
 
     .text-body{
-      padding:0px 0px 0px 10px;
+      padding:0px 0px 0px 16px;
 
       .title-bg{
         font-size:18px;

@@ -1,0 +1,79 @@
+<div class="loading-spinner" *ngIf="loading">
+  <app-progress-spinner></app-progress-spinner>
+</div>
+
+<div class="page">
+  <div class="title-block">
+    <span class="title-bg" i18n="@@ConfirmOrder">Confirm Order</span>
+  </div>
+  <div class="page-body">
+
+    <!-- <div class="contact-block" *ngIf="account">
+          <div class="title-md">
+            <div class="label">
+              <span>送货日期</span>:
+            </div>
+            <span class="date">{{ delivery.date | date: 'yyyy-MM-dd'}} </span>
+          </div>
+          <div class="title-md">
+            <div class="label">
+              <span i18n="@@DeliveryAddress">Delivery Addr</span>:
+            </div>
+            <span class="address-text">{{address}}</span>
+          </div>
+        </div> -->
+
+    <div class="title-md merchant" *ngIf="merchant">{{merchant.name}}</div>
+
+    <div class="row order-detail" *ngIf="cart">
+      <div class="col-12 items-col">
+        <div *ngFor="let item of chargeItems" class="text-sm row item-row">
+          <div class="col-8 product-col">{{item.name + ' ' + item.date}}</div>
+          <div class="col-2 quantity-col">x{{item.quantity}}</div>
+        </div>
+      </div>
+      <div class="row text-sm total-col" *ngIf="charge">
+        <div class="row total-row">
+          <div class="title-xs">
+            <span>总计</span>:</div>
+          <div class="row text-xs">&nbsp;${{charge.total}}</div>
+        </div>
+
+        <div class="row total-row" *ngIf="charge.balance !== 0">
+          <div class="title-xs">
+            <span>当前余额</span>:
+          </div>
+
+          <div class="row text-xs">
+            <span *ngIf="charge.balance > 0">&nbsp;${{charge.balance}}</span>
+            <span *ngIf="charge.balance < 0">
+              <span>-</span>${{abs(charge.balance)}}
+            </span>
+          </div>
+        </div>
+
+        <div class="row total-row">
+          <div class="title-xs">
+            <span>总共应付</span>:
+          </div>
+          <div class="text-xs">&nbsp;${{charge.payable}}</div>
+        </div>
+        <!-- <app-charge-summary [charge]="charge" [bShowBalance]="true"></app-charge-summary> -->
+      </div>
+    </div>
+
+
+
+    <form id="payment-form">
+      <div id="card-element">
+        <!-- placeholder for Elements -->
+      </div>
+      <button id="card-button" *ngIf="!bSubmitted" [disabled]="bSubmitted">确认付款</button>
+      <p id="payment-result">
+        <!-- we'll pass the response from the server here -->
+      </p>
+    </form>
+    <!-- <div class="btn btn-primary" (click)="onPay()">确认付款</div> -->
+
+  </div>
+</div>

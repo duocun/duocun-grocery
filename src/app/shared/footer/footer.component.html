@@ -52,7 +52,7 @@
       &nbsp;
       <!-- ${{total | number : '1.2-2'}} -->
     </div>
-    <div class="title-md bottom-btn pay" (click)="onPay()" i18n="@@ConfirmOrder">Confirm Order</div>
+    <div *ngIf="enable" class="title-md bottom-btn pay" (click)="onPay()" i18n="@@ConfirmOrder">Confirm Order</div>
   </div>
 
   <div class="row bottom-bar restaurant" *ngIf="type === 'next'">

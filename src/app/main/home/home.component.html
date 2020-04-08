@@ -8,6 +8,7 @@
       (addrClear)="onAddressInputClear($event)" (inputFocus)="onAddressInputFocus($event)" (backHistory)="onBack()">
     </app-address-input>
   </div>
+   <!-- <div>{{ 'cId:' + clientId + ', page:' + page + ', tokenId:' + tokenId + ',  appId:' + appCode}}</div> -->
   <div class="location-list">
     <app-location-list *ngIf="places && places.length > 0" [account]="account" [places]="places" (placeSeleted)="onSelectPlace($event)">
     </app-location-list>

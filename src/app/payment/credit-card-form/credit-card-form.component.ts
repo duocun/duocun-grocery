@@ -13,11 +13,11 @@ export class CreditCardFormComponent implements OnInit {
   constructor() { }
 
   ngOnInit() {
-    const {stripe, card} = this.initStripe('card-element', 'payment-result');
+    const {stripe, card} = this.initStripe('payment-result');
     this.init.emit({stripe, card});
   }
 
-  initStripe(htmlCardId, htmlErrorId) {
+  initStripe(htmlErrorId) {
     const stripe = Stripe(environment.STRIPE.API_KEY);
     const elements = stripe.elements();
     const type = 'card';
@@ -39,11 +39,8 @@ export class CreditCardFormComponent implements OnInit {
       }
     };
 
-    // Create an instance of the card Element.
     const card = elements.create(type, { hidePostalCode: true, style: style });
-
-    // Add an instance of the card Element into the `card-element` <div>.
-    card.mount('#' + htmlCardId);
+    card.mount('#card-element');
 
     // Handle real-time validation errors from the card Element.
     card.addEventListener('change', function (event) {

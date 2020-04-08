@@ -1,26 +1,37 @@
 import { IOrder } from './order.model';
-import { OrderActions } from './order.actions';
+import { OrderActions, PaymentActions } from './order.actions';
 
 export interface IOrderAction {
   type: string;
-  payload: IOrder;
+  payload: IOrder[];
 }
 
-export function orderReducer(state: IOrder = { }, action: any) {
+export function orderReducer(state: IOrder[] = [], action: any) {
   if (action.payload) {
     switch (action.type) {
-      case OrderActions.UPDATE_PAYMENT_METHOD:
-      return {
-        ...state,
-        paymentMethod: action.payload.paymentMethod
-      };
-      case OrderActions.UPDATE_ORDER:
+      case OrderActions.REPLACE_ORDERS:
         return action.payload;
 
-      case OrderActions.CLEAR_ORDER:
-        return null;
+      case OrderActions.UPDATE_ORDERS:
+        return state.map(order => {
+          return { ...order, ...action.payload };
+        });
+
+      case OrderActions.CLEAR_ORDERS:
+        return [];
     }
   }
+  return state;
+}
 
+export function paymentReducer(state = {}, action: any) {
+  if (action.payload) {
+    switch (action.type) {
+      case PaymentActions.UPDATE_PAYMENT_METHOD:
+        return { ...state, ...action.payload };
+      case PaymentActions.CLEAR_PAYMENT_METHOD:
+        return {};
+    }
+  }
   return state;
 }

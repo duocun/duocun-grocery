@@ -98,6 +98,32 @@ export class PhoneVerifyDialogComponent implements OnInit, OnDestroy {
     }
   }
 
+  onVerify() {
+    const self = this;
+    const code = this.form.value.verificationCode.toString();
+    let phone: string = this.form.value.phone;
+    phone = phone.substring(0, 2) === '+1' ? phone.substring(2) : phone;
+    phone = phone.match(/\d+/g).join('');
+
+    const accountId = self.account ? self.account._id : '';
+    this.verifing = true;
+    this.accountSvc.verifyPhoneNumber(phone, code, accountId).pipe(takeUntil(this.onDestroy$)).subscribe((r: any) => {
+      self.verifing = false;
+      self.verified = r.verified;
+
+      if (r.err === VerificationError.NONE) {
+        const account = r.account;
+        const paymentMethod = this.data.paymentMethod;
+        self.authSvc.setAccessTokenId(r.tokenId);
+        self.dialogRef.close({ account, paymentMethod });
+      } else if (r.err === VerificationError.REQUIRE_SIGNUP) {
+        self.phoneMatchedAccount = r.account; // display signup button
+      } else {
+        self.showError(r.err);
+      }
+    });
+  }
+
   onPhoneInput(e) {
     const self = this;
     this.verified = false;
@@ -154,23 +180,23 @@ export class PhoneVerifyDialogComponent implements OnInit, OnDestroy {
 
     if (e.target.value && e.target.value.length === 4) {
       const code = e.target.value;
-      const accountId = self.account ? self.account._id : '';
-      this.verifing = true;
-      this.accountSvc.verifyPhoneNumber(phone, code, accountId).pipe(takeUntil(this.onDestroy$)).subscribe((r: any) => {
-        self.verifing = false;
-        self.verified = r.verified;
+      // const accountId = self.account ? self.account._id : '';
+      // this.verifing = true;
+      // this.accountSvc.verifyPhoneNumber(phone, code, accountId).pipe(takeUntil(this.onDestroy$)).subscribe((r: any) => {
+      //   self.verifing = false;
+      //   self.verified = r.verified;
 
-        if (r.err === VerificationError.NONE) {
-          const account = r.account;
-          const paymentMethod = this.data.paymentMethod;
-          self.authSvc.setAccessTokenId(r.tokenId);
-          self.dialogRef.close({ account, paymentMethod });
-        } else if (r.err === VerificationError.REQUIRE_SIGNUP) {
-          self.phoneMatchedAccount = r.account; // display signup button
-        } else {
-          self.showError(r.err);
-        }
-      });
+      //   if (r.err === VerificationError.NONE) {
+      //     const account = r.account;
+      //     const paymentMethod = this.data.paymentMethod;
+      //     self.authSvc.setAccessTokenId(r.tokenId);
+      //     self.dialogRef.close({ account, paymentMethod });
+      //   } else if (r.err === VerificationError.REQUIRE_SIGNUP) {
+      //     self.phoneMatchedAccount = r.account; // display signup button
+      //   } else {
+      //     self.showError(r.err);
+      //   }
+      // });
     } else {
       this.verified = false;
     }

@@ -1,0 +1,166 @@
+@import '../../../base';
+.page-body{
+  padding: 15px;
+}
+.contact-block{
+  padding: 10px 0px;
+  border-bottom: solid 1px #eee;
+
+  .row{
+    margin: 0px;
+    padding-bottom: 0px;
+  }
+  .phone-col{
+    padding-left: 15px;
+  }
+
+  .title-md {
+    padding-top: 0px;
+    font-size: 13px;
+    line-height: 20px;
+    .label{
+      width: 84px;
+      float: left;
+    }
+  }
+
+  .address-text{
+    font-weight: bold;
+  }
+}
+
+.total-block {
+  padding: 10px 15px;
+  
+  .row {
+    padding-bottom: 4px;
+    .col-9 {
+      padding-left: 100px;
+    }
+  }
+
+  .total-row{
+    margin-top: 5px;
+    padding-top: 10px;
+    border-top: solid 1px #eee;
+
+    .col-9, .col-3{
+      font-size: 16px;
+    }
+  }
+}
+
+
+.order-detail{
+  padding-top: 6px;
+  font-size: 16px;
+  .items-col{
+    padding-left: 0px;
+    padding-right: 10px;
+    margin-right: 0px;
+
+    .item-row{
+      padding-bottom: 3px;
+      padding-right: 4px;
+    }
+
+    .product-col, .quantity-col, .price-col {
+      padding-left: 0px;
+      padding-right: 0px;
+      font-size: 14px;
+      line-height: 14px;
+      padding: 0px;
+    }
+  }
+
+  .total-col{
+    display: flex;
+    align-items: flex-end;
+    padding-left: 0px;
+    padding-right: 0px;
+    padding-bottom: 8px;
+
+    .col-12{
+      padding-bottom: 3px;
+      padding-right: 0px;
+      padding-left: 0px;
+    }
+
+    .title-xs{
+      width: 73px;
+      float: left;
+      font-size: 14px;
+      font-weight: 500;
+    }
+
+    .text-xs{
+      float: left;
+      font-size: 14px;
+      margin-left: 4px;
+    }
+
+    .total-row{
+      margin-top: 3px;
+      padding-top: 5px;
+      width: 100%;
+      // border-top: solid 1px #eee;
+    }
+  }
+}
+
+
+// credit card
+#payment-form{
+  margin-top: 13px;
+
+  .form-row{
+    margin: 0px;
+  }
+
+  label.label-sm{
+    margin-bottom: 0px;
+  }
+}
+
+
+/**
+ * The CSS shown here will not be introduced in the Quickstart guide, but shows
+ * how you can use CSS to style your Element's container.
+ */
+ .StripeElement {
+  box-sizing: border-box;
+  height: 40px;
+  padding: 10px 12px;
+  border: 1px solid transparent;
+  border-radius: 3px;
+  background-color: white;
+  box-shadow: none; // 0 1px 3px 0 #e6ebf1;
+  -webkit-transition: none; // box-shadow 150ms ease;
+  transition: none; // box-shadow 150ms ease;
+}
+
+.StripeElement--focus {
+  box-shadow: none; // 0 1px 3px 0 #cfd7df;
+}
+
+.StripeElement--invalid {
+  border-color: #fa755a;
+}
+
+.StripeElement--webkit-autofill {
+  background-color: #fefde5 !important;
+}
+
+#card-element{
+  width: 100%;
+  border: 1px solid #ddd;
+}
+
+#card-button{
+  margin-top: 10px;
+  background: $primary-color;
+  padding: 8px 20px;
+  color: white;
+  border-radius: 3px;
+  border-style: none;
+}
