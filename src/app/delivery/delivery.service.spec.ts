@@ -54,12 +54,12 @@ describe('DeliveryService', () => {
     expect(date.format('YYYY-MM-DD')).toBe('2020-03-27');
   });
 
-  it('getLatest should be 04-07', () => {
+  it('getLatest should be 04-08', () => {
     const service: DeliveryService = TestBed.get(DeliveryService);
-    const myDateTime = '2020-04-07T23:58:00.000Z';
-    const ms = [moment.utc('2020-04-07T23:59:00.000Z'), moment.utc('2020-04-08T23:59:00.000Z')];
+    const myDateTime = '2020-04-08T23:58:00.000Z';
+    const ms = [moment.utc('2020-04-08T23:59:00.000Z'), moment.utc('2020-04-09T23:59:00.000Z')];
     const date = service.getLatest(myDateTime, ms);
-    expect(date.format('YYYY-MM-DD')).toBe('2020-04-07');
+    expect(date.format('YYYY-MM-DD')).toBe('2020-04-08');
   });
 
   // myDateTime -- '2020-03-23 23:58:00'
