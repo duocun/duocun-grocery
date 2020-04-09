@@ -190,7 +190,7 @@ export class OrderFormPageComponent implements OnInit, OnDestroy {
               const order = this.orderSvc.createOrder(account, merchant, items, location, date, time, charge, note, paymentMethod, lang);
               orders.push(order);
             });
-
+            this.loading = false;
             this.rx.dispatch({ type: OrderActions.REPLACE_ORDERS, payload: orders });
           } else {
             // process browser back button press
@@ -212,6 +212,8 @@ export class OrderFormPageComponent implements OnInit, OnDestroy {
               if (self.paymentMethod === PaymentMethod.WECHAT) {
                 window.location.href = rt.url;
                 this.loading = false;
+                // set default payment method
+                this.rx.dispatch({type: PaymentActions.UPDATE_PAYMENT_METHOD, payload: {paymentMethod: PaymentMethod.WECHAT}});
               } else {
                 this.loading = false;
                 // set default payment method
@@ -310,26 +312,32 @@ export class OrderFormPageComponent implements OnInit, OnDestroy {
           } else {
             this.bSubmitted = true; // important! block form submit
             self.placeOrdersAndPay(self.appCode, self.orders, self.paymentMethodId, account, payable).then((rt: any) => {
-              this.showError(rt.err);
               this.bSubmitted = false;
               if (rt.err === PaymentError.NONE) {
                 this.rx.dispatch({ type: CartActions.CLEAR_CART, payload: [] });
                 if (self.paymentMethod === PaymentMethod.WECHAT) {
                   this.loading = false;
                   window.location.href = rt.url;
+                  // set default payment method
+                  this.rx.dispatch({type: PaymentActions.UPDATE_PAYMENT_METHOD, payload: {paymentMethod: PaymentMethod.WECHAT}});
                 } else {
                   this.loading = false;
                   // set default payment method
                   this.rx.dispatch({type: PaymentActions.UPDATE_PAYMENT_METHOD, payload: {paymentMethod: PaymentMethod.WECHAT}});
                   self.router.navigate(['order/history']);
                 }
+              } else {
+                this.showError(rt.err);
+                // stay in same page and set default payment method
+                this.rx.dispatch({type: PaymentActions.UPDATE_PAYMENT_METHOD, payload: {paymentMethod: PaymentMethod.WECHAT}});
               }
             });
           }
-        } else { // didn't login
+        } else { // didn't login or session down
           this.loading = false;
-          // this.openPhoneVerifyDialog(account, paymentMethod);
-          this.router.navigate(['contact/phone-form/' + OrderFormAction.RESUME_PAY]);
+          alert('微信登陆已过期, 请退出公众号重新进入');
+          this.rx.dispatch({type: PaymentActions.UPDATE_PAYMENT_METHOD, payload: {paymentMethod: PaymentMethod.WECHAT}});
+          this.router.navigate(['/']);
         }
       } else {
         // show verify bank card error
