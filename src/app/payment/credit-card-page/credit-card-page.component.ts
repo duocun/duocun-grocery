@@ -135,7 +135,7 @@ export class CreditCardPageComponent implements OnInit, OnDestroy {
       if (result.error) {
         this.loading = false;
         this.bSubmitted = false;
-        alert('Invalid Bank Card or input wrong information.');
+        alert('Invalid Bank Card or input wrong information.'); // allow stay in page and try again.
       } else {
         const paymentMethodId = result.paymentMethod.id;
         this.rx.dispatch({ type: PaymentActions.UPDATE_PAYMENT_METHOD, payload: { paymentMethodId: result.paymentMethod.id } });
@@ -147,13 +147,14 @@ export class CreditCardPageComponent implements OnInit, OnDestroy {
           this.placeOrdersAndPay(orders, paymentMethodId, account, payable).then((rsp: any) => {
             this.loading = false;
             this.bSubmitted = false;
+            // set default payment method !!! important for both success and fail
+            this.rx.dispatch({type: PaymentActions.UPDATE_PAYMENT_METHOD, payload: {paymentMethod: PaymentMethod.WECHAT}});
             if (rsp.err === PaymentError.NONE) {
               this.rx.dispatch({ type: CartActions.CLEAR_CART, payload: [] });
-              // set default payment method
-              this.rx.dispatch({type: PaymentActions.UPDATE_PAYMENT_METHOD, payload: {paymentMethod: PaymentMethod.WECHAT}});
               this.router.navigate(['order/history']);
             } else {
-              alert('Payment Fail, please contact customer service.');
+              alert('Pay failed, please try another card or contact customer service.');
+              this.router.navigate(['order/form/' + OrderFormAction.NEW]); // allow user to redo payment process
             }
           });
         }
@@ -176,6 +177,7 @@ export class CreditCardPageComponent implements OnInit, OnDestroy {
     });
   }
 
+  // deprecated
   async verifyPaymentInput(account, payable) {
     if (payable > 0) {
       const result = await this.stripe.createPaymentMethod({
