@@ -31,19 +31,24 @@ $navbar-h: 0px;
   top: 0px;
   height: 100%;
   width: 100%;
+  padding: 0px $content-padding;
 }
 .title-row{
   height: $head-h;
   padding: 15px;
   border-bottom: 1px solid $border-color;
 }
+
+.title-block{
+  width: calc(100% - #{$content-padding} - #{$content-padding});
+}
+
 .page-body{
   position: fixed;
   top: $head-h;
-  width: 100%;
+  width: calc(100% - #{$content-padding} - #{$content-padding});
   height: calc(100% - #{$head-h} - #{$bottom-bar-h});
 }
-
 app-footer{
   z-index: 990; // spinner 1000
   position: fixed;
@@ -99,6 +104,15 @@ app-footer{
 }
 
 @media #{$mobile}{
+  .page{
+    padding: 0px;
+  }
+  .title-block{
+    width: 100%;
+  }
+  .page-body{
+    width: 100%;
+  }
   .bottom-bar{
     width: 100%;
     border-right: none;

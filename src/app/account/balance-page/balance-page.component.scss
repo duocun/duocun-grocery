@@ -1,5 +1,8 @@
 @import '../../../base';
 
+$list-head-h: 32px;
+$list-bottom-h: 32px;
+
 .payment-table-container{
   margin-top: 60px;
   height: 540px;
@@ -47,7 +50,8 @@ td.mat-cell:last-of-type, td.mat-footer-cell:last-of-type, th.mat-header-cell:la
 // }
 
 .balance-list{
-  margin-top: 70px;
+  height: 100%;
+
   .col-2{
     padding-left: 5px;
     padding-right: 2px;
@@ -63,15 +67,28 @@ td.mat-cell:last-of-type, td.mat-footer-cell:last-of-type, th.mat-header-cell:la
     padding-left: 6px;
     padding-right: 2px;
   }
+
+  .list-head{
+    padding-top: 8px;
+    height: $list-head-h;
+  }
+  
+  .list-body{
+    overflow-y: scroll;
+    height: calc(100% - #{$list-head-h} - #{$list-bottom-h});
+  }
+
   .list-item{
     padding-bottom: 2px;
+    width: 100%;
   }
 }
-
-.balance-pagination {
-  .ngx-pagination {
-    padding-left: 4px;
-  }
+pagination-controls{
+  height: $list-bottom-h;
+}
+.ngx-pagination{
+  padding-left: 0px !important;
+  padding-inline-start: 0px !important;
 }
 
 $cellphone: "(max-width:480px)";

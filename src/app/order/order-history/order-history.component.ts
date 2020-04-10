@@ -180,7 +180,8 @@ export class OrderHistoryComponent implements OnInit, OnDestroy {
   }
 
   toDateString(s) {
-    return s ? this.sharedSvc.toDateString(s) : '';
+    // return s ? this.sharedSvc.toDateString(s) : '';
+    return moment.utc(s).format('YYYY-MM-DD');
   }
 
   getDescription(order) {
