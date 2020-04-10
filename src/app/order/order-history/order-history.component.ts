@@ -181,7 +181,12 @@ export class OrderHistoryComponent implements OnInit, OnDestroy {
 
   toDateString(s) {
     // return s ? this.sharedSvc.toDateString(s) : '';
-    return moment.utc(s).format('YYYY-MM-DD');
+    // return moment.utc(s).format('YYYY-MM-DD');
+    if (s) {
+      return s.split('T')[0];
+    } else {
+      return 'N/A';
+    }
   }
 
   getDescription(order) {
@@ -196,8 +201,8 @@ export class OrderHistoryComponent implements OnInit, OnDestroy {
 
     if (order.type === 'MM') {
       return range + (this.lang === 'en' ? ' Phone monthly fee' : ' 电话月费');
-    // } else if (order.type === 'MS') {
-    //   return (this.lang === 'en' ? ' Phone setup fee' : ' 电话安装费');
+      // } else if (order.type === 'MS') {
+      //   return (this.lang === 'en' ? ' Phone setup fee' : ' 电话安装费');
     } else {
       return '';
     }
