@@ -8,6 +8,7 @@ import { combineReducers } from 'redux';
 export const DEFAULT_CART = [];
 const DEFAULT_LOCATION = {};
 const DEFAULT_MERCHANT = {};
+const DEFAULT_PRODUCT = {};
 
 // state --- [{ product, deliveries:[{date, time, quantity}] }]
 // payload --- { product:{_id, price, cost, taxRate }, delivery: {date, time, quantity} }
@@ -61,6 +62,16 @@ export const cartReducer = (state = DEFAULT_CART, action) => {
 
     case CartActions.CLEAR_CART:
         return [];
+    default:
+      return state;
+  }
+};
+
+export const productReducer = (state = DEFAULT_PRODUCT, action) => {
+  const payload = action.payload;
+  switch (action.type) {
+    case 'SET_LATEST_SELECTED_PRODUCT':
+      return payload;
     default:
       return state;
   }

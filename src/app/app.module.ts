@@ -5,7 +5,7 @@ import { FormsModule } from '@angular/forms';
 import { StoreModule } from '@ngrx/store';
 import { StoreDevtoolsModule } from '@ngrx/store-devtools';
 
-import { NgReduxModule, NgRedux } from '@angular-redux/store';
+import { NgReduxModule, NgRedux, DevToolsExtension } from '@angular-redux/store';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { rootReducer, INITIAL_STATE } from './store';
 // import { NgxPaginationModule } from 'ngx-pagination';
@@ -20,6 +20,7 @@ import { EntityService } from './entity.service';
 import { AccountService } from './account/account.service';
 import { ContactService } from './contact/contact.service';
 import { CartModule } from './cart/cart.module';
+import { environment } from '../environments/environment';
 
 const appRoutes: Routes = [
   {
@@ -118,10 +119,19 @@ const appRoutes: Routes = [
     AccountService,
     ContactService
   ]
-
 })
+
 export class AppModule {
-  constructor(ngRedux: NgRedux<any>) {
-    ngRedux.configureStore(rootReducer, INITIAL_STATE);
+  constructor(
+    ngRedux: NgRedux<any>,
+    devTools: DevToolsExtension
+  ) {
+    const storeEnhancers = devTools.isEnabled() ? [devTools.enhancer()] : [];
+    ngRedux.configureStore(
+      rootReducer,
+      INITIAL_STATE,
+      [],
+      environment.production ? [] : storeEnhancers
+    );
   }
 }

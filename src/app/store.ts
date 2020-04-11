@@ -6,7 +6,7 @@ import { IDelivery } from './delivery/delivery.model';
 import { deliveryReducer, DEFAULT_DELIVERY } from './delivery/delivery.reducer';
 import { IContact } from './contact/contact.model';
 import { contactReducer } from './contact/contact.reducer';
-import { cartReducer, DEFAULT_CART } from './cart/cart.reducer';
+import { cartReducer, DEFAULT_CART, productReducer } from './cart/cart.reducer';
 import { IMerchant } from './merchant/merchant.model';
 import { Account } from './account/account.model';
 import { orderReducer, paymentReducer } from './order/order.reducers';
@@ -25,6 +25,7 @@ export interface IAppState {
     contact: IContact;
     orders: IOrder[];
     address: string;
+    productId: string;
 }
 
 export const INITIAL_STATE: IAppState = {
@@ -38,7 +39,8 @@ export const INITIAL_STATE: IAppState = {
     delivery: DEFAULT_DELIVERY,
     contact: null,
     orders: null,
-    address: ''
+    address: '',
+    productId: null
 };
 
 // export function rootReducer(last:IAppState, action:Action):IAppState{
@@ -62,5 +64,6 @@ export const rootReducer = combineReducers({
     delivery: deliveryReducer,
     contact: contactReducer,
     orders: orderReducer,
-    address: addressReducer
+    address: addressReducer,
+    productId: productReducer
 });

@@ -8,7 +8,9 @@ export class CartActions {
 
 }
 
-
+export class ProductActions {
+  static SET_LATEST_SELECTED_PRODUCT = 'SET_LATEST_SELECTED_PRODUCT';
+}
 
 // item - {product:{_id, price, cost, taxRate }, delivery: {date, time, quantity} }
 export const addToCart = (item) => {

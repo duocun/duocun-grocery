@@ -13,7 +13,7 @@ import { MatDialog } from '../../../../node_modules/@angular/material';
 import { QuitMerchantDialogComponent } from '../quit-merchant-dialog/quit-merchant-dialog.component';
 import { IDelivery } from '../../delivery/delivery.model';
 import { environment } from '../../../environments/environment';
-import { CartActions } from '../../cart/cart.actions';
+import { CartActions, ProductActions } from '../../cart/cart.actions';
 import { CartService } from '../../cart/cart.service';
 import { OrderFormAction } from '../../order/order-form-page/order-form-page.component';
 
@@ -43,6 +43,7 @@ export class MerchantDetailPageComponent implements OnInit, OnDestroy {
   subscription;
   amount = 0;
   items;
+  productId;  // recently selected product
   @ViewChild('list', { static: true }) list: ElementRef;
 
   constructor(
@@ -76,6 +77,10 @@ export class MerchantDetailPageComponent implements OnInit, OnDestroy {
         // this.deliveries = this.mergeQuantity(ds, cart, this.product._id);
         this.amount = this.cartSvc.getTotalPrice(cart);
       }
+    });
+
+    this.rx.select('productId').pipe(takeUntil(this.onDestroy$)).subscribe((productId) => {
+      self.productId = productId;
     });
 
     this.locationSubscription = this.location.subscribe((x) => {
@@ -114,6 +119,18 @@ export class MerchantDetailPageComponent implements OnInit, OnDestroy {
           return { product: p, quantity: 0 };
         });
         this.items = this.mergeCart(this.cart, items);
+
+        const item = this.items.find(it => it.product._id === this.productId);
+        if (item && item.quantity === 0) {
+          const remains = this.items.filter(it => it.quantity > 0);
+          if (remains && remains.length > 0) {
+            const productId = remains[0].product._id;
+            this.rx.dispatch({ type: ProductActions.SET_LATEST_SELECTED_PRODUCT, payload: productId });
+          } else {
+            const productId = this.items[0].product._id;
+            this.rx.dispatch({ type: ProductActions.SET_LATEST_SELECTED_PRODUCT, payload: productId });
+          }
+        }
       });
     });
   }
@@ -178,6 +195,7 @@ export class MerchantDetailPageComponent implements OnInit, OnDestroy {
   }
 
   // merge quantity in card into product
+  // return [{product, quantity}]
   mergeCart(cart, currItems) {
     if (cart && cart.length > 0) {
       cart.map((it: any) => {
@@ -207,6 +225,7 @@ export class MerchantDetailPageComponent implements OnInit, OnDestroy {
       return;
     } else {
       // this.selected = p;
+      this.rx.dispatch({ type: ProductActions.SET_LATEST_SELECTED_PRODUCT, payload: item.product._id });
       this.router.navigate(['cart/delivery/' + item.product._id]);
     }
   }
