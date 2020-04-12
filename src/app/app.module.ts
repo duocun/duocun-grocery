@@ -24,55 +24,55 @@ import { CartModule } from './cart/cart.module';
 const appRoutes: Routes = [
   {
     path: 'location',
-    loadChildren: './location/location.module#LocationModule'
+    loadChildren: () => import('./location/location.module').then(m => m.LocationModule)
   },
   {
     path: 'area',
-    loadChildren: './area/area.module#AreaModule'
+    loadChildren: () => import('./area/area.module').then(m => m.AreaModule)
   },
   {
     path: 'payment',
-    loadChildren: './payment/payment.module#PaymentModule'
+    loadChildren: () => import('./payment/payment.module').then(m => m.PaymentModule)
   },
   {
     path: 'cart',
-    loadChildren: './cart/cart.module#CartModule'
+    loadChildren: () => import('./cart/cart.module').then(m => m.CartModule)
   },
   {
     path: 'product',
-    loadChildren: './product/product.module#ProductModule'
+    loadChildren: () => import('./product/product.module').then(m => m.ProductModule)
   },
   {
     path: 'shopping',
-    loadChildren: './shopping/shopping.module#ShoppingModule'
+    loadChildren: () => import('./shopping/shopping.module').then(m => m.ShoppingModule)
   },
   {
     path: 'merchant',
-    loadChildren: './merchant/merchant.module#MerchantModule'
+    loadChildren: () => import('./merchant/merchant.module').then(m => m.MerchantModule)
   },
   {
     path: 'order',
-    loadChildren: './order/order.module#OrderModule'
+    loadChildren: () => import('./order/order.module').then(m => m.OrderModule)
   },
   {
     path: 'delivery',
-    loadChildren: './delivery/delivery.module#DeliveryModule'
+    loadChildren: () => import('./delivery/delivery.module').then(m => m.DeliveryModule)
   },
   {
     path: 'contact',
-    loadChildren: './contact/contact.module#ContactModule'
+    loadChildren: () => import('./contact/contact.module').then(m => m.ContactModule)
   },
   {
     path: 'account',
-    loadChildren: './account/account.module#AccountModule'
+    loadChildren: () => import('./account/account.module').then(m => m.AccountModule)
   },
   {
     path: 'main',
-    loadChildren: './main/main.module#MainModule'
+    loadChildren: () => import('./main/main.module').then(m => m.MainModule)
   },
   {
     path: '',
-    loadChildren: './main/main.module#MainModule'
+    loadChildren: () => import('./main/main.module').then(m => m.MainModule)
   },
 ];
 
