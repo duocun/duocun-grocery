@@ -152,6 +152,7 @@ export class HomeComponent implements OnInit, OnDestroy {
           this.router.navigate(['/']);
         }
       } else if (window.location.pathname.endsWith('order/history')) {
+
       }
     });
   }
@@ -159,7 +160,7 @@ export class HomeComponent implements OnInit, OnDestroy {
   login(code) {
     // tslint:disable-next-line:no-shadowed-variable
     return new Promise((resolve, reject) => {
-      this.accountSvc.getAccount().then(account => {
+      this.accountSvc.getCurrentAccount().pipe(takeUntil(this.onDestroy$)).subscribe((account: IAccount) => {
         if (account) {
           resolve(account);
         } else {
@@ -228,7 +229,7 @@ export class HomeComponent implements OnInit, OnDestroy {
 
         if (tokenId) {
           this.accountSvc.setAccessTokenId(tokenId);
-          this.accountSvc.getAccount().then((account: IAccount) => {
+          this.accountSvc.getCurrentAccount().pipe(takeUntil(this.onDestroy$)).subscribe((account: IAccount) => {
             self.account = account;
             // use for manage default location
             this.rx.dispatch({ type: AppStateActions.UPDATE_APP_STATE, payload: AppState.READY });

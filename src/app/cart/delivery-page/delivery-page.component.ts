@@ -12,7 +12,6 @@ import { MerchantScheduleService } from '../../merchant/merchant-schedule.servic
 import { AreaService } from '../../area/area.service';
 import { DeliveryService } from '../../delivery/delivery.service';
 import { MerchantService } from '../../merchant/merchant.service';
-import { resolve } from '@types/q';
 
 const baseTimeList = ['11:00'];
 export const AppType = {
