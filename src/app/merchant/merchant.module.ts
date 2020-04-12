@@ -5,7 +5,7 @@ import { MerchantDetailPageComponent } from './merchant-detail-page/merchant-det
 import { ProductModule } from '../product/product.module';
 
 import { MatTabsModule } from '@angular/material/tabs';
-import { MatDialogModule } from '../../../node_modules/@angular/material';
+import { MatDialogModule } from '@angular/material';
 import { CartModule } from '../cart/cart.module';
 import { QuitMerchantDialogComponent } from './quit-merchant-dialog/quit-merchant-dialog.component';
 import { SharedModule } from '../shared/shared.module';

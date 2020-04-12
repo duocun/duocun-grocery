@@ -1,8 +1,8 @@
 import { Injectable } from '@angular/core';
 import { EntityService } from '../entity.service';
 import { AuthService } from '../account/auth.service';
-import { HttpClient } from '../../../node_modules/@angular/common/http';
-import { Observable } from '../../../node_modules/rxjs';
+import { HttpClient } from '@angular/common/http';
+import { Observable } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'

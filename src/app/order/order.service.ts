@@ -4,7 +4,7 @@ import { HttpClient } from '@angular/common/http';
 
 import { EntityService, HttpStatus } from '../entity.service';
 import { AuthService } from '../account/auth.service';
-import { Observable } from '../../../node_modules/rxjs';
+import { Observable } from 'rxjs';
 import { IOrder, OrderType, OrderStatus } from './order.model';
 import { PaymentMethod, PaymentStatus } from '../payment/payment.model';
 

@@ -1,11 +1,11 @@
 import { Component, OnInit, Inject, OnDestroy } from '@angular/core';
-import { MatDialogRef, MAT_DIALOG_DATA, MatSnackBar } from '../../../../node_modules/@angular/material';
-import { takeUntil } from '../../../../node_modules/rxjs/operators';
-import { Subject } from '../../../../node_modules/rxjs';
+import { MatDialogRef, MAT_DIALOG_DATA, MatSnackBar } from '@angular/material';
+import { takeUntil } from 'rxjs/operators';
+import { Subject } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import { AccountService } from '../../account/account.service';
 import { IAccount } from '../../account/account.model';
-import { FormBuilder } from '../../../../node_modules/@angular/forms';
+import { FormBuilder } from '@angular/forms';
 import { AuthService } from '../../account/auth.service';
 
 export const AccountType = {

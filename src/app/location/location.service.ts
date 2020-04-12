@@ -4,7 +4,7 @@ import { Observable, of } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
 import { AuthService } from '../account/auth.service';
 import { EntityService } from '../entity.service';
-import { mergeMap, map } from '../../../node_modules/rxjs/operators';
+import { mergeMap, map } from 'rxjs/operators';
 
 declare let google: any;
 

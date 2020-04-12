@@ -2,8 +2,8 @@ import { Component, OnInit, OnDestroy } from '@angular/core';
 
 
 import { PaymentService } from '../payment.service';
-// import { takeUntil } from '../../../../node_modules/rxjs/operators';
-import { Subject } from '../../../../node_modules/rxjs';
+// import { takeUntil } from 'rxjs/operators';
+import { Subject } from 'rxjs';
 
 // import { environment } from '../../../environments/environment';
 // declare var Stripe;

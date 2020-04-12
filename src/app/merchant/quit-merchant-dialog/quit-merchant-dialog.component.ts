@@ -1,10 +1,10 @@
 import { Component, OnInit, Inject, OnDestroy } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA} from '@angular/material';
-import { NgRedux } from '../../../../node_modules/@angular-redux/store';
+import { NgRedux } from '@angular-redux/store';
 import { IAppState } from '../../store';
 import { CartActions } from '../../cart/cart.actions';
 import { Router} from '@angular/router';
-import { Subject } from '../../../../node_modules/rxjs';
+import { Subject } from 'rxjs';
 import { MerchantActions } from '../merchant.actions';
 
 export interface IDialogData {

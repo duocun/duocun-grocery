@@ -1,5 +1,5 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
-import { Subject } from '../../node_modules/rxjs';
+import { Subject } from 'rxjs';
 
 @Component({
   selector: 'app-root',

@@ -1,15 +1,15 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { IPlace, ILocation, ILocationHistory, IDistance } from '../../location/location.model';
-import { Subject } from '../../../../node_modules/rxjs';
-import { takeUntil } from '../../../../node_modules/rxjs/operators';
+import { Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 import { PageActions } from '../../main/main.actions';
-import { ActivatedRoute, Router } from '../../../../node_modules/@angular/router';
-import { NgRedux } from '../../../../node_modules/@angular-redux/store';
+import { ActivatedRoute, Router } from '@angular/router';
+import { NgRedux } from '@angular-redux/store';
 import { IAppState } from '../../store';
 import { LocationService } from '../../location/location.service';
 import { AccountService } from '../../account/account.service';
 import * as Cookies from 'js-cookie';
-import { MatSnackBar } from '../../../../node_modules/@angular/material';
+import { MatSnackBar } from '@angular/material';
 import { DeliveryActions } from '../../delivery/delivery.actions';
 import { IDeliveryAction } from '../../delivery/delivery.reducer';
 
