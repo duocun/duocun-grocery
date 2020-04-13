@@ -90,6 +90,16 @@ export class AccountService extends EntityService {
       return of(null);
     }
   }
+  // ------------------------------------
+  // getCurrentAccount
+  // return IAccount or null
+  getAccountByToken(tokenId: string): Observable<any> {
+    if (tokenId) {
+      return this.http.get(this.url + '/current?tokenId=' + tokenId);
+    } else {
+      return of(null);
+    }
+  }
 
   wechatLogin(authCode: string) {
     const url = this.url + '/wechatLogin?code=' + authCode;

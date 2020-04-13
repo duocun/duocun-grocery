@@ -229,13 +229,18 @@ export class HomeComponent implements OnInit, OnDestroy {
 
         if (tokenId) {
           this.accountSvc.setAccessTokenId(tokenId);
-          this.accountSvc.getCurrentAccount().pipe(takeUntil(this.onDestroy$)).subscribe((account: IAccount) => {
-            self.account = account;
-            // use for manage default location
-            this.rx.dispatch({ type: AppStateActions.UPDATE_APP_STATE, payload: AppState.READY });
-            self.mount(account);
+          this.accountSvc.getAccountByToken(tokenId).pipe(takeUntil(this.onDestroy$)).subscribe((account: IAccount) => {
+            if (account) {
+              self.account = account;
+              // use for manage default location
+              this.rx.dispatch({ type: AppStateActions.UPDATE_APP_STATE, payload: AppState.READY });
+              self.mount(account);
+            } else {
+              alert('登陆失败');
+            }
           });
-        } else {
+        } else { // when browser navigate back
+          // alert('微信登陆失败');
           const code = queryParams.get('code');
           this.loading = true;
           this.login(code).then((account: IAccount) => {
