@@ -1,6 +1,8 @@
 import { Injectable } from '@angular/core';
 import * as moment from 'moment';
 
+const N_WEEKS = 2;
+
 @Injectable({
   providedIn: 'root'
 })
@@ -151,7 +153,7 @@ export class DeliveryService {
   getDeliverySchedule(baseList, deliverTimeList) {
     const list = [];
     if (baseList && baseList.length > 0) {
-      for (let i = 0; i < 30; i++) {
+      for (let i = 0; i < N_WEEKS; i++) {
         const dateList = baseList.map(b => moment.utc(b).add(7 * i, 'days').format('YYYY-MM-DD'));
         dateList.map(d => {
           deliverTimeList.map(t => {
