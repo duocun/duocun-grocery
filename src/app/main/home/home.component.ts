@@ -11,7 +11,7 @@ import { PageActions, AppStateActions } from '../../main/main.actions';
 import { Router, ActivatedRoute } from '@angular/router';
 import { AppState, IApp } from '../main.reducers';
 import { Subject } from 'rxjs';
-import { takeUntil } from 'rxjs/operators';
+import { takeUntil, skip, debounceTime, distinctUntilChanged } from 'rxjs/operators';
 import { ICommand } from '../../shared/command.reducers';
 import { IAccount } from '../../account/account.model';
 import { AccountActions } from '../../account/account.actions';
@@ -186,7 +186,12 @@ export class HomeComponent implements OnInit, OnDestroy {
   ngOnInit() {
     const self = this;
     this.places = []; // clear address list
-    self.route.queryParamMap.pipe(takeUntil(this.onDestroy$)).subscribe(queryParams => {
+    self.route.queryParamMap.pipe(
+      // skip(1),
+      debounceTime(100),
+      distinctUntilChanged(),
+      takeUntil(this.onDestroy$)
+    ).subscribe(queryParams => {
       // if url has format '...?cId=x&p=y', it is some procedure that re-enter the home page
       const clientId = queryParams.get('cId'); // use for after card pay, could be null
       const page = queryParams.get('p');
