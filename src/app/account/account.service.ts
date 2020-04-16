@@ -90,6 +90,16 @@ export class AccountService extends EntityService {
       return of(null);
     }
   }
+  // ------------------------------------
+  // getCurrentAccount
+  // return IAccount or null
+  getAccountByToken(tokenId: string): Observable<any> {
+    if (tokenId) {
+      return this.http.get(this.url + '/current?tokenId=' + tokenId);
+    } else {
+      return of(null);
+    }
+  }
 
   wechatLogin(authCode: string) {
     const url = this.url + '/wechatLogin?code=' + authCode;
@@ -114,18 +124,18 @@ export class AccountService extends EntityService {
     return this.http.get(url).toPromise();
   }
 
-  getAccount() {
-    const tokenId: string = this.authSvc.getAccessTokenId();
-    return new Promise((resolve, reject) => {
-      this.http.get(this.url + '/current?tokenId=' + tokenId).toPromise().then((rsp: any) => {
-        if (rsp && (rsp.code || rsp.err)) {
-          resolve();
-        } else {
-          resolve(rsp);
-        }
-      });
-    });
-  }
+  // getAccount() {
+  //   const tokenId: string = this.authSvc.getAccessTokenId();
+  //   return new Promise((resolve, reject) => {
+  //     this.http.get(this.url + '/current?tokenId=' + tokenId).toPromise().then((rsp: any) => {
+  //       if (rsp && (rsp.code || rsp.err)) {
+  //         resolve();
+  //       } else {
+  //         resolve(rsp);
+  //       }
+  //     });
+  //   });
+  // }
 
   quitSystem() {
     this.authSvc.removeCookies();

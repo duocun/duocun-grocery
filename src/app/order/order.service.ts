@@ -4,7 +4,7 @@ import { HttpClient } from '@angular/common/http';
 
 import { EntityService, HttpStatus } from '../entity.service';
 import { AuthService } from '../account/auth.service';
-import { Observable } from '../../../node_modules/rxjs';
+import { Observable } from 'rxjs';
 import { IOrder, OrderType, OrderStatus } from './order.model';
 import { PaymentMethod, PaymentStatus } from '../payment/payment.model';
 
@@ -73,7 +73,10 @@ export class OrderService extends EntityService {
   //   const url = this.url + '/afterAddOrder';
   //   return this.doPost(url, { clientId: clientId, merchantId: merchantId, dateType: dateType, address: address, paid: paid });
   // }
-
+  loadHistory(clientId: string, currentPageNumber: number, itemsPerPage: number ): Observable<any> {
+    const url = this.url + '/history/' + currentPageNumber + '/' + itemsPerPage;
+    return this.doGet(url, {clientId});
+  }
   loadPage(filter: any, currentPageNumber: number, itemsPerPage: number ): Observable<any> {
     const url = this.url + '/loadPage/' + currentPageNumber + '/' + itemsPerPage;
     return this.doGet(url, filter);

@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { AuthService } from '../account/auth.service';
 import { EntityService } from '../entity.service';
 import { ILocation } from '../location/location.model';
-import { Observable } from '../../../node_modules/rxjs';
+import { Observable } from 'rxjs';
 
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 @Injectable({

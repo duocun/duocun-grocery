@@ -1,7 +1,7 @@
 import { Component, OnInit, OnDestroy, Input, ViewChild } from '@angular/core';
 import { AccountService } from '../../account/account.service';
-import { Subject } from '../../../../node_modules/rxjs';
-import { takeUntil } from '../../../../node_modules/rxjs/operators';
+import { Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 import { Role, IAccount } from '../../account/account.model';
 import { TransactionService } from '../../transaction/transaction.service';
 import { environment } from '../../../environments/environment';

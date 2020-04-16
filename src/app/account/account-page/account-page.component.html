@@ -21,7 +21,7 @@
         </div>
     </div>
 
-    <div class="row form-group" *ngIf="account">
+    <!-- <div class="row form-group" *ngIf="account">
       <div class="row label-sm">
         <span i18n="@@PhoneNumber">Phone Number</span><span>*</span>
       </div>
@@ -33,15 +33,15 @@
         <span i18n="@@DefaultAddress">Default Address</span><span>*</span>
       </div>
       <div class="phone-input" (click)="changeAddress()">{{getDefaultAddress()}}</div>
-    </div>
+    </div> -->
 
     <!-- <div class="row form-group actions-row">
       <div class="btn btn-primary btn-add-credit" i18n="@@AddCredit" (click)="toAddCreditPage()">Add Credit</div>
     </div> -->
 
     <div class="row form-group actions-row">
-        <div class="btn btn-primary btn-logout" i18n="@@LogoutDuocun" (click)="logout()">Logout</div>
-      </div>
+      <div class="btn btn-primary btn-logout" i18n="@@LogoutDuocun" (click)="logout()">Logout</div>
+    </div>
   </div>
 
   <app-footer [type]="'menu'" [menu]="'account-setting'"></app-footer>

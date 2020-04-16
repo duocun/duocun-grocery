@@ -4,7 +4,7 @@ import { HttpClient } from '@angular/common/http';
 import { AuthService } from '../account/auth.service';
 import { IDeliveryTime } from '../delivery/delivery.model';
 import { ILocation } from './location.model';
-import { Observable } from '../../../node_modules/rxjs';
+import { Observable } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'

@@ -1,8 +1,8 @@
 import { Injectable } from '@angular/core';
 import { EntityService, HttpStatus } from '../entity.service';
 import { AuthService } from '../account/auth.service';
-import { HttpClient } from '../../../node_modules/@angular/common/http';
-import { Observable } from '../../../node_modules/rxjs';
+import { HttpClient } from '@angular/common/http';
+import { Observable } from 'rxjs';
 import { IOrder } from '../order/order.model';
 import { environment } from '../../environments/environment';
 import { IAccount } from '../account/account.model';
@@ -146,9 +146,9 @@ export class PaymentService extends EntityService {
   }
 
   // order --- when order == null, add credit, when order != null, pay order
-  payBySnappay(appCode, accountId, accountName, orders, amount, note) {
+  payBySnappay(appCode, accountId, orders, amount) {
     const url = this.url + '/payBySnappay';
-    const data = { appCode, accountId, accountName, orders, amount, note };
+    const data = { appCode, accountId, orders, amount };
 
     return this.doPost(url, data);
   }

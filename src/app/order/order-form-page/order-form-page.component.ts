@@ -1,15 +1,15 @@
 import { Component, OnInit, OnDestroy, ViewChild, ElementRef } from '@angular/core';
-import { NgRedux } from '../../../../node_modules/@angular-redux/store';
+import { NgRedux } from '@angular-redux/store';
 import { IAppState } from '../../store';
-import { Subject } from '../../../../node_modules/rxjs';
-import { takeUntil } from '../../../../node_modules/rxjs/operators';
+import { Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 import { ICartItem } from '../../cart/cart.model';
-import { Router, ActivatedRoute } from '../../../../node_modules/@angular/router';
-import { FormBuilder } from '../../../../node_modules/@angular/forms';
+import { Router, ActivatedRoute } from '@angular/router';
+import { FormBuilder } from '@angular/forms';
 import { OrderService } from '../order.service';
 import { IOrder, ICharge, OrderType, OrderStatus } from '../order.model';
 import { PageActions } from '../../main/main.actions';
-import { MatSnackBar, MatDialog } from '../../../../node_modules/@angular/material';
+import { MatSnackBar, MatDialog } from '@angular/material';
 import { IDelivery } from '../../delivery/delivery.model';
 import { IAccount } from '../../account/account.model';
 import { LocationService } from '../../location/location.service';
@@ -190,7 +190,7 @@ export class OrderFormPageComponent implements OnInit, OnDestroy {
               const order = this.orderSvc.createOrder(account, merchant, items, location, date, time, charge, note, paymentMethod, lang);
               orders.push(order);
             });
-
+            this.loading = false;
             this.rx.dispatch({ type: OrderActions.REPLACE_ORDERS, payload: orders });
           } else {
             // process browser back button press
@@ -212,6 +212,8 @@ export class OrderFormPageComponent implements OnInit, OnDestroy {
               if (self.paymentMethod === PaymentMethod.WECHAT) {
                 window.location.href = rt.url;
                 this.loading = false;
+                // set default payment method
+                this.rx.dispatch({type: PaymentActions.UPDATE_PAYMENT_METHOD, payload: {paymentMethod: PaymentMethod.WECHAT}});
               } else {
                 this.loading = false;
                 // set default payment method
@@ -310,26 +312,32 @@ export class OrderFormPageComponent implements OnInit, OnDestroy {
           } else {
             this.bSubmitted = true; // important! block form submit
             self.placeOrdersAndPay(self.appCode, self.orders, self.paymentMethodId, account, payable).then((rt: any) => {
-              this.showError(rt.err);
               this.bSubmitted = false;
               if (rt.err === PaymentError.NONE) {
                 this.rx.dispatch({ type: CartActions.CLEAR_CART, payload: [] });
                 if (self.paymentMethod === PaymentMethod.WECHAT) {
                   this.loading = false;
                   window.location.href = rt.url;
+                  // set default payment method
+                  this.rx.dispatch({type: PaymentActions.UPDATE_PAYMENT_METHOD, payload: {paymentMethod: PaymentMethod.WECHAT}});
                 } else {
                   this.loading = false;
                   // set default payment method
                   this.rx.dispatch({type: PaymentActions.UPDATE_PAYMENT_METHOD, payload: {paymentMethod: PaymentMethod.WECHAT}});
                   self.router.navigate(['order/history']);
                 }
+              } else {
+                this.showError(rt.err);
+                // stay in same page and set default payment method
+                this.rx.dispatch({type: PaymentActions.UPDATE_PAYMENT_METHOD, payload: {paymentMethod: PaymentMethod.WECHAT}});
               }
             });
           }
-        } else { // didn't login
+        } else { // didn't login or session down
           this.loading = false;
-          // this.openPhoneVerifyDialog(account, paymentMethod);
-          this.router.navigate(['contact/phone-form/' + OrderFormAction.RESUME_PAY]);
+          alert('微信登陆已过期, 请退出公众号重新进入');
+          this.rx.dispatch({type: PaymentActions.UPDATE_PAYMENT_METHOD, payload: {paymentMethod: PaymentMethod.WECHAT}});
+          this.router.navigate(['/']);
         }
       } else {
         // show verify bank card error
@@ -397,7 +405,7 @@ export class OrderFormPageComponent implements OnInit, OnDestroy {
               });
           } else if (this.paymentMethod === PaymentMethod.WECHAT) {
             this.loading = false;
-            this.paymentSvc.payBySnappay(appCode, account._id, accountName, newOrders, payable, paymentNote)
+            this.paymentSvc.payBySnappay(appCode, account._id, newOrders, payable)
               .pipe(takeUntil(this.onDestroy$)).subscribe(rsp => {
                 resolve(rsp);
               });

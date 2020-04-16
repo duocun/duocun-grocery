@@ -13,14 +13,13 @@
   },
   "private": true,
   "dependencies": {
-    "@angular-redux/store": "^9.0.0",
+    "@angular-redux/store": "^10.0.0",
     "@angular/animations": "^6.1.10",
     "@angular/cdk": "^7.3.6",
     "@angular/common": "^8.1.0",
     "@angular/compiler": "^8.1.0",
     "@angular/core": "^8.1.0",
     "@angular/forms": "^6.1.9",
-    "@angular/http": "^7.2.15",
     "@angular/material": "^7.3.6",
     "@angular/platform-browser": "^8.1.0",
     "@angular/platform-browser-dynamic": "^8.1.0",
@@ -35,14 +34,15 @@
     "js-cookie": "^2.2.1",
     "moment": "^2.24.0",
     "ngx-pagination": "^4.1.0",
-    "redux": "^4.0.1",
-    "rxjs": "6.5.2",
+    "redux": "4.0.1",
+    "rxjs": "6.4.0",
+    "tslib": "^1.11.1",
     "zone.js": "^0.8.26"
   },
   "devDependencies": {
     "@angular-devkit/build-angular": "^0.803.26",
-    "@angular/cli": "~8.1.1",
-    "@angular/compiler-cli": "^8.1.1",
+    "@angular/cli": "~8.3.26",
+    "@angular/compiler-cli": "^8.1.0",
     "@angular/language-service": "^6.1.10",
     "@ngrx/schematics": "^8.6.0",
     "@ngrx/store-devtools": "^8.6.0",
@@ -59,9 +59,10 @@
     "karma-jasmine": "^2.0.1",
     "karma-jasmine-html-reporter": "^1.4.2",
     "protractor": "^5.4.2",
+    "redux-devtools-extension": "^2.13.8",
     "rxjs-tslint": "^0.1.7",
     "ts-node": "~7.0.0",
     "tslint": "^5.18.0",
-    "typescript": "^3.4.5"
+    "typescript": "^3.5.3"
   }
 }

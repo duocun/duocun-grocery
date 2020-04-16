@@ -1,11 +1,11 @@
 import { Component, OnInit, Inject, OnDestroy } from '@angular/core';
-import { NgRedux } from '../../../../node_modules/@angular-redux/store';
+import { NgRedux } from '@angular-redux/store';
 import { IAppState } from '../../store';
-import { Router } from '../../../../node_modules/@angular/router';
-import { MatDialogRef, MAT_DIALOG_DATA, MatSnackBar } from '../../../../node_modules/@angular/material';
+import { Router } from '@angular/router';
+import { MatDialogRef, MAT_DIALOG_DATA, MatSnackBar } from '@angular/material';
 import { OrderService } from '../order.service';
-import { takeUntil } from '../../../../node_modules/rxjs/operators';
-import { Subject } from '../../../../node_modules/rxjs';
+import { takeUntil } from 'rxjs/operators';
+import { Subject } from 'rxjs';
 import { CommandActions } from '../../shared/command.actions';
 import { environment } from '../../../environments/environment';
 import { AccountService } from '../../account/account.service';

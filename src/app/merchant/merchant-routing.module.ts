@@ -1,6 +1,6 @@
 import { MerchantDetailPageComponent } from './merchant-detail-page/merchant-detail-page.component';
-import { Routes, RouterModule } from '../../../node_modules/@angular/router';
-import { NgModule } from '../../../node_modules/@angular/core';
+import { Routes, RouterModule } from '@angular/router';
+import { NgModule } from '@angular/core';
 
 
 const routes: Routes = [

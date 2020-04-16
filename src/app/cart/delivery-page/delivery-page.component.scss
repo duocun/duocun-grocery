@@ -16,8 +16,8 @@
 .delivery-list{
   overflow: scroll;
   height: 100%;
+  width: 100%;
 }
-
 
 .product-list{
   float: left;
@@ -28,13 +28,10 @@
 $border-radius: 3px;
 $input-h: 38px;
 
-
-
-
 .delivery-list{
   position: absolute;
   top: $input-h + 15px;
-  width: calc(100% - 22px);
+  width: calc(100% - 2px);
   // border: 1px solid $border-color;
   // border-radius: $border-radius;
   overflow-y: scroll;

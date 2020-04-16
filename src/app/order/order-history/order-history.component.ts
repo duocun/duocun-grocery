@@ -11,10 +11,10 @@ import { OrderActions } from '../order.actions';
 import { CartActions } from '../../cart/cart.actions';
 import { Router } from '@angular/router';
 import { RemoveOrderDialogComponent } from '../remove-order-dialog/remove-order-dialog.component';
-import { MatDialog } from '../../../../node_modules/@angular/material';
+import { MatDialog } from '@angular/material';
 import { ICommand } from '../../shared/command.reducers';
-import { takeUntil } from '../../../../node_modules/rxjs/operators';
-import { Subject } from '../../../../node_modules/rxjs';
+import { takeUntil } from 'rxjs/operators';
+import { Subject } from 'rxjs';
 import * as moment from 'moment';
 import { DeliveryActions } from '../../delivery/delivery.actions';
 import { environment } from '../../../environments/environment';
@@ -180,48 +180,26 @@ export class OrderHistoryComponent implements OnInit, OnDestroy {
   }
 
   toDateString(s) {
-    return s ? this.sharedSvc.toDateString(s) : '';
-  }
-
-  getDescription(order) {
-    const d = order.delivered.split('T')[0];
-    // const y = +(d.split('-')[0]);
-    const m = +(d.split('-')[1]);
-    const prevMonth = m === 1 ? 12 : (m - 1);
-
-    const product = order.items[0].product;
-    const productName = this.lang === 'en' ? product.name : product.nameEN;
-    const range = prevMonth + '/27 ~ ' + m + '/26';
-
-    if (order.type === 'MM') {
-      return range + (this.lang === 'en' ? ' Phone monthly fee' : ' 电话月费');
-    // } else if (order.type === 'MS') {
-    //   return (this.lang === 'en' ? ' Phone setup fee' : ' 电话安装费');
+    // return s ? this.sharedSvc.toDateString(s) : '';
+    // return moment.utc(s).format('YYYY-MM-DD');
+    if (s) {
+      return s.split('T')[0];
     } else {
-      return '';
+      return 'N/A';
     }
   }
 
+
   OnPageChange(pageNumber) {
-    const accountId = this.account._id;
+    const clientId = this.account._id;
     const itemsPerPage = this.itemsPerPage;
 
     this.loading = true;
     this.currentPageNumber = pageNumber;
-    const query = { clientId: accountId, status: { $nin: [OrderStatus.BAD, OrderStatus.DELETED, OrderStatus.TEMP] } };
-    this.orderSvc.loadPage(query, pageNumber, itemsPerPage).pipe(takeUntil(this.onDestroy$)).subscribe((ret: any) => {
-      ret.orders.map(order => {
-        order.description = this.getDescription(order);
-        if (environment.language === 'en') {
-          order.merchantName = order.merchant ? order.merchant.nameEN : '';
-          order.items.map(item => {
-            item.product.name = item.product.nameEN;
-          });
-        }
-      });
 
+    this.orderSvc.loadHistory(clientId, pageNumber, itemsPerPage).pipe(takeUntil(this.onDestroy$)).subscribe((ret: any) => {
       this.orders = ret.orders;
-      this.nOrders = ret.total;
+      this.nOrders = ret.orders.length;
       this.loading = false;
     });
   }

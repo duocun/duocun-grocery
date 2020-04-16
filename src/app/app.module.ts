@@ -15,7 +15,7 @@ import { CoreModule } from './core/core.module';
 import { AppComponent } from './app.component';
 
 import { AuthService } from './account/auth.service';
-import { HttpClientModule } from '../../node_modules/@angular/common/http';
+import { HttpClientModule } from '@angular/common/http';
 import { EntityService } from './entity.service';
 import { AccountService } from './account/account.service';
 import { ContactService } from './contact/contact.service';

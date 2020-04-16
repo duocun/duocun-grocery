@@ -1,12 +1,12 @@
 import { Component, OnInit } from '@angular/core';
-import { FormBuilder, Validators } from '../../../../node_modules/@angular/forms';
+import { FormBuilder, Validators } from '@angular/forms';
 import { PaymentService } from '../../payment/payment.service';
-import { takeUntil } from '../../../../node_modules/rxjs/operators';
-import { Subject } from '../../../../node_modules/rxjs';
-import { MatSnackBar } from '../../../../node_modules/@angular/material';
+import { takeUntil } from 'rxjs/operators';
+import { Subject } from 'rxjs';
+import { MatSnackBar } from '@angular/material';
 import { IAccount } from '../account.model';
 import { AccountService } from '../account.service';
-import { Router } from '../../../../node_modules/@angular/router';
+import { Router } from '@angular/router';
 import { environment } from '../../../environments/environment.prod';
 import { ResponseStatus, IPaymentResponse } from '../../transaction/transaction.model';
 import { PaymentError, PaymentMethod, AppType } from '../../payment/payment.model';
@@ -160,7 +160,7 @@ export class AddCreditPageComponent implements OnInit {
           }
         });
       } else if (paymentMethod === PaymentMethod.WECHAT) {
-        this.paymentSvc.payBySnappay(AppType.FOOD_DELIVERY, account._id, account.username, [], amount, note)
+        this.paymentSvc.payBySnappay(AppType.FOOD_DELIVERY, account._id, [], amount)
           .pipe(takeUntil(this.destroy$)).subscribe((rsp: any) => {
             resolve(rsp);
           });

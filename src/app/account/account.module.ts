@@ -17,7 +17,7 @@ import { BalancePageComponent } from './balance-page/balance-page.component';
 import { OrderService } from '../order/order.service';
 import { TransactionService } from '../transaction/transaction.service';
 import { AddCreditPageComponent } from './add-credit-page/add-credit-page.component';
-import { PaginatePipe, NgxPaginationModule } from '../../../node_modules/ngx-pagination';
+import { PaginatePipe, NgxPaginationModule } from 'ngx-pagination';
 import { PaymentModule } from '../payment/payment.module';
 
 @NgModule({

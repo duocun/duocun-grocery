@@ -1750,7 +1750,7 @@
       </trans-unit>
       <trans-unit id="LeaveCartHint" datatype="html">
         <source>The Cart will be clear when leave</source>
-        <target>离开后将清空购物车</target>
+        <target>各店单独结算，请您支付完再去购买其它商品。</target>
         <context-group purpose="location">
           <context context-type="sourcefile">app/account/account-page.component.ts</context>
           <context context-type="linenumber">19</context>

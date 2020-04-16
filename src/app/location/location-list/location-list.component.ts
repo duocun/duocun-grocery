@@ -1,8 +1,8 @@
 import { Component, OnInit, Input, EventEmitter, Output } from '@angular/core';
 import { LocationService } from '../location.service';
 import { IPlace } from '../location.model';
-import { takeUntil } from '../../../../node_modules/rxjs/operators';
-import { Subject } from '../../../../node_modules/rxjs';
+import { takeUntil } from 'rxjs/operators';
+import { Subject } from 'rxjs';
 
 @Component({
   selector: 'app-location-list',

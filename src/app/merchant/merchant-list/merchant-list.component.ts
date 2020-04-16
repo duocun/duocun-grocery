@@ -1,10 +1,10 @@
 import { Component, OnInit, OnDestroy, Input, OnChanges } from '@angular/core';
 import { IMerchant } from '../../merchant/merchant.model';
 import { environment } from '../../../environments/environment';
-import { Router } from '../../../../node_modules/@angular/router';
-import { Subject } from '../../../../node_modules/rxjs';
+import { Router } from '@angular/router';
+import { Subject } from 'rxjs';
 import { DistanceService } from '../../location/distance.service';
-import { NgRedux } from '../../../../node_modules/@angular-redux/store';
+import { NgRedux } from '@angular-redux/store';
 import { IAppState } from '../../store';
 import { PageActions } from '../../main/main.actions';
 import { DeliveryActions } from '../../delivery/delivery.actions';

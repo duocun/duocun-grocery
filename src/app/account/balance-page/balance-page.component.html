@@ -17,24 +17,26 @@
         <div class="col-2 title-xs" i18n="@@Payable"> Payable</div>
       </div>
 
-      <!-- [class.highlight]="tr.id === highlightedId" -->
-      <div class="list-item" *ngFor="let tr of transactions | paginate: { itemsPerPage: itemsPerPage, currentPage: currentPageNumber, totalItems: nTransactions }"
-        (click)="onSelect(tr)">
-        <div class="row">
-          <div class="col-3">
-            <span class="text-xs">{{tr.date | date: 'MMMdE'}}</span>
-          </div>
-          <div class="col-3">
-            <span class="text-xs">{{tr.description.length > 13 ? ((tr.description | slice:0:11) + '..') : tr.description}}</span>
-          </div>
-          <div class="col-2">
-            <span class="text-xs">{{tr.consumed | number : '1.2-2'}}</span>
-          </div>
-          <div class="col-2">
-            <span class="text-xs">{{tr.paid | number : '1.2-2'}}</span>
-          </div>
-          <div class="col-2">
-            <span class="text-xs">{{tr.balance | number : '1.2-2'}}</span>
+      <div class="row list-body">
+        <!-- [class.highlight]="tr.id === highlightedId" -->
+        <div class="list-item" *ngFor="let tr of transactions | paginate: { itemsPerPage: itemsPerPage, currentPage: currentPageNumber, totalItems: nTransactions }"
+          (click)="onSelect(tr)">
+          <div class="row">
+            <div class="col-3">
+              <span class="text-xs">{{tr.date | date: 'MMMdE'}}</span>
+            </div>
+            <div class="col-3">
+              <span class="text-xs">{{tr.description.length > 13 ? ((tr.description | slice:0:11) + '..') : tr.description}}</span>
+            </div>
+            <div class="col-2">
+              <span class="text-xs">{{tr.consumed | number : '1.2-2'}}</span>
+            </div>
+            <div class="col-2">
+              <span class="text-xs">{{tr.paid | number : '1.2-2'}}</span>
+            </div>
+            <div class="col-2">
+              <span class="text-xs">{{tr.balance | number : '1.2-2'}}</span>
+            </div>
           </div>
         </div>
       </div>

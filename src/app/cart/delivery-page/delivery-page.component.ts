@@ -1,9 +1,9 @@
 import { Component, OnInit, Output, EventEmitter } from '@angular/core';
 import { ProductService } from '../../product/product.service';
-import { ActivatedRoute, Router } from '../../../../node_modules/@angular/router';
-import { takeUntil } from '../../../../node_modules/rxjs/operators';
-import { Subject } from '../../../../node_modules/rxjs';
-import { NgRedux } from '../../../../node_modules/@angular-redux/store';
+import { ActivatedRoute, Router } from '@angular/router';
+import { takeUntil } from 'rxjs/operators';
+import { Subject } from 'rxjs';
+import { NgRedux } from '@angular-redux/store';
 import { IAppState } from '../../store';
 import * as moment from 'moment';
 import { CartActions } from '../cart.actions';
@@ -12,7 +12,6 @@ import { MerchantScheduleService } from '../../merchant/merchant-schedule.servic
 import { AreaService } from '../../area/area.service';
 import { DeliveryService } from '../../delivery/delivery.service';
 import { MerchantService } from '../../merchant/merchant.service';
-import { resolve } from '../../../../node_modules/@types/q';
 
 const baseTimeList = ['11:00'];
 export const AppType = {

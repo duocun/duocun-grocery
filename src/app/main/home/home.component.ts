@@ -10,12 +10,12 @@ import { PageActions, AppStateActions } from '../../main/main.actions';
 // import { SocketService } from '../../shared/socket.service';
 import { Router, ActivatedRoute } from '@angular/router';
 import { AppState, IApp } from '../main.reducers';
-import { Subject } from '../../../../node_modules/rxjs';
-import { takeUntil } from '../../../../node_modules/rxjs/operators';
+import { Subject } from 'rxjs';
+import { takeUntil, skip, debounceTime, distinctUntilChanged } from 'rxjs/operators';
 import { ICommand } from '../../shared/command.reducers';
 import { IAccount } from '../../account/account.model';
 import { AccountActions } from '../../account/account.actions';
-import { MatSnackBar } from '../../../../node_modules/@angular/material';
+import { MatSnackBar } from '@angular/material';
 import { CommandActions } from '../../shared/command.actions';
 import { IAddressAction } from '../../location/address.reducer';
 import { AddressActions } from '../../location/address.actions';
@@ -152,6 +152,7 @@ export class HomeComponent implements OnInit, OnDestroy {
           this.router.navigate(['/']);
         }
       } else if (window.location.pathname.endsWith('order/history')) {
+
       }
     });
   }
@@ -159,7 +160,7 @@ export class HomeComponent implements OnInit, OnDestroy {
   login(code) {
     // tslint:disable-next-line:no-shadowed-variable
     return new Promise((resolve, reject) => {
-      this.accountSvc.getAccount().then(account => {
+      this.accountSvc.getCurrentAccount().pipe(takeUntil(this.onDestroy$)).subscribe((account: IAccount) => {
         if (account) {
           resolve(account);
         } else {
@@ -185,7 +186,12 @@ export class HomeComponent implements OnInit, OnDestroy {
   ngOnInit() {
     const self = this;
     this.places = []; // clear address list
-    self.route.queryParamMap.pipe(takeUntil(this.onDestroy$)).subscribe(queryParams => {
+    self.route.queryParamMap.pipe(
+      // skip(1),
+      debounceTime(100),
+      distinctUntilChanged(),
+      takeUntil(this.onDestroy$)
+    ).subscribe(queryParams => {
       // if url has format '...?cId=x&p=y', it is some procedure that re-enter the home page
       const clientId = queryParams.get('cId'); // use for after card pay, could be null
       const page = queryParams.get('p');
@@ -228,13 +234,18 @@ export class HomeComponent implements OnInit, OnDestroy {
 
         if (tokenId) {
           this.accountSvc.setAccessTokenId(tokenId);
-          this.accountSvc.getAccount().then((account: IAccount) => {
-            self.account = account;
-            // use for manage default location
-            this.rx.dispatch({ type: AppStateActions.UPDATE_APP_STATE, payload: AppState.READY });
-            self.mount(account);
+          this.accountSvc.getAccountByToken(tokenId).pipe(takeUntil(this.onDestroy$)).subscribe((account: IAccount) => {
+            if (account) {
+              self.account = account;
+              // use for manage default location
+              this.rx.dispatch({ type: AppStateActions.UPDATE_APP_STATE, payload: AppState.READY });
+              self.mount(account);
+            } else {
+              alert('登陆失败');
+            }
           });
-        } else {
+        } else { // when browser navigate back
+          // alert('微信登陆失败');
           const code = queryParams.get('code');
           this.loading = true;
           this.login(code).then((account: IAccount) => {
