@@ -1,4 +1,8 @@
 @import '../../../base';
+.price-col{
+  position: relative;
+  left: 25px;
+}
 .col-7 {
   flex: 53%;
   max-width: 100% !important;
