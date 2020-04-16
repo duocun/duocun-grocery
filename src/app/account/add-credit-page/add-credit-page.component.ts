@@ -160,7 +160,7 @@ export class AddCreditPageComponent implements OnInit {
           }
         });
       } else if (paymentMethod === PaymentMethod.WECHAT) {
-        this.paymentSvc.payBySnappay(AppType.FOOD_DELIVERY, account._id, account.username, [], amount, note)
+        this.paymentSvc.payBySnappay(AppType.FOOD_DELIVERY, account._id, [], amount)
           .pipe(takeUntil(this.destroy$)).subscribe((rsp: any) => {
             resolve(rsp);
           });

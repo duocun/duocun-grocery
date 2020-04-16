@@ -405,7 +405,7 @@ export class OrderFormPageComponent implements OnInit, OnDestroy {
               });
           } else if (this.paymentMethod === PaymentMethod.WECHAT) {
             this.loading = false;
-            this.paymentSvc.payBySnappay(appCode, account._id, accountName, newOrders, payable, paymentNote)
+            this.paymentSvc.payBySnappay(appCode, account._id, newOrders, payable)
               .pipe(takeUntil(this.onDestroy$)).subscribe(rsp => {
                 resolve(rsp);
               });
