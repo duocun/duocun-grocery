@@ -1,5 +1,28 @@
 @import '../../../base';
+.col-7 {
+  flex: 53%;
+  max-width: 100% !important;
+  margin-right: 5px;
+  margin-top: 4px;
+  margin-bottom: 4px;
+}
+.items-col{
+  margin-bottom: 10px;
+}
+.title-xs{
+  width: 100px !important;
+}
 
+.page-body{
+  position: fixed;
+    top: 60px;
+    height: calc(90% - 60px - 60px) !important;
+}
+.bottomPageNav {
+
+  position: fixed !important;
+  bottom: 50px !important;
+}
 .empty-order{
   text-align: center;
   margin-top: 210px;
