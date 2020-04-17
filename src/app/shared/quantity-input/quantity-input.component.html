@@ -6,7 +6,7 @@
       />
     </svg>
   </div>
-  <input *ngIf="val>0" class="quantity-input" type="number" [value]="val" (change)="onChange($event)" />
+  <input *ngIf="val>0" class="quantity-input" type="number"  onkeypress="return event.charCode >= 48 && event.charCode <= 57"  [value]="val" (change)="onChange($event)" />
   <div *ngIf="val>0" class="decrease-btn" (click)="onDecrease()">
     <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24">
       <path fill="none" d="M0 0h24v24H0V0z" />
