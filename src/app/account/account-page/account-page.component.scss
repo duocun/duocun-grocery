@@ -82,7 +82,15 @@
     float: right;
   }
 }
+.edit-phone{
+  width: 100%;
 
+  text-align: center;
+  padding-top: 15px;
+  float: left;
+  margin-top: 15px;
+  margin-right: 0px;
+}
 
 @media #{$tablet}{
   $bottom-bar-h: 60px;
