@@ -1,0 +1,51 @@
+<div class="page">
+    <div class="row title-block">
+      <div class="col-12 title-bg" i18n="@@PhoneNumber">更改手机号码</div>
+    </div>
+  
+    <div class="page-body">
+      <div class="row label-sm verify-hint">
+        <span >您当前手机号为 :{{currentPhone}}</span>
+      </div>
+      <div class="row label-sm verify-hint">
+        <span >请在以下更新您的手机号</span>
+      </div>
+      <form [formGroup]="form">
+        <div class="row form-group">
+          <div class="row label-sm">
+            <span i18n="@@PhoneNumber">Phone Number</span>
+            <span>*</span>
+          </div>
+          <input name="phone" type="tel" [maxlength]="10" pattern="[0-9]*" [formControl]="phone" />
+          <!-- <input class="phone" name="phone" type="tel" [maxlength]="10" pattern="[0-9]*" [formControl]="phone" (keyup)="onPhoneInput($event)" />
+          <div class="btn get-code-btn btn-primary" (click)="sendVerify()" i18n="@@GetVerificationCode" >Send Code</div> -->
+        </div>
+    
+        <!-- [class.warning]="!verified" [ngClass]="bAllowVerify ? 'btn-primary': 'btn-secondary'"-->
+        <!-- <div class="row form-group">
+          <div class="row label-sm" >
+            <span i18n="@@VerificationCode">Verification Code</span>
+            <span>*</span>
+          </div>
+          <input class="verification-code" type="number" pattern="[\d]*" name="verificationCode" [formControl]="verificationCode"
+            (keyup)="onVerificationCodeInput($event)" />
+    
+          <div class="verification-result">
+            <svg *ngIf="verified" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+              <path fill="none" d="M0 0h24v24H0z" />
+              <path fill="#0F9D58" d="M9 16.2L4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4L9 16.2z" />
+            </svg>
+          </div>
+    
+        </div>
+        <div class="row form-group signup-block">
+          <div *ngIf="phoneMatchedAccount && phoneMatchedAccount.type === 'tmp' && verified" class="btn btn-primary signup-btn" (click)="signup()" i18n="@@SignupAndContinuePay">Signup and Continue Pay</div>
+        </div> -->
+  
+        <div class="row form-group signup-block">
+          <div class="btn btn-primary signup-btn" (click)="signupAndPay()" i18n="@@Ok">Ok</div>
+        </div>
+      </form>
+    
+    </div>
+  </div>

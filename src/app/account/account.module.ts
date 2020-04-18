@@ -19,6 +19,7 @@ import { TransactionService } from '../transaction/transaction.service';
 import { AddCreditPageComponent } from './add-credit-page/add-credit-page.component';
 import { PaginatePipe, NgxPaginationModule } from 'ngx-pagination';
 import { PaymentModule } from '../payment/payment.module';
+import { EditPhoneComponent } from './editInfo/edit-phone/edit-phone.component';
 
 @NgModule({
   imports: [
@@ -43,6 +44,7 @@ import { PaymentModule } from '../payment/payment.module';
     AccountPageComponent,
     BalancePageComponent,
     AddCreditPageComponent,
+    EditPhoneComponent,
   ],
   providers: [
     AccountService,

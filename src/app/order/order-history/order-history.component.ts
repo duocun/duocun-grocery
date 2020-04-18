@@ -179,16 +179,11 @@ export class OrderHistoryComponent implements OnInit, OnDestroy {
     return s ? this.sharedSvc.toDateTimeString(s) : '';
   }
 
-  toDateString(s) {
-    // return s ? this.sharedSvc.toDateString(s) : '';
-    // return moment.utc(s).format('YYYY-MM-DD');
-    if (s) {
-      return s.split('T')[0];
-    } else {
-      return 'N/A';
-    }
+  // sUTC --- must be 'YYYY-MM-DDTHH:mm:ss.000Z';
+  toDateString(sUTC) {
+    const local = moment(sUTC);
+    return local.format('YYYY-MM-DD');
   }
-
 
   OnPageChange(pageNumber) {
     const clientId = this.account._id;
