@@ -9,7 +9,7 @@ import { contactReducer } from './contact/contact.reducer';
 import { cartReducer, DEFAULT_CART } from './cart/cart.reducer';
 import { IMerchant } from './merchant/merchant.model';
 import { Account } from './account/account.model';
-import { orderReducer, paymentReducer } from './order/order.reducers';
+import { orderReducer, paymentReducer, DEFAULT_PAYMENT, IPayment } from './order/order.reducers';
 import { IOrder } from './order/order.model';
 import { addressReducer } from './location/address.reducer';
 import { merchantReducer } from './merchant/merchant.reducer';
@@ -17,7 +17,7 @@ export interface IAppState {
     cart: any; // ICart;
     account: Account;
     appState: IApp;
-    payment: string;
+    payment: IPayment;
     page: string;
     cmd: ICommand;
     merchant: IMerchant;
@@ -31,7 +31,7 @@ export const INITIAL_STATE: IAppState = {
     cart: DEFAULT_CART,
     account: null,
     appState: DEFAULT_APP,
-    payment: '',
+    payment: DEFAULT_PAYMENT,
     page: 'home',
     cmd: {name: '', args: ''},
     merchant: null,

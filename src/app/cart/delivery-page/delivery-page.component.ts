@@ -54,7 +54,7 @@ export class DeliveryPageComponent implements OnInit {
       if (this.schedule && this.product) {
         const productId = this.product._id;
         this.deliveries = this.mergeQuantity(this.schedule, cart, productId);
-        this.amount = this.cartSvc.getTotalPrice(cart);
+        this.amount = this.cartSvc.getTotal(cart);
       }
     });
     this.rx.select('delivery').pipe(takeUntil(this.onDestroy$)).subscribe((d: any) => {
@@ -144,7 +144,7 @@ export class DeliveryPageComponent implements OnInit {
               this.inRange = true;
               this.schedule = this.getDeliverySchedule(merchant, bs, baseTimeList);
               this.deliveries = this.mergeQuantity(this.schedule, cart, productId);
-              this.amount = this.cartSvc.getTotalPrice(cart);
+              this.amount = this.cartSvc.getTotal(cart);
               _resolve();
             } else {
               this.areaSvc.quickFind({ appType: AppType.GROCERY }).then(areas => {

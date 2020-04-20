@@ -41,14 +41,6 @@ export class SharedService {
     return moment(s).format('YYYY-MM-DD');
   }
 
-  getTotal(items) {
-    let total = 0;
-    items.forEach(item => {
-      total += item.price * item.quantity;
-    });
-    return total.toFixed(2);
-  }
-
   // type --- 'day', 'date', week', 'month', 'year', 12:00 am
   getStartOf(type) {
     return moment().startOf(type);

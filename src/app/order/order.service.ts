@@ -158,6 +158,10 @@ export class OrderService extends EntityService {
     };
   }
 
+
+  
+
+
   getCharge(group, overRangeCharge) {
     let price = 0;
     let cost = 0;
@@ -201,6 +205,7 @@ export class OrderService extends EntityService {
     // const { deliverDate, deliverTime } = this.getDeliveryDateTimeByPhase(sCreated, merchant.phases, delivery.dateType);
     const status = (paymentMethod === PaymentMethod.CREDIT_CARD || paymentMethod === PaymentMethod.WECHAT) ?
       OrderStatus.TEMP : OrderStatus.NEW; // prepay need Driver to confirm finished
+
     const paymentStatus = paymentMethod === PaymentMethod.PREPAY ? PaymentStatus.PAID : PaymentStatus.UNPAID;
 
     const order = {

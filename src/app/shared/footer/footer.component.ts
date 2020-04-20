@@ -64,27 +64,6 @@ export class FooterComponent implements OnInit, OnDestroy {
       }
     });
 
-    // this.rx.select<ICart>('cart').pipe(takeUntil(this.onDestroy$)).subscribe((cart: ICart) => {
-    //   self.cart = cart;
-    //   if (self.page === 'cart-page') {
-    //   }
-    //   self.quantity = cart.quantity;
-    //   self.productTotal = cart.price;
-    // });
-
-    // this.rx.select('merchant').pipe(takeUntil(this.onDestroy$)).subscribe((x: IMerchant) => {
-    //   self.merchant = x;
-    // });
-
-    // this.rx.select('delivery').pipe(takeUntil(this.onDestroy$)).subscribe((x: IDelivery) => {
-    //   self.delivery = x;
-    // });
-
-    // // for update paymentMethod for order-form-page
-    // this.rx.select('order').pipe(takeUntil(this.onDestroy$)).subscribe((order: IOrder) => {
-    //   this.order = order;
-    // });
-
     this.rx.select<string>('page').pipe(takeUntil(this.onDestroy$)).subscribe((x: any) => {
       self.page = x.name;
       self.selected = x.name;

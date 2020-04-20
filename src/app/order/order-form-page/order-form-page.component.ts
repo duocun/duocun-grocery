@@ -27,6 +27,7 @@ import { ProductService } from '../../product/product.service';
 import { IApp } from '../../main/main.reducers';
 // import { AuthService } from '../../account/auth.service';
 import { OrderActions, PaymentActions } from '../order.actions';
+import { CartService } from '../../cart/cart.service';
 
 declare var Stripe;
 
@@ -53,13 +54,11 @@ export class OrderFormPageComponent implements OnInit, OnDestroy {
   charge: ICharge;
   afterGroupDiscount: number;
   bSubmitted = false;
-  fromPage: string; // params from previous page
   action: string;   // params from previous page
 
   // state start
   loading = true;
   merchant: IMerchant;
-  delivery: IDelivery;
   cart;
   paymentMethod = PaymentMethod.WECHAT;
   // state end
@@ -97,7 +96,7 @@ export class OrderFormPageComponent implements OnInit, OnDestroy {
     private route: ActivatedRoute,
     private productSvc: ProductService,
     private orderSvc: OrderService,
-    // private authSvc: AuthService,
+    private cartSvc: CartService,
     // private sharedSvc: SharedService,
     private locationSvc: LocationService,
     private accountSvc: AccountService,
@@ -116,15 +115,11 @@ export class OrderFormPageComponent implements OnInit, OnDestroy {
       verificationCode: ['']
     });
 
-    // this.fromPage = this.route.snapshot.queryParamMap.get('fromPage');
-    // this.action = this.route.snapshot.queryParamMap.get('action');
-
     // update footer
     this.rx.dispatch({ type: PageActions.UPDATE_URL, payload: { name: 'order-form' } });
 
     // load delivery date and location
     this.rx.select('delivery').pipe(takeUntil(this.onDestroy$)).subscribe((x: IDelivery) => {
-      self.delivery = x;
       self.location = x.origin;
       self.address = this.locationSvc.getAddrString(x.origin);
     });
@@ -141,9 +136,6 @@ export class OrderFormPageComponent implements OnInit, OnDestroy {
     });
 
     this.rx.select('orders').pipe(takeUntil(this.onDestroy$)).subscribe((orders: any[]) => {
-      // if (orders && orders.length > 0) {
-      //   this.paymentMethod = orders[0].paymentMethod;
-      // }
       this.orders = orders;
     });
 
@@ -181,22 +173,26 @@ export class OrderFormPageComponent implements OnInit, OnDestroy {
             const overRangeCharge = 0;
             const location = this.location; // from redux
             const lang = this.lang;
-            this.groups.map(group => {
-              const charge = this.orderSvc.getCharge(group, overRangeCharge);
-              const items = group.items;
-              const date = group.date;
-              const time = group.time;
-              const note = '';
-              const order = this.orderSvc.createOrder(account, merchant, items, location, date, time, charge, note, paymentMethod, lang);
-              orders.push(order);
-            });
-            this.loading = false;
-            this.rx.dispatch({ type: OrderActions.REPLACE_ORDERS, payload: orders });
+
+            if (!account) {
+              alert('网络会话已过期, 请退出后重新尝试。');
+              return;
+            } else {
+              this.groups.map(group => {
+                const charge = this.orderSvc.getCharge(group, overRangeCharge);
+                const items = group.items;
+                const date = group.date;
+                const time = group.time;
+                const note = '';
+                const order = this.orderSvc.createOrder(account, merchant, items, location, date, time, charge, note, paymentMethod, lang);
+                orders.push(order);
+              });
+              this.loading = false;
+              this.rx.dispatch({ type: OrderActions.REPLACE_ORDERS, payload: orders });
+            }
           } else {
             // process browser back button press
             this.loading = false;
-            // alert('您已经退出提交订单，请重新下单。');
-            // this.router.navigate(['/home']);
           }
         });
       } else if (action === OrderFormAction.RESUME_PAY) { // from phone verify page
@@ -213,11 +209,11 @@ export class OrderFormPageComponent implements OnInit, OnDestroy {
                 window.location.href = rt.url;
                 this.loading = false;
                 // set default payment method
-                this.rx.dispatch({type: PaymentActions.UPDATE_PAYMENT_METHOD, payload: {paymentMethod: PaymentMethod.WECHAT}});
+                this.rx.dispatch({ type: PaymentActions.UPDATE_PAYMENT_METHOD, payload: { paymentMethod: PaymentMethod.WECHAT } });
               } else {
                 this.loading = false;
                 // set default payment method
-                this.rx.dispatch({type: PaymentActions.UPDATE_PAYMENT_METHOD, payload: {paymentMethod: PaymentMethod.WECHAT}});
+                this.rx.dispatch({ type: PaymentActions.UPDATE_PAYMENT_METHOD, payload: { paymentMethod: PaymentMethod.WECHAT } });
                 self.router.navigate(['order/history']);
               }
             }
@@ -319,24 +315,24 @@ export class OrderFormPageComponent implements OnInit, OnDestroy {
                   this.loading = false;
                   window.location.href = rt.url;
                   // set default payment method
-                  this.rx.dispatch({type: PaymentActions.UPDATE_PAYMENT_METHOD, payload: {paymentMethod: PaymentMethod.WECHAT}});
+                  this.rx.dispatch({ type: PaymentActions.UPDATE_PAYMENT_METHOD, payload: { paymentMethod: PaymentMethod.WECHAT } });
                 } else {
                   this.loading = false;
                   // set default payment method
-                  this.rx.dispatch({type: PaymentActions.UPDATE_PAYMENT_METHOD, payload: {paymentMethod: PaymentMethod.WECHAT}});
+                  this.rx.dispatch({ type: PaymentActions.UPDATE_PAYMENT_METHOD, payload: { paymentMethod: PaymentMethod.WECHAT } });
                   self.router.navigate(['order/history']);
                 }
               } else {
                 this.showError(rt.err);
                 // stay in same page and set default payment method
-                this.rx.dispatch({type: PaymentActions.UPDATE_PAYMENT_METHOD, payload: {paymentMethod: PaymentMethod.WECHAT}});
+                this.rx.dispatch({ type: PaymentActions.UPDATE_PAYMENT_METHOD, payload: { paymentMethod: PaymentMethod.WECHAT } });
               }
             });
           }
         } else { // didn't login or session down
           this.loading = false;
           alert('微信登陆已过期, 请退出公众号重新进入');
-          this.rx.dispatch({type: PaymentActions.UPDATE_PAYMENT_METHOD, payload: {paymentMethod: PaymentMethod.WECHAT}});
+          this.rx.dispatch({ type: PaymentActions.UPDATE_PAYMENT_METHOD, payload: { paymentMethod: PaymentMethod.WECHAT } });
           this.router.navigate(['/']);
         }
       } else {
@@ -359,23 +355,17 @@ export class OrderFormPageComponent implements OnInit, OnDestroy {
         const fields = ['_id', 'name', 'price', 'taxRate'];
         this.productSvc.quickFind({ merchantId, status: 1 }, fields).then(products => {
           this.accountSvc.getCurrentAccount().pipe(takeUntil(this.onDestroy$)).subscribe(account => {
-            const amount = Math.round(this.summary.total * 100) / 100;
+            const amount = this.cartSvc.getTotal(this.cart);
             const balance = Math.round((account && account.balance ? account.balance : 0) * 100) / 100;
             const payable = Math.round((balance >= amount ? 0 : amount - balance) * 100) / 100;
-            this.charge = { ...this.summary, ...{ payable }, ...{ balance } };
-
-            const paymentMethod = (account.balance >= amount) ? PaymentMethod.PREPAY : this.paymentMethod;
-            this.paymentMethod = paymentMethod;
+            const paymentMethod = (balance >= amount) ? PaymentMethod.PREPAY : this.paymentMethod;
             this.rx.dispatch({ type: PaymentActions.UPDATE_PAYMENT_METHOD, payload: { paymentMethod } });
 
+            this.paymentMethod = paymentMethod;
+            this.charge = { ...this.summary, ...{ payable }, ...{ balance } };
             this.products = products;
             this.account = account;
-
             this.loading = false;
-
-            // if (paymentMethod === PaymentMethod.CREDIT_CARD && !this.creditcard) {
-            //   this.creditcard = this.initStripe();
-            // }
 
             resolve({ account, merchant, payable });
           });
@@ -386,7 +376,7 @@ export class OrderFormPageComponent implements OnInit, OnDestroy {
     });
   }
 
-  // account, self.merchant, self.charge, cart, delivery, paymentMethod
+  // account, self.merchant, self.charge, cart, paymentMethod
   // paymentMethodId --- stripe payment method id
   placeOrdersAndPay(appCode, orders, paymentMethodId, account, payable) {
     const accountName = account.username;
@@ -472,7 +462,7 @@ export class OrderFormPageComponent implements OnInit, OnDestroy {
               window.location.href = rt.url;
             } else {
               // set default payment method
-              this.rx.dispatch({type: PaymentActions.UPDATE_PAYMENT_METHOD, payload: {paymentMethod: PaymentMethod.WECHAT}});
+              this.rx.dispatch({ type: PaymentActions.UPDATE_PAYMENT_METHOD, payload: { paymentMethod: PaymentMethod.WECHAT } });
               this.router.navigate(['order/history']);
             }
           }

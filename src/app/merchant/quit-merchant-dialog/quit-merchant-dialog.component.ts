@@ -9,7 +9,6 @@ import { MerchantActions } from '../merchant.actions';
 
 export interface IDialogData {
   merchantId: string;
-  fromPage: string;
   onSchedule: string;
   targetUrl: string;
 }
@@ -45,15 +44,6 @@ export class QuitMerchantDialogComponent implements OnInit, OnDestroy {
     setTimeout(() => {
       this.router.navigate(['main/home']);
     }, 200);
-    // this.router.navigate(['main/home']);
-    // if (this.data && this.data.fromPage === 'restaurant-list') {
-      // this.router.navigate(['main/home']);
-    // } else if (this.data.fromPage === 'order-history') {
-    //   this.router.navigate(['order/history']);
-    // }
-    // setTimeout(() => {
-    //   this.router.navigate(['main/home']);
-    // }, 200);
   }
 
   onStay() {
