@@ -85,7 +85,8 @@ export class AccountPageComponent implements OnInit, OnDestroy {
   toBalancePage() {
     this.router.navigate(['account/balance']);
   }
-  toEditPhonePage(){
+
+  toEditPhonePage() {
     this.router.navigate(['account/edit-phone']);
   }
 

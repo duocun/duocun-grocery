@@ -16,6 +16,10 @@ import { environment } from '../../../environments/environment';
 import { CartActions } from '../../cart/cart.actions';
 import { CartService } from '../../cart/cart.service';
 import { OrderFormAction } from '../../order/order-form-page/order-form-page.component';
+import { AccountService } from '../../account/account.service';
+import { PaymentMethod } from '../../payment/payment.model';
+import { IPayment } from '../../order/order.reducers';
+import { PaymentActions } from '../../order/order.actions';
 
 
 @Component({
@@ -43,12 +47,16 @@ export class MerchantDetailPageComponent implements OnInit, OnDestroy {
   subscription;
   amount = 0;
   items;
+  account;
+  paymentMethod;
+
   @ViewChild('list', { static: true }) list: ElementRef;
 
   constructor(
     private productSvc: ProductService,
     private merchantSvc: MerchantService,
     private cartSvc: CartService,
+    private accountSvc: AccountService,
     private route: ActivatedRoute,
     private router: Router,
     private location: Location,
@@ -74,8 +82,12 @@ export class MerchantDetailPageComponent implements OnInit, OnDestroy {
       if (cart) {
         // const ds = this.getDeliverySchedule();
         // this.deliveries = this.mergeQuantity(ds, cart, this.product._id);
-        this.amount = this.cartSvc.getTotalPrice(cart);
+        this.amount = this.cartSvc.getTotal(cart);
       }
+    });
+
+    this.rx.select('payment').pipe(takeUntil(this.onDestroy$)).subscribe((r: IPayment) => {
+      this.paymentMethod = r.paymentMethod;
     });
 
     this.locationSubscription = this.location.subscribe((x) => {
@@ -85,7 +97,7 @@ export class MerchantDetailPageComponent implements OnInit, OnDestroy {
         window.location.pathname.endsWith('contact/address-form')
       ) {
         if (self.cart && self.cart.length > 0) {
-          self.openQuitMerchantDialog(merchantId, 'restaurant-list');
+          self.openQuitMerchantDialog(merchantId);
         }
       } else if (window.location.pathname.endsWith('order/history')) {
         // if (self.restaurant && self.cart && self.cart.items && self.cart.items.length > 0) {
@@ -116,6 +128,10 @@ export class MerchantDetailPageComponent implements OnInit, OnDestroy {
         this.items = this.mergeCart(this.cart, items);
       });
     });
+
+    this.accountSvc.getCurrentAccount().pipe(takeUntil(this.onDestroy$)).subscribe(account => {
+      this.account = account;
+    });
   }
 
   // mergeQuantityFromCart(groups, cart) {
@@ -134,11 +150,11 @@ export class MerchantDetailPageComponent implements OnInit, OnDestroy {
     this.onDestroy$.complete();
   }
 
-  openQuitMerchantDialog(merchantId: string, fromPage: string, targetUrl?: string): void {
+  openQuitMerchantDialog(merchantId: string): void {
     const self = this;
     this.dialogRef = this.dialog.open(QuitMerchantDialogComponent, {
       width: '300px',
-      data: { merchantId, fromPage },
+      data: { merchantId },
       closeOnNavigation: true
     });
 
@@ -157,9 +173,14 @@ export class MerchantDetailPageComponent implements OnInit, OnDestroy {
   }
 
   onNext() {
-    this.router.navigate(['order/form/' + OrderFormAction.NEW]); //  { queryParams: { fromPage: 'restaurant-detail' } });
+    // set up prepay method
+    const account = this.account;
+    const amount = this.cartSvc.getTotal(this.cart);
+    const balance = Math.round((account && account.balance ? account.balance : 0) * 100) / 100;
+    const paymentMethod = (balance >= amount) ? PaymentMethod.PREPAY : this.paymentMethod;
+    this.rx.dispatch({ type: PaymentActions.UPDATE_PAYMENT_METHOD, payload: { paymentMethod } });
+    this.router.navigate(['order/form/' + OrderFormAction.NEW]);
   }
-
 
   componentDidMount(merchantId) {
     // tslint:disable-next-line:no-shadowed-variable
