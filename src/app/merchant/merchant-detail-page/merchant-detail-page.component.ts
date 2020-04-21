@@ -177,7 +177,7 @@ export class MerchantDetailPageComponent implements OnInit, OnDestroy {
     const account = this.account;
     const amount = this.cartSvc.getTotal(this.cart);
     const balance = Math.round((account && account.balance ? account.balance : 0) * 100) / 100;
-    const paymentMethod = (balance >= amount) ? PaymentMethod.PREPAY : this.paymentMethod;
+    const paymentMethod = ((amount !== 0) && (balance >= amount)) ? PaymentMethod.PREPAY : this.paymentMethod;
     this.rx.dispatch({ type: PaymentActions.UPDATE_PAYMENT_METHOD, payload: { paymentMethod } });
     this.router.navigate(['order/form/' + OrderFormAction.NEW]);
   }

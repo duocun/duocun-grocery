@@ -358,7 +358,7 @@ export class OrderFormPageComponent implements OnInit, OnDestroy {
             const amount = this.cartSvc.getTotal(this.cart);
             const balance = Math.round((account && account.balance ? account.balance : 0) * 100) / 100;
             const payable = Math.round((balance >= amount ? 0 : amount - balance) * 100) / 100;
-            const paymentMethod = (balance >= amount) ? PaymentMethod.PREPAY : this.paymentMethod;
+            const paymentMethod = ((amount !== 0) && (balance >= amount)) ? PaymentMethod.PREPAY : this.paymentMethod;
             this.rx.dispatch({ type: PaymentActions.UPDATE_PAYMENT_METHOD, payload: { paymentMethod } });
 
             this.paymentMethod = paymentMethod;
