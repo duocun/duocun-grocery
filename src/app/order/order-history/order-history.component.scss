@@ -1,4 +1,6 @@
 @import '../../../base';
+
+$bottom-nav-bar-h:100px;
 .price-col{
   position: relative;
   left: 25px;
@@ -13,19 +15,13 @@
 .items-col{
   margin-bottom: 10px;
 }
-.title-xs{
-  width: 100px !important;
-}
 
-.page-body{
+.bottom-page-nav {
+
   position: fixed;
-    top: 60px;
-    height: calc(90% - 60px - 60px) !important;
-}
-.bottomPageNav {
-
-  position: fixed !important;
-  bottom: 50px !important;
+  bottom: 0px;
+  height: $bottom-nav-bar-h;
+  // padding: 0px $tablet-content-padding;
 }
 .empty-order{
   text-align: center;
@@ -39,9 +35,9 @@
 
 .order-list{
   padding: 0px 10px 60px 10px;
-  margin-top: 70px;
+  margin-top: 50px;
   overflow: scroll;
-  height: 100%;
+  height: calc(100% - #{$bottom-nav-bar-h});
 
   .list-item{
     padding: 20px 15px;
@@ -49,6 +45,9 @@
 
     .title-xs, .text-xs{
       font-size: 13px;
+    }
+    .title-xs{
+      width:50%;
     }
 
     .mat-expansion-panel-header {
@@ -107,6 +106,15 @@
         line-height: 12px;
         padding: 0px;
       }
+      .product-col{
+        left:15px;
+      }
+      .quantity-col{
+        left:20px;
+      }
+      .price-col{
+        left: 60px;
+      }
 
       .description-col{
         font-size: 13px;
@@ -150,19 +158,20 @@
   $bottom-bar-h: 60px;
   $padding-w: 100px;
   .page{
-    padding: 0px $padding-w;
+    padding: 0px $tablet-content-padding;
   }
 
   .title-block{
-    width: calc(100% - #{$padding-w} - #{$padding-w});
+    width: calc(100% - #{$tablet-content-padding} - #{$tablet-content-padding});
   }
 }
 
-@media (max-width: 767px){
+@media #{$mobile}{
+
   .order-list{
     margin: 0px;
     padding: 0px 0px 60px 0px;
-
+    margin-top:40px;
     .list-item{
       .col-6, .col-12{
         padding-left: 0px;

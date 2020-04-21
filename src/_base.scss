@@ -22,7 +22,7 @@ $bottom-bar-h: 60px;
 $bottom-btn-w: 125px;
 
 $content-padding: 300px;
-
+$tablet-content-padding:150px;
 $input-h: 42px;
 $navbar-h: 0px;
 
@@ -97,9 +97,18 @@ app-footer{
 
 @media #{$tablet}{
   .bottom-bar{
-    width: 100%;
+    width: calc(100% - #{$tablet-content-padding} - #{$tablet-content-padding});
     border-right: none;
     border-left: none;
+  }
+  .page{
+    padding: 0px $tablet-content-padding;
+  }
+  .page-body{
+    width: calc(100% - #{$tablet-content-padding} - #{$tablet-content-padding});
+  }
+  .title-block{
+    width: calc(100% - #{$tablet-content-padding} - #{$tablet-content-padding});
   }
 }
 
