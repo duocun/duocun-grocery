@@ -8,14 +8,17 @@ export class CartService {
 
   constructor() { }
 
-  getTotalPrice(cart) { // group by date time
+  // cart --- [{product, deliveries: [{date, time, quantity}] }]
+  getTotal(cart) {
     let total = 0;
-    cart.map(it => { //  {productId, productName, deliveries:[{date, time, price, quantity }]}
-      it.deliveries.map(d => {
+    cart.forEach((v) => {
+      const price = v.product.price;
+      const taxRate = v.product.taxRate;
+      v.deliveries.forEach((d) => {
         const quantity = d.quantity ? d.quantity : 0;
-        total += it.product.price * quantity;
+        total += price * quantity * (100 + taxRate) / 100;
       });
     });
-    return total;
+    return Math.round(total * 100) / 100;
   }
 }

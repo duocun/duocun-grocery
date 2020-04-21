@@ -9,14 +9,14 @@
   <div class="page-body">
   <form [formGroup]="form" id="order-form" (ngSubmit)="onPay()">
     <div class="contact-block" *ngIf="account">
-      <div class="title-md">
+      <!-- <div class="title-md">
         <div class="label">
-          <span i18n="@@OrderDate">Order Date</span>:
+          <span i18n="@@DeliverDate">Deliver Date</span>:
         </div>
         <span class="date">{{ delivery.date | date: 'yyyy-MM-dd'}} </span>
-        <!-- <span class="time">11:45~13:00</span> -->
-        <!-- <span class="time">{{delivery.date.toDate() | date: 'HH:mm'}}~{{delivery.toTime | date: 'HH:mm'}} </span> -->
-      </div>
+        <span class="time">11:45~13:00</span>
+        <span class="time">{{delivery.date.toDate() | date: 'HH:mm'}}~{{delivery.toTime | date: 'HH:mm'}} </span>
+      </div> -->
       <div class="title-md">
         <div class="label">
           <span i18n="@@DeliverTo">Deliver to</span>:

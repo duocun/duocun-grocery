@@ -184,7 +184,7 @@ mat-button-toggle-group{
 
   .merchant-list {
     padding: 10px 0px;
-    width: 100%;
+    width: calc(100% - #{$tablet-content-padding} - #{$tablet-content-padding});
     height: calc(100% - #{$navbar-h} - #{$bottom-bar-h});
   }
 }

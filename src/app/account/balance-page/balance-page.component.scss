@@ -100,10 +100,10 @@ $desktop: "(min-width: 1200px)";
   $bottom-bar-h: 60px;
   $padding-w: 100px;
   .page{
-    padding: 0px $padding-w;
+    padding: 0px $tablet-content-padding;
   }
 
   .title-block{
-    width: calc(100% - #{$padding-w} - #{$padding-w});
+    width: calc(100% - #{$tablet-content-padding} - #{$tablet-content-padding});
   }
 }
