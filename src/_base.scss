@@ -101,6 +101,15 @@ app-footer{
     border-right: none;
     border-left: none;
   }
+  .page{
+    padding:0px;
+  }
+  .title-block{
+    width: 100%;
+  }
+  .page-body{
+    width: 100%;
+  }
 }
 
 @media #{$mobile}{

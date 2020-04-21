@@ -150,11 +150,14 @@
   $bottom-bar-h: 60px;
   $padding-w: 100px;
   .page{
-    padding: 0px $padding-w;
+    padding: 0px;
   }
 
   .title-block{
-    width: calc(100% - #{$padding-w} - #{$padding-w});
+    width:100%;
+  }
+  .page-body{
+    width: 100%;
   }
 }
 
