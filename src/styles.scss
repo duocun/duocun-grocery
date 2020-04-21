@@ -351,6 +351,7 @@ body{
 }// end of body
 
 $content-padding: 300px;
+$tablet-content-padding: 150px;
 
 .banner{
   padding: 30px $content-padding;
@@ -522,6 +523,10 @@ select:not([multiple]) {
     $dialog-w: 400px;
     $dialog-h: 560px;
 
+    .map-block{
+      padding: 0px $tablet-content-padding;
+    }
+
     .phone-verify-dialog{
       top:0;
       left:0;
@@ -538,6 +543,9 @@ select:not([multiple]) {
         // max-width: none !important;
       }
     }
+
+
+
   }
 
   @media #{$mobile}{
