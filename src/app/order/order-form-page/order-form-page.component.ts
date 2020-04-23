@@ -197,6 +197,9 @@ export class OrderFormPageComponent implements OnInit, OnDestroy {
         });
       } else if (action === OrderFormAction.RESUME_PAY) { // from phone verify page
         this.componentDidMount().then((r: any) => {
+          if (!r) { // wechat pay finished and use browser back button
+            this.router.navigate(['/home']);
+          }
           const account = r.account;
           const payable = r.payable;
           // orders from redux

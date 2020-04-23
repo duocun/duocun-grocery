@@ -52,14 +52,13 @@ export class CreditCardPageComponent implements OnInit, OnDestroy {
     private router: Router,
     private rx: NgRedux<IAppState>,
   ) {
-
     this.rx.select('cart').pipe(takeUntil(this.onDestroy$)).subscribe((cart: any) => {
       this.cart = cart;
       this.chargeItems = this.orderSvc.getChargeItems(cart); // [{date, time, quantity, _id, name, price, cost, taxRate}] }]
     });
 
     this.rx.select('appState').pipe(takeUntil(this.onDestroy$)).subscribe((x: IApp) => {
-      this.appCode = x.code;
+      this.appCode = x ? x.code : '';
     });
 
     this.rx.select('merchant').pipe(takeUntil(this.onDestroy$)).subscribe((m: IMerchant) => {
@@ -68,13 +67,17 @@ export class CreditCardPageComponent implements OnInit, OnDestroy {
 
     // load delivery date and location
     this.rx.select('delivery').pipe(takeUntil(this.onDestroy$)).subscribe((x: IDelivery) => {
-      this.location = x.origin;
+      this.location = x ? x.origin : null;
     });
   }
 
   ngOnInit() {
     this.accountSvc.getCurrentAccount().pipe(takeUntil(this.onDestroy$)).subscribe((account: IAccount) => {
       this.account = account;
+
+      if (!this.cart || this.cart.length === 0) {
+        this.router.navigate(['home']);
+      }
 
       const lang = environment.language;
       const merchant = this.merchant;
@@ -83,6 +86,7 @@ export class CreditCardPageComponent implements OnInit, OnDestroy {
       const amount = Math.round(summary.total * 100) / 100;
       const balance = Math.round((account && account.balance ? account.balance : 0) * 100) / 100;
       this.payable = Math.round((balance >= amount ? 0 : amount - balance) * 100) / 100;
+
       this.charge = { ...summary, payable: this.payable, ...{ balance } };
       const location = this.location;
       const orders = [];
@@ -148,7 +152,7 @@ export class CreditCardPageComponent implements OnInit, OnDestroy {
             this.loading = false;
             this.bSubmitted = false;
             // set default payment method !!! important for both success and fail
-            this.rx.dispatch({type: PaymentActions.UPDATE_PAYMENT_METHOD, payload: {paymentMethod: PaymentMethod.WECHAT}});
+            this.rx.dispatch({ type: PaymentActions.UPDATE_PAYMENT_METHOD, payload: { paymentMethod: PaymentMethod.WECHAT } });
             if (rsp.err === PaymentError.NONE) {
               this.rx.dispatch({ type: CartActions.CLEAR_CART, payload: [] });
               this.router.navigate(['order/history']);
