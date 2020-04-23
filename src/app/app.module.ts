@@ -95,7 +95,7 @@ const appRoutes: Routes = [
     BrowserAnimationsModule,
     // StoreModule.forRoot({ rootReducer }),
     // StoreDevtoolsModule.instrument({
-    //   maxAge: 10
+    //   maxAge: 25
     // })
     // NgxPaginationModule
     // SharedModule,
@@ -122,6 +122,9 @@ const appRoutes: Routes = [
 })
 export class AppModule {
   constructor(ngRedux: NgRedux<any>) {
-    ngRedux.configureStore(rootReducer, INITIAL_STATE);
+    ngRedux.configureStore(
+      rootReducer,
+      INITIAL_STATE,
+    );
   }
 }
