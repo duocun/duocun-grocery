@@ -83,13 +83,14 @@
   }
 }
 .edit-phone{
-  width: 100%;
-
+  width: 30%;
   text-align: center;
   padding-top: 15px;
   float: left;
   margin-top: 15px;
   margin-right: 0px;
+  position: relative;
+  left:35%;
 }
 
 @media #{$tablet}{
@@ -101,5 +102,19 @@
 
   .head-block{
     width: 100%;
+  }
+}
+
+@media #{$cellphone}{
+  .edit-phone{
+    width: 50%;
+    left:25%;
+  }
+}
+
+@media #{$mobile}{
+  .edit-phone{
+    width: 50%;
+    left:25%;
   }
 }
