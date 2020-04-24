@@ -145,7 +145,7 @@ export class AddCreditPageComponent implements OnInit {
     const accountId = account._id;
     const paymentId = '';
     const merchantNames =[];
-    const returnUrl = '';
+    const returnUrl = 'https://duocun.ca/grocery?p=h&cId=' + accountId;
 
 
     return new Promise((resolve, reject) => {

@@ -383,7 +383,7 @@ export class OrderFormPageComponent implements OnInit, OnDestroy {
     const accountId = account._id;
     const amount = payable;
     const note = '';
-    const returnUrl = '';
+    const returnUrl = 'https://duocun.ca/grocery?p=h&cId=' + accountId;
 
 
     // tslint:disable-next-line:no-shadowed-variable
