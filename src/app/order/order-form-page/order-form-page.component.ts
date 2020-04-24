@@ -379,7 +379,12 @@ export class OrderFormPageComponent implements OnInit, OnDestroy {
   // paymentMethodId --- stripe payment method id
   placeOrdersAndPay(appCode, orders, paymentMethodId, account, payable) {
     const accountName = account.username;
-    const paymentNote = '';
+    const paymentActionCode ='';
+    const accountId = account._id;
+    const amount = payable;
+    const note = '';
+    const returnUrl = '';
+
 
     // tslint:disable-next-line:no-shadowed-variable
     return new Promise((resolve, reject) => {
@@ -387,14 +392,14 @@ export class OrderFormPageComponent implements OnInit, OnDestroy {
       this.orderSvc.placeOrders(orders).pipe(takeUntil(this.onDestroy$)).subscribe(newOrders => {
         if (payable > 0) {
           if (this.paymentMethod === PaymentMethod.CREDIT_CARD) {
-            this.paymentSvc.payByCreditCard(AppType.GROCERY, paymentMethodId, account._id, accountName, newOrders, payable, paymentNote)
+            this.paymentSvc.payByCreditCard(paymentActionCode, paymentMethodId, accountId, accountName, amount, note,newOrders[0].paymentId,[newOrders[0].merchantName])
               .pipe(takeUntil(this.onDestroy$)).subscribe(rsp => {
                 this.loading = false;
                 resolve(rsp);
               });
           } else if (this.paymentMethod === PaymentMethod.WECHAT) {
             this.loading = false;
-            this.paymentSvc.payBySnappay(appCode, account._id, newOrders, payable)
+            this.paymentSvc.payBySnappay(paymentActionCode,appCode,accountId,amount,returnUrl, newOrders[0].paymentId, [newOrders[0].merchantName])
               .pipe(takeUntil(this.onDestroy$)).subscribe(rsp => {
                 resolve(rsp);
               });

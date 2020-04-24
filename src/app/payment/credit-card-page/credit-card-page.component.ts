@@ -167,13 +167,20 @@ export class CreditCardPageComponent implements OnInit, OnDestroy {
   }
 
   placeOrdersAndPay(orders, paymentMethodId, account, payable) {
+    const paymentActionCode ='';
     const accountName = account.username;
-    const paymentNote = '';
+    const accountId = account._id;
+    const amount = payable;
+    const note = '';
+    const paymentId = '';
+    const merchantNames =[];
+
 
     // tslint:disable-next-line:no-shadowed-variable
     return new Promise((resolve, reject) => {
       this.orderSvc.placeOrders(orders).pipe(takeUntil(this.onDestroy$)).subscribe(newOrders => {
-        this.paymentSvc.payByCreditCard(AppType.GROCERY, paymentMethodId, account._id, accountName, newOrders, payable, paymentNote)
+        console.log(newOrders),
+        this.paymentSvc.payByCreditCard(paymentActionCode, paymentMethodId,accountId, accountName, amount, newOrders[0].note,newOrders[0].paymentId,[newOrders[0].merchantName])
           .pipe(takeUntil(this.onDestroy$)).subscribe(rsp => {
             resolve(rsp);
           });
