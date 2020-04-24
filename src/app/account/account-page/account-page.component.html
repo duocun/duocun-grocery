@@ -23,7 +23,9 @@
     </div>
 
     <div class="edit-phone">
-      <div class="btn btn-primary"  (click)="toEditPhonePage()">更改电话</div>
+      <div>电话号码</div>
+      <input name="phone" placeholder="{{currentPhone}}" type="tel" pattern="[0-9]*" readonly (click)="toEditPhonePage()" />
+      <!-- <div class="btn btn-primary"  (click)="toEditPhonePage()">{{currentPhone}}</div> -->
     </div>
 
     <!-- <div class="row form-group" *ngIf="account">

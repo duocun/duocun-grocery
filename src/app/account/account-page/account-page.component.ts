@@ -25,7 +25,7 @@ export class AccountPageComponent implements OnInit, OnDestroy {
   form;
   balance: number;
   address: string;
-
+  currentPhone: any;
   constructor(
     private accountSvc: AccountService,
     private authSvc: AuthService,
@@ -49,6 +49,7 @@ export class AccountPageComponent implements OnInit, OnDestroy {
       }
 
       if (account && account.phone) {
+        this.currentPhone = account.phone;
         Cookies.set('duocun-old-phone', account.phone);
       } else {
         Cookies.set('duocun-old-phone', '');
