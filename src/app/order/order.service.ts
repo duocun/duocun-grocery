@@ -83,7 +83,7 @@ export class OrderService extends EntityService {
   }
 
   placeOrders(orders) {
-    const url = this.url + '/bulk';
+    const url = this.url + '/placeOrders';
     return this.doPost(url, orders);
   }
 

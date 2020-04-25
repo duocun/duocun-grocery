@@ -139,6 +139,15 @@ export class AddCreditPageComponent implements OnInit {
     const paymentMethod = this.paymentMethod;
     const amount = Math.round(+received * 100) / 100;
 
+
+    const paymentActionCode ='';
+    const accountName = account.username;
+    const accountId = account._id;
+    const paymentId = '';
+    const merchantNames =[];
+    const returnUrl = 'https://duocun.ca/grocery?p=h&cId=' + accountId;
+
+
     return new Promise((resolve, reject) => {
       if (paymentMethod === PaymentMethod.CREDIT_CARD) {
         this.stripe.createPaymentMethod({
@@ -153,14 +162,14 @@ export class AddCreditPageComponent implements OnInit {
             resolve({ err: PaymentError.BANK_CARD_FAIL });
           } else {
             const paymentMethodId = result.payment.id;
-            this.paymentSvc.payByCreditCard(AppType.FOOD_DELIVERY, paymentMethodId, account._id, account.username, [], amount, note)
+            this.paymentSvc.payByCreditCard(paymentActionCode, paymentMethodId, account._id, account.username, amount, note,paymentId,merchantNames)
               .pipe(takeUntil(this.destroy$)).subscribe((rsp: any) => {
                 resolve(rsp);
               });
           }
         });
       } else if (paymentMethod === PaymentMethod.WECHAT) {
-        this.paymentSvc.payBySnappay(AppType.FOOD_DELIVERY, account._id, [], amount)
+        this.paymentSvc.payBySnappay(paymentActionCode,AppType.FOOD_DELIVERY, account._id, amount,returnUrl,paymentId,merchantNames)
           .pipe(takeUntil(this.destroy$)).subscribe((rsp: any) => {
             resolve(rsp);
           });

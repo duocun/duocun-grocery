@@ -43,31 +43,31 @@ export class PaymentService extends EntityService {
     return this.doPost(url, { account: account, paid: paid, paymentMethod: paymentMethod, note: note });
   }
 
-  snappayPayOrder( order: IOrder, paid: number): Observable<IPaymentResponse> {
+  snappayPayOrder(order: IOrder, paid: number): Observable<IPaymentResponse> {
     const url = this.url + '/snappayPayOrder';
     return this.doPost(url, { order: order, paid: paid });
   }
 
   // deprecated
-  stripeCreateCustomer( tokenId: string, clientId: string, clientName: string, clientPhoneNumber: string): Observable<any> {
+  stripeCreateCustomer(tokenId: string, clientId: string, clientName: string, clientPhoneNumber: string): Observable<any> {
     const url = this.url + '/stripeCreateCustomer';
-    return this.doPost(url, {source: tokenId, clientId: clientId, clientName: clientName, clientPhoneNumber: clientPhoneNumber});
+    return this.doPost(url, { source: tokenId, clientId: clientId, clientName: clientName, clientPhoneNumber: clientPhoneNumber });
   }
 
   // deprecated
   refund(chargeId: string): Observable<any> {
     const url = this.url + '/refund';
-    return this.doPost(url, {chargeId: chargeId});
+    return this.doPost(url, { chargeId: chargeId });
   }
 
   // deprecated
-  addGroupDiscount( clientId: string, merchantId: string, dateType: string, address: string ): Observable<any> {
+  addGroupDiscount(clientId: string, merchantId: string, dateType: string, address: string): Observable<any> {
     const url = this.url + '/addGroupDiscount';
     return this.doPost(url, { clientId: clientId, merchantId: merchantId, dateType: dateType, address: address });
   }
 
   // deprecated
-  removeGroupDiscount( orderId: string ): Observable<any> {
+  removeGroupDiscount(orderId: string): Observable<any> {
     const url = this.url + '/removeGroupDiscount';
     return this.doPost(url, { orderId: orderId });
   }
@@ -110,7 +110,7 @@ export class PaymentService extends EntityService {
       }
     });
 
-    return {stripe: stripe, card: card};
+    return { stripe: stripe, card: card };
   }
 
   // fix me
@@ -126,7 +126,7 @@ export class PaymentService extends EntityService {
             errorElement.textContent = r.error.message;
             resolve({ err: PaymentError.INVALID_BANK_CARD, chargeId: '', msg: r.error.message });
           } else {
-            resolve({err: PaymentError.NONE, status: r.status, chargeId: r.chargeId, token: r.token, msg: ''});
+            resolve({ err: PaymentError.NONE, status: r.status, chargeId: r.chargeId, token: r.token, msg: '' });
           }
         }, err => {
           resolve({ err: PaymentError.INVALID_BANK_CARD, chargeId: '', msg: 'empty card info' });
@@ -139,16 +139,17 @@ export class PaymentService extends EntityService {
 
   // paymentMethodId --- stripe payment method id token
   // order --- when order == null, add credit, when order != null, pay order
-  payByCreditCard(appType, paymentMethodId, accountId, accountName, orders, amount, note) {
+  payByCreditCard(paymentActionCode, paymentMethodId, accountId, accountName, amount, note, paymentId, merchantNames) {
     const url = this.url + '/payByCreditCard';
-    const data = { appType, paymentMethodId, accountId, accountName, orders, amount, note };
+    const data = { paymentActionCode, paymentMethodId, accountId, accountName, amount, note, paymentId, merchantNames };
     return this.doPost(url, data);
   }
 
   // order --- when order == null, add credit, when order != null, pay order
-  payBySnappay(appCode, accountId, orders, amount) {
+
+  payBySnappay(paymentActionCode, appCode, accountId, amount, returnUrl, paymentId, merchantName) {
     const url = this.url + '/payBySnappay';
-    const data = { appCode, accountId, orders, amount };
+    const data = { paymentActionCode, appCode, accountId, amount, returnUrl, paymentId, merchantName };
 
     return this.doPost(url, data);
   }

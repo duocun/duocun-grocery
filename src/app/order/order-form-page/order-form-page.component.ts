@@ -28,8 +28,14 @@ import { IApp } from '../../main/main.reducers';
 // import { AuthService } from '../../account/auth.service';
 import { OrderActions, PaymentActions } from '../order.actions';
 import { CartService } from '../../cart/cart.service';
+import { ProductStatus } from '../../product/product.model';
 
 declare var Stripe;
+
+export const PaymentAction = {
+  PAY: { code: 'P', text: 'Pay' },
+  ADD_CREDIT: { code: 'A', text: 'Add Credit' },
+};
 
 export const OrderFormAction = {
   RESUME_PAY: 'RP',
@@ -197,6 +203,9 @@ export class OrderFormPageComponent implements OnInit, OnDestroy {
         });
       } else if (action === OrderFormAction.RESUME_PAY) { // from phone verify page
         this.componentDidMount().then((r: any) => {
+          if (!r) { // wechat pay finished and use browser back button
+            this.router.navigate(['/home']);
+          }
           const account = r.account;
           const payable = r.payable;
           // orders from redux
@@ -353,15 +362,11 @@ export class OrderFormPageComponent implements OnInit, OnDestroy {
         this.loading = true;
         const merchantId = this.merchant._id;
         const fields = ['_id', 'name', 'price', 'taxRate'];
-        this.productSvc.quickFind({ merchantId, status: 1 }, fields).then(products => {
+        this.productSvc.quickFind(merchantId, ProductStatus.ACTIVE).then(products => {
           this.accountSvc.getCurrentAccount().pipe(takeUntil(this.onDestroy$)).subscribe(account => {
             const amount = this.cartSvc.getTotal(this.cart);
             const balance = Math.round((account && account.balance ? account.balance : 0) * 100) / 100;
             const payable = Math.round((balance >= amount ? 0 : amount - balance) * 100) / 100;
-            const paymentMethod = ((amount !== 0) && (balance >= amount)) ? PaymentMethod.PREPAY : this.paymentMethod;
-            this.rx.dispatch({ type: PaymentActions.UPDATE_PAYMENT_METHOD, payload: { paymentMethod } });
-
-            this.paymentMethod = paymentMethod;
             this.charge = { ...this.summary, ...{ payable }, ...{ balance } };
             this.products = products;
             this.account = account;
@@ -387,15 +392,22 @@ export class OrderFormPageComponent implements OnInit, OnDestroy {
       this.loading = true;
       this.orderSvc.placeOrders(orders).pipe(takeUntil(this.onDestroy$)).subscribe(newOrders => {
         if (payable > 0) {
+          const paymentActionCode = PaymentAction.PAY.code;
+          const accountId = account._id;
+          const returnUrl = 'https://duocun.ca/grocery?p=h&cId=' + account._id;
+
           if (this.paymentMethod === PaymentMethod.CREDIT_CARD) {
-            this.paymentSvc.payByCreditCard(AppType.GROCERY, paymentMethodId, account._id, accountName, newOrders, payable, paymentNote)
-              .pipe(takeUntil(this.onDestroy$)).subscribe(rsp => {
+            const paymentId = newOrders ? newOrders[0].paymentId : null;
+            const merchantNames = newOrders.map(order => order.merchantName);
+
+            this.paymentSvc.payByCreditCard(paymentActionCode, paymentMethodId, accountId, accountName, payable,
+              paymentNote, paymentId, merchantNames).pipe(takeUntil(this.onDestroy$)).subscribe(rsp => {
                 this.loading = false;
                 resolve(rsp);
               });
           } else if (this.paymentMethod === PaymentMethod.WECHAT) {
             this.loading = false;
-            this.paymentSvc.payBySnappay(appCode, account._id, newOrders, payable)
+            this.paymentSvc.payBySnappay(paymentActionCode, appCode, accountId, payable, returnUrl, paymentId, merchantName)
               .pipe(takeUntil(this.onDestroy$)).subscribe(rsp => {
                 resolve(rsp);
               });

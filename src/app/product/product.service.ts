@@ -33,9 +33,9 @@ export class ProductService extends EntityService {
     return this.http.get(url, {headers: headers});
   }
 
-  // quickFind(query, fields ): Observable<any> {
-  //   const url = this.url + '/qFind';
-  //   return this.doGet(url, query, fields);
-  // }
+  quickFind(query) {
+    const url = this.url + '/';
+    return this.doGet(url, query).toPromise();
+  }
 
 }

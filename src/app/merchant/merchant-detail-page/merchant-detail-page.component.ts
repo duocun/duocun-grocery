@@ -177,7 +177,7 @@ export class MerchantDetailPageComponent implements OnInit, OnDestroy {
     const account = this.account;
     const amount = this.cartSvc.getTotal(this.cart);
     const balance = Math.round((account && account.balance ? account.balance : 0) * 100) / 100;
-    const paymentMethod = ((amount !== 0) && (balance >= amount)) ? PaymentMethod.PREPAY : this.paymentMethod;
+    const paymentMethod = ((amount !== 0) && (balance >= amount)) ? PaymentMethod.PREPAY : PaymentMethod.WECHAT;
     this.rx.dispatch({ type: PaymentActions.UPDATE_PAYMENT_METHOD, payload: { paymentMethod } });
     this.router.navigate(['order/form/' + OrderFormAction.NEW]);
   }
@@ -186,8 +186,8 @@ export class MerchantDetailPageComponent implements OnInit, OnDestroy {
     // tslint:disable-next-line:no-shadowed-variable
     return new Promise((resolve, reject) => {
       this.merchantSvc.getById(merchantId).then(merchant => {
-        this.productSvc.quickFind({ merchantId, status: 1 }, ['_id', 'name', 'description', 'price', 'pictures', 'order']).
-          then((products: any[]) => {
+        // ['_id', 'name', 'description', 'price', 'pictures', 'order']
+        this.productSvc.quickFind({ merchantId, status: 1 }).then((products: any[]) => {
             const ps = products.sort((a: any, b: any) => {
               return a.order > b.order ? 1 : -1;
             });
