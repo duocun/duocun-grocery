@@ -1,12 +1,12 @@
 import { IMerchant } from '../merchant/merchant.model';
 import { IAccount } from '../account/account.model';
 
-export enum ProductStatus {
-  ACTIVE = 1,
-  INACTIVE,
-  NEW,
-  PROMOTE
-}
+export const ProductStatus = {
+  ACTIVE: 'A',
+  INACTIVE: 'I',
+  NEW: 'N',
+  PROMOTE: 'P'
+};
 
 export interface IProduct {
   _id?: string;
@@ -24,7 +24,7 @@ export interface IProduct {
   pictures?: any[];
   dow?: string[];
   order?: number;
-  status?: ProductStatus;
+  status?: string;
   created?: string;
   modified?: string;
 
@@ -44,7 +44,7 @@ export class Product implements IProduct {
   pictures: any[];
   dow?: string[];
   order?: number;
-  status?: ProductStatus;
+  status?: string;
   constructor(data?: IProduct) {
     Object.assign(this, data);
   }

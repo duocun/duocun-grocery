@@ -194,7 +194,7 @@ export class OrderHistoryComponent implements OnInit, OnDestroy {
 
     this.orderSvc.loadHistory(clientId, pageNumber, itemsPerPage).pipe(takeUntil(this.onDestroy$)).subscribe((ret: any) => {
       this.orders = ret.orders;
-      this.nOrders = ret.orders.length;
+      this.nOrders = ret.total;
       this.loading = false;
     });
   }

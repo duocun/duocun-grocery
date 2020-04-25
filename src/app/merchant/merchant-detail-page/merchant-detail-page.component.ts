@@ -20,6 +20,7 @@ import { AccountService } from '../../account/account.service';
 import { PaymentMethod } from '../../payment/payment.model';
 import { IPayment } from '../../order/order.reducers';
 import { PaymentActions } from '../../order/order.actions';
+import { ProductStatus } from '../../product/product.model';
 
 
 @Component({
@@ -187,7 +188,7 @@ export class MerchantDetailPageComponent implements OnInit, OnDestroy {
     return new Promise((resolve, reject) => {
       this.merchantSvc.getById(merchantId).then(merchant => {
         // ['_id', 'name', 'description', 'price', 'pictures', 'order']
-        this.productSvc.quickFind({ merchantId, status: 1 }).then((products: any[]) => {
+        this.productSvc.quickFind({ merchantId, status: ProductStatus.ACTIVE}).then((products: any[]) => {
             const ps = products.sort((a: any, b: any) => {
               return a.order > b.order ? 1 : -1;
             });

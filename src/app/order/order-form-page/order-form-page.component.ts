@@ -362,7 +362,7 @@ export class OrderFormPageComponent implements OnInit, OnDestroy {
         this.loading = true;
         const merchantId = this.merchant._id;
         const fields = ['_id', 'name', 'price', 'taxRate'];
-        this.productSvc.quickFind(merchantId, ProductStatus.ACTIVE).then(products => {
+        this.productSvc.quickFind({merchantId, status: ProductStatus.ACTIVE}).then(products => {
           this.accountSvc.getCurrentAccount().pipe(takeUntil(this.onDestroy$)).subscribe(account => {
             const amount = this.cartSvc.getTotal(this.cart);
             const balance = Math.round((account && account.balance ? account.balance : 0) * 100) / 100;
@@ -395,10 +395,10 @@ export class OrderFormPageComponent implements OnInit, OnDestroy {
           const paymentActionCode = PaymentAction.PAY.code;
           const accountId = account._id;
           const returnUrl = 'https://duocun.ca/grocery?p=h&cId=' + account._id;
+          const paymentId = newOrders ? newOrders[0].paymentId : null;
+          const merchantNames = newOrders.map(order => order.merchantName);
 
           if (this.paymentMethod === PaymentMethod.CREDIT_CARD) {
-            const paymentId = newOrders ? newOrders[0].paymentId : null;
-            const merchantNames = newOrders.map(order => order.merchantName);
 
             this.paymentSvc.payByCreditCard(paymentActionCode, paymentMethodId, accountId, accountName, payable,
               paymentNote, paymentId, merchantNames).pipe(takeUntil(this.onDestroy$)).subscribe(rsp => {
@@ -407,7 +407,7 @@ export class OrderFormPageComponent implements OnInit, OnDestroy {
               });
           } else if (this.paymentMethod === PaymentMethod.WECHAT) {
             this.loading = false;
-            this.paymentSvc.payBySnappay(paymentActionCode, appCode, accountId, payable, returnUrl, paymentId, merchantName)
+            this.paymentSvc.payBySnappay(paymentActionCode, appCode, accountId, payable, returnUrl, paymentId, merchantNames)
               .pipe(takeUntil(this.onDestroy$)).subscribe(rsp => {
                 resolve(rsp);
               });
