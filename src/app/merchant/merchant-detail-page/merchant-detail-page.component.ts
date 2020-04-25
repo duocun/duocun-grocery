@@ -186,8 +186,8 @@ export class MerchantDetailPageComponent implements OnInit, OnDestroy {
     // tslint:disable-next-line:no-shadowed-variable
     return new Promise((resolve, reject) => {
       this.merchantSvc.getById(merchantId).then(merchant => {
-        this.productSvc.quickFind({ merchantId, status: 1 }, ['_id', 'name', 'description', 'price', 'pictures', 'order']).
-          then((products: any[]) => {
+        // ['_id', 'name', 'description', 'price', 'pictures', 'order']
+        this.productSvc.quickFind({ merchantId, status: 1 }).then((products: any[]) => {
             const ps = products.sort((a: any, b: any) => {
               return a.order > b.order ? 1 : -1;
             });
