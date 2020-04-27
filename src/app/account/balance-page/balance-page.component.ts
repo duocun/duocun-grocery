@@ -36,9 +36,9 @@ export class BalancePageComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
     const self = this;
-    this.accountSvc.getCurrentAccount().pipe(takeUntil(this.onDestroy$)).subscribe((account: IAccount) => {
-      this.account = account;
-      if (account) {
+    this.accountSvc.getCurrentAccount().pipe(takeUntil(this.onDestroy$)).subscribe((r: any) => {
+      this.account = r.data;
+      if (r.data) {
         this.OnPageChange(this.currentPageNumber);
       } else {
 

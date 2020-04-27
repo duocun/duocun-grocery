@@ -98,11 +98,11 @@ export class EditPhoneComponent implements OnInit,OnDestroy {
       payload: { name: 'phone-form', fromPage: 'account-setting' }
     });
 
-    this.accountSvc.getCurrentAccount().pipe(takeUntil(this.onDestroy$)).subscribe(account => {
-      self.account = account;
-      if (account) {
-        self.phone.patchValue(account.phone);
-        this.currentPhone = account.phone;
+    this.accountSvc.getCurrentAccount().pipe(takeUntil(this.onDestroy$)).subscribe(r => {
+      self.account = r.data;
+      if (r.data) {
+        self.phone.patchValue(r.data.phone);
+        this.currentPhone = r.data.phone;
         // self.verificationCode.patchValue('');
       }
     });

@@ -44,8 +44,13 @@ export class LocationService extends EntityService {
   //   return this.http.get(url, {headers: headers});
   // }
 
+  reqLocationHistory(accountId: string): Observable<any> {
+    const url = encodeURI(this.url + '/history/' + accountId);
+    return this.doGet(url);
+  }
+
   reqPlaces(input: string): Observable<any> {
-    const url = encodeURI(this.url + '/Places/' + input);
+    const url = encodeURI(this.url + '/place/' + input);
     return this.doGet(url);
   }
 
@@ -71,7 +76,7 @@ export class LocationService extends EntityService {
   // }
 
   reqLocationByAddress(address: string): Observable<any> {
-    const url = encodeURI(this.url + '/Geocodes/' + address); // super.getBaseUrl() + 'geocodeLocations?address=' + address;
+    const url = encodeURI(this.url + '/geocode/' + address); // super.getBaseUrl() + 'geocodeLocations?address=' + address;
     return this.doGet(url);
   }
 

@@ -72,8 +72,8 @@ export class CreditCardPageComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit() {
-    this.accountSvc.getCurrentAccount().pipe(takeUntil(this.onDestroy$)).subscribe((account: IAccount) => {
-      this.account = account;
+    this.accountSvc.getCurrentAccount().pipe(takeUntil(this.onDestroy$)).subscribe((r: any) => {
+      this.account = r.data;
 
       if (!this.cart || this.cart.length === 0) {
         this.router.navigate(['home']);
@@ -84,7 +84,7 @@ export class CreditCardPageComponent implements OnInit, OnDestroy {
       const groups = this.orderSvc.getOrderGroups(this.cart);
       const summary = this.orderSvc.getSummary(groups, 0);
       const amount = Math.round(summary.total * 100) / 100;
-      const balance = Math.round((account && account.balance ? account.balance : 0) * 100) / 100;
+      const balance = Math.round((r.data && r.data.balance ? r.data.balance : 0) * 100) / 100;
       this.payable = Math.round((balance >= amount ? 0 : amount - balance) * 100) / 100;
 
       this.charge = { ...summary, payable: this.payable, ...{ balance } };
@@ -93,7 +93,7 @@ export class CreditCardPageComponent implements OnInit, OnDestroy {
       const overRangeCharge = 0;
       groups.map(group => {
         const charge = this.orderSvc.getCharge(group, overRangeCharge);
-        const order = this.orderSvc.createOrder(account, merchant, group.items, location, group.date,
+        const order = this.orderSvc.createOrder(r.data, merchant, group.items, location, group.date,
           group.time, charge, '', PaymentMethod.CREDIT_CARD, lang);
         orders.push(order);
       });
@@ -181,8 +181,8 @@ export class CreditCardPageComponent implements OnInit, OnDestroy {
       this.orderSvc.placeOrders(orders).pipe(takeUntil(this.onDestroy$)).subscribe(newOrders => {
         console.log(newOrders),
         this.paymentSvc.payByCreditCard(paymentActionCode, paymentMethodId,accountId, accountName, amount, newOrders[0].note,newOrders[0].paymentId,[newOrders[0].merchantName])
-          .pipe(takeUntil(this.onDestroy$)).subscribe(rsp => {
-            resolve(rsp);
+          .pipe(takeUntil(this.onDestroy$)).subscribe(r => {
+            resolve(r.data);
           });
       });
     });

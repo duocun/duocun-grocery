@@ -130,8 +130,8 @@ export class MerchantDetailPageComponent implements OnInit, OnDestroy {
       });
     });
 
-    this.accountSvc.getCurrentAccount().pipe(takeUntil(this.onDestroy$)).subscribe(account => {
-      this.account = account;
+    this.accountSvc.getCurrentAccount().pipe(takeUntil(this.onDestroy$)).subscribe(r => {
+      this.account = r.data;
     });
   }
 
@@ -188,13 +188,21 @@ export class MerchantDetailPageComponent implements OnInit, OnDestroy {
     return new Promise((resolve, reject) => {
       this.merchantSvc.getById(merchantId).then(merchant => {
         // ['_id', 'name', 'description', 'price', 'pictures', 'order']
-        this.productSvc.quickFind({ merchantId, status: ProductStatus.ACTIVE}).then((products: any[]) => {
-            const ps = products.sort((a: any, b: any) => {
+        this.productSvc.quickFind({ merchantId, status: ProductStatus.ACTIVE }).then((r: any) => {
+          if (r.code === 'success') {
+            const products = r.data.sort((a: any, b: any) => {
               return a.order > b.order ? 1 : -1;
             });
 
             resolve({ merchant, products });
-          });
+          } else {
+            resolve({ merchant, prodcuts:[]});
+          } 
+          
+
+
+
+        });
       });
     });
   }

@@ -85,7 +85,7 @@ export class AccountService extends EntityService {
   getCurrentAccount(): Observable<any> {
     const tokenId: string = this.authSvc.getAccessTokenId();
     if (tokenId) {
-      return this.http.get(this.url + '/current?tokenId=' + tokenId);
+      return this.http.get(this.url + '/G/token/' + tokenId);
     } else {
       return of(null);
     }
@@ -95,7 +95,7 @@ export class AccountService extends EntityService {
   // return IAccount or null
   getAccountByToken(tokenId: string): Observable<any> {
     if (tokenId) {
-      return this.http.get(this.url + '/current?tokenId=' + tokenId);
+      return this.http.get(this.url + '/G/token/' + tokenId);
     } else {
       return of(null);
     }

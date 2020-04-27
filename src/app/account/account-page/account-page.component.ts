@@ -37,20 +37,20 @@ export class AccountPageComponent implements OnInit, OnDestroy {
 
     this.rx.dispatch({ type: PageActions.UPDATE_URL, payload: { name: 'account-setting' } });
 
-    this.accountSvc.getCurrentAccount().pipe(takeUntil(this.onDestroy$)).subscribe((account: IAccount) => {
-      self.account = account;
-      self.balance = account ? account.balance : 0;
+    this.accountSvc.getCurrentAccount().pipe(takeUntil(this.onDestroy$)).subscribe((r: any) => {
+      self.account = r.data;
+      self.balance = r.data ? r.data.balance : 0;
 
-      if (account && account.location) {
-        self.address = this.locationSvc.getAddrString(account.location);
-        Cookies.set('duocun-old-location', account.location);
+      if (r.data && r.data.location) {
+        self.address = this.locationSvc.getAddrString(r.data.location);
+        Cookies.set('duocun-old-location', r.data.location);
       } else {
         Cookies.set('duocun-old-location', '');
       }
 
-      if (account && account.phone) {
-        this.currentPhone = account.phone;
-        Cookies.set('duocun-old-phone', account.phone);
+      if (r.data && r.data.phone) {
+        this.currentPhone = r.data.phone;
+        Cookies.set('duocun-old-phone', r.data.phone);
       } else {
         Cookies.set('duocun-old-phone', '');
       }

@@ -180,8 +180,8 @@ export class HomeComponent implements OnInit, OnDestroy {
             self.router.navigate(['account/balance']);
           });
         } else {
-          self.accountSvc.getCurrentAccount().pipe(takeUntil(this.onDestroy$)).subscribe((account: IAccount) => {
-            self.rx.dispatch({ type: AccountActions.UPDATE, payload: account });
+          self.accountSvc.getCurrentAccount().pipe(takeUntil(this.onDestroy$)).subscribe((r: any) => {
+            self.rx.dispatch({ type: AccountActions.UPDATE, payload: r.data });
             self.router.navigate(['account/balance']);
           });
         }
@@ -193,8 +193,8 @@ export class HomeComponent implements OnInit, OnDestroy {
             self.router.navigate(['order/history']);
           });
         } else {
-          self.accountSvc.getCurrentAccount().pipe(takeUntil(this.onDestroy$)).subscribe((account: IAccount) => {
-            self.rx.dispatch({ type: AccountActions.UPDATE, payload: account });
+          self.accountSvc.getCurrentAccount().pipe(takeUntil(this.onDestroy$)).subscribe((r: any) => {
+            self.rx.dispatch({ type: AccountActions.UPDATE, payload: r.data });
             self.router.navigate(['order/history']);
           });
         }
@@ -208,23 +208,27 @@ export class HomeComponent implements OnInit, OnDestroy {
 
         if (tokenId) {
           this.accountSvc.setAccessTokenId(tokenId);
-          this.accountSvc.getAccountByToken(tokenId).pipe(takeUntil(this.onDestroy$)).subscribe((account: IAccount) => {
-            if (account) {
-              self.account = account;
+          this.accountSvc.getAccountByToken(tokenId).pipe(takeUntil(this.onDestroy$)).subscribe((r: any) => {
+            if(r.code==='success'){
+            if (r.data) {
+              self.account = r.data;
               // use for manage default location
               this.rx.dispatch({ type: AppStateActions.UPDATE_APP_STATE, payload: AppState.READY });
-              self.mount(account);
+              self.mount(r.data);
             } else {
               alert('登陆失败');
             }
+          }
           });
         } else { // when browser navigate back
           this.loading = true;
-          this.accountSvc.getCurrentAccount().pipe(takeUntil(this.onDestroy$)).subscribe((account: IAccount) => {
-            self.account = account;
+          this.accountSvc.getCurrentAccount().pipe(takeUntil(this.onDestroy$)).subscribe((r: any) => {
+            if(r.code==='success'){
+            self.account = r.data;
             // use for manage default location
             this.rx.dispatch({ type: AppStateActions.UPDATE_APP_STATE, payload: AppState.READY });
-            self.mount(account);
+            self.mount(r.data);
+            }
           });
         }
       }
@@ -267,14 +271,16 @@ export class HomeComponent implements OnInit, OnDestroy {
     this.updateFooterStatus(account);
 
     const origin = this.location ? this.location : (account ? account.location : null);
+
     if (origin) {
-      self.areaSvc.getMyArea(origin).then((area: any) => {
+      self.areaSvc.getMyArea(origin).then((r: any) => {
         // self.location = origin;
         // self.deliveryAddress = self.locationSvc.getAddrString(origin); // set address text to input
-        self.inRange = area ? true : false;
+        if(r.code==='success'){
+        self.inRange = r.data ? true : false;
         self.rx.dispatch<IDeliveryAction>({ type: DeliveryActions.UPDATE_ORIGIN, payload: { origin } });
-        if (area) {
-          self.loadMerchants(area._id).then(rs => {
+        if (r.data) {
+          self.loadMerchants(r.data._id).then(rs => {
             self.loading = false;
           });
         } else {
@@ -283,6 +289,7 @@ export class HomeComponent implements OnInit, OnDestroy {
             self.loading = false;
           });
         }
+      }
       });
     } else {
       self.loadMerchants().then(rs => {
@@ -291,9 +298,14 @@ export class HomeComponent implements OnInit, OnDestroy {
     }
 
     if (accountId) {
-      this.locationSvc.find({ accountId }).pipe(takeUntil(this.onDestroy$)).subscribe((lhs: ILocationHistory[]) => {
-        const a = this.locationSvc.toPlaces(lhs);
+      this.locationSvc.reqLocationHistory(accountId).pipe(takeUntil(this.onDestroy$)).subscribe((r: any) => {
+        if(r.code==='success'){
+        const a = this.locationSvc.toPlaces(r.data);
         self.historyAddressList = a;
+        }else{
+          const a = this.locationSvc.toPlaces([]);
+          self.historyAddressList = a;
+        }
       });
     } else {
       self.historyAddressList = [];
@@ -347,10 +359,11 @@ export class HomeComponent implements OnInit, OnDestroy {
   getSuggestLocationList(input: string, bShowList: boolean) {
     const self = this;
     this.places = [];
-    this.locationSvc.reqPlaces(input).pipe(takeUntil(this.onDestroy$)).subscribe((ps: IPlace[]) => {
-      if (ps && ps.length > 0) {
+    this.locationSvc.reqPlaces(input).pipe(takeUntil(this.onDestroy$)).subscribe((r: any) => {
+      if(r.code==='success'){
+        if (r.data && r.data.length > 0) {
         const places = [];
-        ps.map(p => {
+        r.data.map(p => {
           p.type = 'suggest';
           places.push(Object.assign({}, p));
         });
@@ -359,7 +372,14 @@ export class HomeComponent implements OnInit, OnDestroy {
         if (bShowList) {
           self.places = places; // without lat lng
         }
-      }
+       }
+     }else{
+      const places = [];
+      self.suggestAddressList = places;
+
+     }
+
+
     });
   }
 
@@ -393,10 +413,11 @@ export class HomeComponent implements OnInit, OnDestroy {
       const origin = self.location;
 
       // self.rangeSvc.inDeliveryRange(origin).pipe(takeUntil(this.onDestroy$)).subscribe(inRange => {
-      self.areaSvc.getMyArea(origin).then((area: any) => {
-        self.inRange = area ? true : false;
+      self.areaSvc.getMyArea(origin).then((r: any) => {
+        if(r.code==='success'){
+        self.inRange = r.data ? true : false;
         if (self.inRange) {
-          self.loadMerchants(area._id).then(rs => {
+          self.loadMerchants(r.data._id).then(rs => {
             self.loading = false;
           });
         } else {
@@ -405,7 +426,9 @@ export class HomeComponent implements OnInit, OnDestroy {
             self.loading = false;
           });
         }
+      }
       });
+
       // });
     } else {
       self.loadMerchants().then(rs => {

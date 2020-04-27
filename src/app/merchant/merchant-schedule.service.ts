@@ -24,7 +24,7 @@ export class MerchantScheduleService extends EntityService {
   //   return this.doPost(url, { origin: origin, dateType: dateType }, filter);
   // }
 
-  getAvailableSchedules(merchantId: string, location: any) {
+    getAvailableSchedules(merchantId: string, location: any) {
     const url = this.url + '/availables';
     return this._get(url, { merchantId, location });
   }

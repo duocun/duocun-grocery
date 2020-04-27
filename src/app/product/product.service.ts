@@ -17,6 +17,29 @@ export class ProductService extends EntityService {
     this.url = super.getBaseUrl() + 'Products';
   }
 
+  getById(id, fields = null) {
+    const url = this.url + '/G/' + id;
+    let headers: HttpHeaders = new HttpHeaders();
+    headers = headers.append('Content-Type', 'application/json');
+    const accessTokenId = this.cookieSvc.getAccessTokenId();
+    if (accessTokenId) {
+      headers = headers.append('Authorization', this.authPrefix + accessTokenId);
+    }
+    if (fields) {
+      headers = headers.append('fields', JSON.stringify(fields));
+    }
+    // tslint:disable-next-line:no-shadowed-variable
+    return new Promise((resolve, reject) => {
+      this.http.get(url, { headers: headers }).toPromise().then((r: any) => {
+        if (r.code==='success') {
+          resolve(r.data);
+        } else {
+          resolve({});
+        }
+      });
+    });
+  }
+
 
   categorize(filter: any, lang: string): Observable<any> {
     const url = this.url + '/categorize';
@@ -34,7 +57,7 @@ export class ProductService extends EntityService {
   }
 
   quickFind(query) {
-    const url = this.url + '/';
+    const url = this.url + '/G?merchantId=' + query.merchantId + '&status=' + query.status;
     return this.doGet(url, query).toPromise();
   }
 
