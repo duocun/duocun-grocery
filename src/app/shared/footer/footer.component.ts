@@ -104,7 +104,7 @@ export class FooterComponent implements OnInit, OnDestroy {
         payload: { name: 'clear-location-list', args: null }
       });
       this.selected = 'home';
-      this.router.navigate(['main/home']);
+      this.router.navigate(['/']); // routing issue
     } else {
       this.accountSvc.getCurrentAccount().pipe(takeUntil(this.onDestroy$)).subscribe((account1: IAccount) => {
         this.account = account1;
@@ -113,7 +113,7 @@ export class FooterComponent implements OnInit, OnDestroy {
           payload: { name: 'clear-location-list', args: null }
         });
         this.selected = 'home';
-        this.router.navigate(['main/home']);
+        this.router.navigate(['/']); // routing issue
       });
     }
   }

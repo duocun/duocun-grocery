@@ -225,7 +225,7 @@ export class MerchantDetailPageComponent implements OnInit, OnDestroy {
     const addressHint = this.lang === 'en' ? 'Please enter delivery address' : '请先输入送货地址';
     if (!this.bHasAddress) {
       alert(addressHint);
-      this.router.navigate(['main/home']);
+      this.router.navigate(['/']); // routing issue
       return;
     } else {
       // this.selected = p;

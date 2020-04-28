@@ -167,7 +167,7 @@ export class OrderFormPageComponent implements OnInit, OnDestroy {
       if (action === OrderFormAction.NEW) { // || action === OrderFormAction.CONTINUE
 
         if (!this.cart || this.cart.length === 0) {
-          this.router.navigate(['/home']);
+          this.router.navigate(['/']); // routing issue
         }
 
         this.componentDidMount().then((r: any) => {
@@ -204,7 +204,7 @@ export class OrderFormPageComponent implements OnInit, OnDestroy {
       } else if (action === OrderFormAction.RESUME_PAY) { // from phone verify page
         this.componentDidMount().then((r: any) => {
           if (!r) { // wechat pay finished and use browser back button
-            this.router.navigate(['/home']);
+            this.router.navigate(['/']); // routing issue
           }
           const account = r.account;
           const payable = r.payable;
@@ -342,7 +342,7 @@ export class OrderFormPageComponent implements OnInit, OnDestroy {
           this.loading = false;
           alert('微信登陆已过期, 请退出公众号重新进入');
           this.rx.dispatch({ type: PaymentActions.UPDATE_PAYMENT_METHOD, payload: { paymentMethod: PaymentMethod.WECHAT } });
-          this.router.navigate(['/']);
+          this.router.navigate(['/']); // routing issue
         }
       } else {
         // show verify bank card error

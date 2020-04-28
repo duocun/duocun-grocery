@@ -42,7 +42,7 @@ export class QuitMerchantDialogComponent implements OnInit, OnDestroy {
     this.router.navigate(['merchant/list/' + this.data.merchantId]); // !!! used for close dialog
 
     setTimeout(() => {
-      this.router.navigate(['main/home']);
+      this.router.navigate(['/']); // routing issue
     }, 200);
   }
 

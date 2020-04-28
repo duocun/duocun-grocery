@@ -76,7 +76,7 @@ export class CreditCardPageComponent implements OnInit, OnDestroy {
       this.account = account;
 
       if (!this.cart || this.cart.length === 0) {
-        this.router.navigate(['home']);
+        this.router.navigate(['/']); // routing issue
       }
 
       const lang = environment.language;

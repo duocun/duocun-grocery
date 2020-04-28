@@ -66,10 +66,10 @@ const appRoutes: Routes = [
     path: 'account',
     loadChildren: './account/account.module#AccountModule'
   },
-  {
-    path: 'main',
-    loadChildren: './main/main.module#MainModule'
-  },
+  // {
+  //   path: 'main',
+  //   loadChildren: './main/main.module#MainModule'
+  // },
   {
     path: '',
     loadChildren: './main/main.module#MainModule'
