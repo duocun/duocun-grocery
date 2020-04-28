@@ -361,7 +361,6 @@ export class OrderFormPageComponent implements OnInit, OnDestroy {
       if (this.merchant) {
         this.loading = true;
         const merchantId = this.merchant._id;
-        const fields = ['_id', 'name', 'price', 'taxRate'];
         this.productSvc.quickFind({merchantId, status: ProductStatus.ACTIVE}).then(products => {
           this.accountSvc.getCurrentAccount().pipe(takeUntil(this.onDestroy$)).subscribe(account => {
             const amount = this.cartSvc.getTotal(this.cart);
