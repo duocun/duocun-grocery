@@ -50,7 +50,6 @@ export class LogService {
       message: message,
       type: whiteScreenEventType.toString()
     };
-    debugger;
     this.whiteScreenLogState[ whiteScreenEventType ]++;
 
     if ( whiteScreenEventType === LogEventWhiteScreenType.Exception
