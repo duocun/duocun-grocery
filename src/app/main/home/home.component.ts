@@ -30,6 +30,7 @@ import { AppType } from '../../payment/payment.model';
 import { CartActions } from '../../cart/cart.actions';
 import { MerchantScheduleService } from '../../merchant/merchant-schedule.service';
 import { MerchantActions } from '../../merchant/merchant.actions';
+import { LogService, LogEventWhiteScreenType } from '../../log.service';
 
 const WECHAT_APP_ID = environment.WECHAT.APP_ID;
 const WECHAT_REDIRCT_URL = environment.WECHAT.REDIRECT_URL;
@@ -100,6 +101,7 @@ export class HomeComponent implements OnInit, OnDestroy {
     private route: ActivatedRoute,
     private rx: NgRedux<IAppState>,
     private snackBar: MatSnackBar,
+    private logSvc: LogService
   ) {
     const self = this;
 
@@ -160,6 +162,8 @@ export class HomeComponent implements OnInit, OnDestroy {
   ngOnInit() {
     const self = this;
     this.places = []; // clear address list
+    let whiteScreenLog = "OnInit"; // white screen log
+
     self.route.queryParamMap.pipe(
       // skip(1),
       debounceTime(100),
@@ -172,6 +176,7 @@ export class HomeComponent implements OnInit, OnDestroy {
 
       this.clientId = clientId;
       this.page = page;
+      whiteScreenLog += "->Subscribe queryParamMap Done";
 
       if (page === 'b') { // for wechatpay add credit procedure
         if (clientId) {
@@ -204,30 +209,53 @@ export class HomeComponent implements OnInit, OnDestroy {
 
         this.tokenId = tokenId;
         this.appCode = appCode ? appCode.toString() : '';
+        whiteScreenLog += `->TokenID`; 
+        // whiteScreenLog += `-> TokenID: ${tokenId}, appCode: ${appCode}`; 
+
         this.rx.dispatch({ type: AppStateActions.UPDATE_APP_CODE, payload: appCode });
 
         if (tokenId) {
+          whiteScreenLog += `->Exist URL TokenID`;
           this.accountSvc.setAccessTokenId(tokenId);
+          whiteScreenLog += `->Set TokenID Done`;
           this.accountSvc.getAccountByToken(tokenId).pipe(takeUntil(this.onDestroy$)).subscribe((account: IAccount) => {
+            whiteScreenLog += `->Subscribe getAccountByToken Done`;
             if (account) {
+              whiteScreenLog += `->Verify Done`;
+              this.logSvc.saveWhiteScreenLog(whiteScreenLog, LogEventWhiteScreenType.Success);
               self.account = account;
               // use for manage default location
               this.rx.dispatch({ type: AppStateActions.UPDATE_APP_STATE, payload: AppState.READY });
               self.mount(account);
             } else {
+              whiteScreenLog += `->Verify Fail: no Account`;
+              this.logSvc.saveWhiteScreenLog(whiteScreenLog, LogEventWhiteScreenType.Failure);
               alert('登陆失败');
             }
+          }, error => {
+            whiteScreenLog += `->Subscribe getAccountByToken Error : ${error}`;
+            this.logSvc.saveWhiteScreenLog(whiteScreenLog, LogEventWhiteScreenType.Exception);
           });
         } else { // when browser navigate back
+          whiteScreenLog += `->No URL TokenID`;
           this.loading = true;
           this.accountSvc.getCurrentAccount().pipe(takeUntil(this.onDestroy$)).subscribe((account: IAccount) => {
+            whiteScreenLog += `->Subscribe getCurrentAccount Done ${account && account.name} `;
+            this.logSvc.saveWhiteScreenLog(whiteScreenLog, account ? LogEventWhiteScreenType.Success : LogEventWhiteScreenType.Failure);
             self.account = account;
             // use for manage default location
             this.rx.dispatch({ type: AppStateActions.UPDATE_APP_STATE, payload: AppState.READY });
             self.mount(account);
+          }, error => {
+            whiteScreenLog += `->Subscribe getCurrentAccount Error : ${error}`;
+            this.logSvc.saveWhiteScreenLog(whiteScreenLog, LogEventWhiteScreenType.Exception);
           });
         }
       }
+    }, error => {
+      // incase http failure
+      whiteScreenLog += `->Subscribe queryParamMap Error : ${error}`;
+      this.logSvc.saveWhiteScreenLog(whiteScreenLog, LogEventWhiteScreenType.Exception);
     });
   }
 

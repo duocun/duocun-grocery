@@ -17,6 +17,7 @@ import { AppComponent } from './app.component';
 import { AuthService } from './account/auth.service';
 import { HttpClientModule } from '@angular/common/http';
 import { EntityService } from './entity.service';
+import { LogService } from './log.service';
 import { AccountService } from './account/account.service';
 import { ContactService } from './contact/contact.service';
 import { CartModule } from './cart/cart.module';
@@ -116,7 +117,8 @@ const appRoutes: Routes = [
     EntityService,
     AuthService,
     AccountService,
-    ContactService
+    ContactService,
+    LogService
   ]
 
 })
