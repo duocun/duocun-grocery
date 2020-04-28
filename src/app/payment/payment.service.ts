@@ -140,7 +140,7 @@ export class PaymentService extends EntityService {
   // paymentMethodId --- stripe payment method id token
   // order --- when order == null, add credit, when order != null, pay order
   payByCreditCard(paymentActionCode, paymentMethodId, accountId, accountName, amount, note, paymentId, merchantNames) {
-    const url = this.url + '/payByCreditCard';
+    const url = this.url + '/stripe';
     const data = { paymentActionCode, paymentMethodId, accountId, accountName, amount, note, paymentId, merchantNames };
     return this.doPost(url, data);
   }

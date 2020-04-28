@@ -48,8 +48,8 @@ export class AddCreditPageComponent implements OnInit {
 
 
   ngOnInit() {
-    this.accountSvc.getCurrentAccount().pipe(takeUntil(this.destroy$)).subscribe((account: IAccount) => {
-      this.account = account;
+    this.accountSvc.getCurrentAccount().pipe(takeUntil(this.destroy$)).subscribe((r: any) => {
+      this.account = r.data;
       this.paymentMethod = this.lang === 'en' ? PaymentMethod.CREDIT_CARD : PaymentMethod.WECHAT;
     });
   }
@@ -164,6 +164,7 @@ export class AddCreditPageComponent implements OnInit {
             const paymentMethodId = result.payment.id;
             this.paymentSvc.payByCreditCard(paymentActionCode, paymentMethodId, account._id, account.username, amount, note,paymentId,merchantNames)
               .pipe(takeUntil(this.destroy$)).subscribe((rsp: any) => {
+                console.log(rsp)
                 resolve(rsp);
               });
           }

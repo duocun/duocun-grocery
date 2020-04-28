@@ -56,8 +56,8 @@ export class FooterComponent implements OnInit, OnDestroy {
     // listen account changes from UI
     this.rx.select<IAccount>('account').pipe(takeUntil(this.onDestroy$)).subscribe((account: IAccount) => { // must be redux
       if (!account) {
-        this.accountSvc.getCurrentAccount().pipe(takeUntil(this.onDestroy$)).subscribe((account1: IAccount) => {
-          self.account = account1;
+        this.accountSvc.getCurrentAccount().pipe(takeUntil(this.onDestroy$)).subscribe((r1: any) => {
+          self.account = r1.data;
         });
       } else {
         self.account = account;
@@ -106,8 +106,8 @@ export class FooterComponent implements OnInit, OnDestroy {
       this.selected = 'home';
       this.router.navigate(['/']); // routing issue
     } else {
-      this.accountSvc.getCurrentAccount().pipe(takeUntil(this.onDestroy$)).subscribe((account1: IAccount) => {
-        this.account = account1;
+      this.accountSvc.getCurrentAccount().pipe(takeUntil(this.onDestroy$)).subscribe((r1: any) => {
+        this.account = r1.data;
         this.rx.dispatch({
           type: CommandActions.SEND,
           payload: { name: 'clear-location-list', args: null }
@@ -119,8 +119,8 @@ export class FooterComponent implements OnInit, OnDestroy {
   }
 
   toOrder() {
-    this.accountSvc.getCurrentAccount().pipe(takeUntil(this.onDestroy$)).subscribe((account1: IAccount) => {
-      this.account = account1;
+    this.accountSvc.getCurrentAccount().pipe(takeUntil(this.onDestroy$)).subscribe((r1: any) => {
+      this.account = r1.data;
       if (this.account) {
         this.selected = 'order';
         this.router.navigate(['order/history']);
@@ -143,8 +143,8 @@ export class FooterComponent implements OnInit, OnDestroy {
   }
 
   toAccount() {
-    this.accountSvc.getCurrentAccount().pipe(takeUntil(this.onDestroy$)).subscribe((account1: IAccount) => {
-      this.account = account1;
+    this.accountSvc.getCurrentAccount().pipe(takeUntil(this.onDestroy$)).subscribe((r1: any) => {
+      this.account = r1.data;
       if (this.account) {
         this.selected = 'account';
         this.router.navigate(['account/settings']);

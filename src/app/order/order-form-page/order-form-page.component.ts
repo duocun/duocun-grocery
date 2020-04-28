@@ -362,15 +362,15 @@ export class OrderFormPageComponent implements OnInit, OnDestroy {
         this.loading = true;
         const merchantId = this.merchant._id;
         this.productSvc.quickFind({merchantId, status: ProductStatus.ACTIVE}).then(products => {
-          this.accountSvc.getCurrentAccount().pipe(takeUntil(this.onDestroy$)).subscribe(account => {
+          this.accountSvc.getCurrentAccount().pipe(takeUntil(this.onDestroy$)).subscribe(r => {
             const amount = this.cartSvc.getTotal(this.cart);
-            const balance = Math.round((account && account.balance ? account.balance : 0) * 100) / 100;
+            const balance = Math.round((r.data && r.data.balance ? r.data.balance : 0) * 100) / 100;
             const payable = Math.round((balance >= amount ? 0 : amount - balance) * 100) / 100;
             this.charge = { ...this.summary, ...{ payable }, ...{ balance } };
             this.products = products;
-            this.account = account;
+            this.account = r.data;
             this.loading = false;
-
+            const account = r.data;
             resolve({ account, merchant, payable });
           });
         });

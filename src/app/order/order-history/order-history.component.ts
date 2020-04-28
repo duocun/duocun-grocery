@@ -56,9 +56,9 @@ export class OrderHistoryComponent implements OnInit, OnDestroy {
   ngOnInit() {
     const self = this;
     this.loading = true;
-    this.accountSvc.getCurrentAccount().pipe(takeUntil(this.onDestroy$)).subscribe(account => {
-      self.account = account;
-      if (account && account._id) {
+    this.accountSvc.getCurrentAccount().pipe(takeUntil(this.onDestroy$)).subscribe(r => {
+      self.account = r.data;
+      if (r.data && r.data._id) {
         self.OnPageChange(this.currentPageNumber);
       } else {
         self.orders = []; // should never be here.

@@ -237,9 +237,10 @@ export class PhoneVerifyDialogComponent implements OnInit, OnDestroy {
       this.accountSvc.signup(phone, code).pipe(takeUntil(this.onDestroy$)).subscribe((tokenId: any) => {
         if (tokenId) {
           self.authSvc.setAccessTokenId(tokenId);
-          self.accountSvc.getCurrentAccount().pipe(takeUntil(this.onDestroy$)).subscribe((account: IAccount) => {
-            if (account) {
-              self.dialogRef.close({ account, paymentMethod });
+          self.accountSvc.getCurrentAccount().pipe(takeUntil(this.onDestroy$)).subscribe((r: any) => {
+            if (r.data) {
+              const data =r.data;
+              self.dialogRef.close({ data, paymentMethod });
               // self.rx.dispatch({ type: AccountActions.UPDATE, payload: account });
             }
             this.snackBar.open('', 'Signup successful', { duration: 1000 });

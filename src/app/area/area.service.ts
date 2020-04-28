@@ -24,7 +24,6 @@ export class AreaService extends EntityService {
   }
 
   getMyArea(location: any) {
-    const url = this.url + '/my';
     return this._get(url, { location });
   }
 }
