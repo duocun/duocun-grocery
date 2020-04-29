@@ -123,7 +123,7 @@ export class FooterComponent implements OnInit, OnDestroy {
       this.account = account1;
       if (this.account) {
         this.selected = 'order';
-        this.router.navigate(['order/history']);
+        this.router.navigate(['payment/history']);
       } else {
         const hint = this.lang === 'en' ? 'Require login, please try place an order, we will bring you to signup process' :
         '登陆用户才能访问订单历史，请尝试重新进入并完成微信登陆';

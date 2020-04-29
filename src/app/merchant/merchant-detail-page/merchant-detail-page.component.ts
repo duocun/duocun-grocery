@@ -94,7 +94,7 @@ export class MerchantDetailPageComponent implements OnInit, OnDestroy {
     //     if (self.cart && self.cart.length > 0) {
     //       self.openQuitMerchantDialog(merchantId);
     //     }
-    //   } else if (window.location.pathname.endsWith('order/history')) {
+    //   } else if (window.location.pathname.endsWith('payment/history')) {
     //     // if (self.restaurant && self.cart && self.cart.items && self.cart.items.length > 0) {
     //     //   this.openDialog(merchantId, 'order-history');
     //     // }

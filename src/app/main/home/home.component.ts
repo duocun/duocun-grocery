@@ -153,7 +153,7 @@ export class HomeComponent implements OnInit, OnDestroy {
     //       // this.accountSvc.quitSystem();
     //       this.router.navigate(['/']);
     //     }
-    //   } else if (window.location.pathname.endsWith('order/history')) {
+    //   } else if (window.location.pathname.endsWith('payment/history')) {
 
     //   }
     // });
@@ -195,12 +195,12 @@ export class HomeComponent implements OnInit, OnDestroy {
           self.bPayment = true;
           self.accountSvc.find({ _id: clientId }).pipe(takeUntil(this.onDestroy$)).subscribe((accounts: IAccount[]) => {
             self.rx.dispatch({ type: AccountActions.UPDATE, payload: accounts[0] });
-            self.router.navigate(['order/history']);
+            self.router.navigate(['payment/history']);
           });
         } else {
           self.accountSvc.getCurrentAccount().pipe(takeUntil(this.onDestroy$)).subscribe((account: IAccount) => {
             self.rx.dispatch({ type: AccountActions.UPDATE, payload: account });
-            self.router.navigate(['order/history']);
+            self.router.navigate(['payment/history']);
           });
         }
       } else {

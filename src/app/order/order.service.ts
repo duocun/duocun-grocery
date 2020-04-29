@@ -82,6 +82,11 @@ export class OrderService extends EntityService {
     return this.doGet(url, filter);
   }
 
+  getPaymentHistory(filter: any, currentPageNumber: number, itemsPerPage: number): Observable<any> {
+    const url = this.url + '/paymentHistory/' + currentPageNumber + '/' + itemsPerPage;
+    return this.doGet(url, filter);
+  }
+
   placeOrders(orders) {
     const url = this.url + '/placeOrders';
     return this.doPost(url, orders);

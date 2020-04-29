@@ -82,7 +82,7 @@ export class RemoveOrderDialogComponent implements OnInit, OnDestroy {
           self.dialogRef.close();
           self.rx.dispatch({ type: CommandActions.SEND, payload: { name: 'reload-orders', args: null } }); // refresh order history
           self.snackBar.open('', text, { duration: 1000 });
-          self.router.navigate(['order/history']);
+          self.router.navigate(['payment/history']);
 
         });
       } else if (self.data.paymentMethod === PaymentMethod.CASH || self.data.paymentMethod === PaymentMethod.PREPAY) { // cash or prepaid
@@ -90,7 +90,7 @@ export class RemoveOrderDialogComponent implements OnInit, OnDestroy {
           self.dialogRef.close();
           self.rx.dispatch({ type: CommandActions.SEND, payload: { name: 'reload-orders', args: null } });
           self.snackBar.open('', text, { duration: 1000 });
-          self.router.navigate(['order/history']);
+          self.router.navigate(['payment/history']);
 
         });
       }

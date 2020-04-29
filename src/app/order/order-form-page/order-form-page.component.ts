@@ -223,7 +223,7 @@ export class OrderFormPageComponent implements OnInit, OnDestroy {
                 this.loading = false;
                 // set default payment method
                 this.rx.dispatch({ type: PaymentActions.UPDATE_PAYMENT_METHOD, payload: { paymentMethod: PaymentMethod.WECHAT } });
-                self.router.navigate(['order/history']);
+                self.router.navigate(['payment/history']);
               }
             }
           });
@@ -329,7 +329,7 @@ export class OrderFormPageComponent implements OnInit, OnDestroy {
                   this.loading = false;
                   // set default payment method
                   this.rx.dispatch({ type: PaymentActions.UPDATE_PAYMENT_METHOD, payload: { paymentMethod: PaymentMethod.WECHAT } });
-                  self.router.navigate(['order/history']);
+                  self.router.navigate(['payment/history']);
                 }
               } else {
                 this.showError(rt.err);
@@ -474,7 +474,7 @@ export class OrderFormPageComponent implements OnInit, OnDestroy {
             } else {
               // set default payment method
               this.rx.dispatch({ type: PaymentActions.UPDATE_PAYMENT_METHOD, payload: { paymentMethod: PaymentMethod.WECHAT } });
-              this.router.navigate(['order/history']);
+              this.router.navigate(['payment/history']);
             }
           }
         });

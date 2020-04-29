@@ -16,7 +16,6 @@
     </div>
 
     <div class="order-list" *ngIf="!loading && orders && orders.length>0">
-      <!-- *ngFor="let order of orders;"  -->
       <div class="list-item" *ngFor="let order of orders | paginate: { itemsPerPage: itemsPerPage, currentPage: currentPageNumber, totalItems: nOrders }"
         (click)="onSelect(order)" [class.highlight]="order._id === highlightedOrderId">
         <div class="row first-row">
@@ -115,8 +114,6 @@
           </div>
         </div>
         <div class="row btn-col" *ngIf="canChange(order)">
-          <!-- <div class="btn btn-sm btn-primary btn-change" i18n="@@Change" (click)="changeOrder(order)">Change</div> -->
-          <!-- <div class="btn btn-sm btn-primary btn-delete" i18n="@@Delete" (click)="deleteOrder(order)">Delete</div> -->
         </div>
 
       </div>
@@ -124,7 +121,6 @@
       <pagination-controls (pageChange)="OnPageChange($event)"></pagination-controls>
       </div>
     </div>
-    <!-- class="order-list" -->
   </div>
   <app-footer [type]="'menu'" [menu]="'order-history'"></app-footer>
 </div>

@@ -155,7 +155,7 @@ export class CreditCardPageComponent implements OnInit, OnDestroy {
             this.rx.dispatch({ type: PaymentActions.UPDATE_PAYMENT_METHOD, payload: { paymentMethod: PaymentMethod.WECHAT } });
             if (rsp.err === PaymentError.NONE) {
               this.rx.dispatch({ type: CartActions.CLEAR_CART, payload: [] });
-              this.router.navigate(['order/history']);
+              this.router.navigate(['payment/history']);
             } else {
               alert('Pay failed, please try another card or contact customer service.');
               this.router.navigate(['order/form/' + OrderFormAction.NEW]); // allow user to redo payment process
