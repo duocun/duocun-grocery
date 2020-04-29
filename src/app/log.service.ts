@@ -60,7 +60,8 @@ export class LogService {
       } else {
         if ( this.whiteScreenLogState[ whiteScreenEventType ] <= 1 ) { 
           // only send once, otherwise, when switch tabs, it will send
-          this.save(data);
+          // this.save(data);
+          // do nothing
           // console.log(data); 
         }
       }
