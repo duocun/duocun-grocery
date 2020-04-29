@@ -76,13 +76,7 @@ export class MerchantDetailPageComponent implements OnInit, OnDestroy {
 
     this.rx.select('cart').pipe(takeUntil(this.onDestroy$)).subscribe(cart => {
       this.cart = cart;
-      // // update quantity of cart items
-      // if (self.groups && self.groups.length > 0) {
-      //   self.groups = this.mergeQuantityFromCart(self.groups, cart);
-      // }
       if (cart) {
-        // const ds = this.getDeliverySchedule();
-        // this.deliveries = this.mergeQuantity(ds, cart, this.product._id);
         this.amount = this.cartSvc.getTotal(cart);
       }
     });
@@ -91,21 +85,21 @@ export class MerchantDetailPageComponent implements OnInit, OnDestroy {
       this.paymentMethod = r.paymentMethod;
     });
 
-    this.locationSubscription = this.location.subscribe((x) => {
-      const merchantId = self.merchant._id;
+    // this.locationSubscription = this.location.subscribe((x) => {
+    //   const merchantId = self.merchant._id;
 
-      if (window.location.pathname.endsWith('main/home') || window.location.pathname.endsWith('/') ||
-        window.location.pathname.endsWith('contact/address-form')
-      ) {
-        if (self.cart && self.cart.length > 0) {
-          self.openQuitMerchantDialog(merchantId);
-        }
-      } else if (window.location.pathname.endsWith('order/history')) {
-        // if (self.restaurant && self.cart && self.cart.items && self.cart.items.length > 0) {
-        //   this.openDialog(merchantId, 'order-history');
-        // }
-      }
-    });
+    //   if (window.location.pathname.endsWith('main/home') || window.location.pathname.endsWith('/') ||
+    //     window.location.pathname.endsWith('contact/address-form')
+    //   ) {
+    //     if (self.cart && self.cart.length > 0) {
+    //       self.openQuitMerchantDialog(merchantId);
+    //     }
+    //   } else if (window.location.pathname.endsWith('order/history')) {
+    //     // if (self.restaurant && self.cart && self.cart.items && self.cart.items.length > 0) {
+    //     //   this.openDialog(merchantId, 'order-history');
+    //     // }
+    //   }
+    // });
 
   }
 
@@ -146,7 +140,7 @@ export class MerchantDetailPageComponent implements OnInit, OnDestroy {
   // }
 
   ngOnDestroy() {
-    this.locationSubscription.unsubscribe();
+    // this.locationSubscription.unsubscribe();
     this.onDestroy$.next();
     this.onDestroy$.complete();
   }
@@ -200,17 +194,18 @@ export class MerchantDetailPageComponent implements OnInit, OnDestroy {
   }
 
   // merge quantity in card into product
+  // currentItems: [{product, quantity}]
   mergeCart(cart, currItems) {
-    if (cart && cart.length > 0) {
-      cart.map((it: any) => {
+    if (cart && Object.keys(cart).length > 0) {
+      currItems.map(ci => {
         let quantity = 0;
-        it.deliveries.map(d => quantity += (d.quantity ? d.quantity : 0));
-
-        currItems.map(ci => {
-          if (it.product._id === ci.product._id) {
-            ci.quantity = quantity;
-          }
+        Object.keys(cart).forEach((dt: string) => {
+          const d = cart[dt];
+          const q = this.cartSvc.getProductQuantity(cart, d.date, d.time, ci.product._id);
+          quantity += q;
         });
+
+        ci.quantity = quantity;
       });
       return currItems;
     } else {
@@ -219,6 +214,27 @@ export class MerchantDetailPageComponent implements OnInit, OnDestroy {
       });
     }
   }
+
+  // // merge quantity in card into product
+  // mergeCart(cart, currItems) {
+  //   if (cart && cart.length > 0) {
+  //     cart.map((it: any) => {
+  //       let quantity = 0;
+  //       it.deliveries.map(d => quantity += (d.quantity ? d.quantity : 0));
+
+  //       currItems.map(ci => {
+  //         if (it.product._id === ci.product._id) {
+  //           ci.quantity = quantity;
+  //         }
+  //       });
+  //     });
+  //     return currItems;
+  //   } else {
+  //     return currItems.map(ci => {
+  //       return { product: ci.product, quantity: 0 };
+  //     });
+  //   }
+  // }
 
 
   onSelectShoppingItem(item) {

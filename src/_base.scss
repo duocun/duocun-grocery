@@ -48,6 +48,7 @@ $navbar-h: 0px;
   top: $head-h;
   width: calc(100% - #{$content-padding} - #{$content-padding});
   height: calc(100% - #{$head-h} - #{$bottom-bar-h});
+  overflow-y: scroll;
 }
 app-footer{
   z-index: 990; // spinner 1000
@@ -106,6 +107,7 @@ app-footer{
   }
   .page-body{
     width: calc(100% - #{$tablet-content-padding} - #{$tablet-content-padding});
+    overflow-y: scroll;
   }
   .title-block{
     width: calc(100% - #{$tablet-content-padding} - #{$tablet-content-padding});
@@ -121,6 +123,7 @@ app-footer{
   }
   .page-body{
     width: 100%;
+    overflow-y: scroll;
   }
   .bottom-bar{
     width: 100%;

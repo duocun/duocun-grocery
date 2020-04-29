@@ -5,62 +5,118 @@ import { ICart, ICartItem } from './cart.model';
 import { combineReducers } from 'redux';
 
 
-export const DEFAULT_CART = [];
+export const DEFAULT_CART = {};
 const DEFAULT_LOCATION = {};
 const DEFAULT_MERCHANT = {};
 
-// state --- [{ product, deliveries:[{date, time, quantity}] }]
-// payload --- { product:{_id, price, cost, taxRate }, delivery: {date, time, quantity} }
+
+  // cart: (state)
+  //  {date + T + time: {// map key
+  //    date,
+  //    time,
+  //    merchantMap:
+  //      { merchantId: { // map key
+  //        merchant: {_id, name }, // merchant Name
+  //        productMap:
+  //          {productId: { // map key
+  //            product: {_id, name, price, cost, taxRate},
+  //            quantity
+  //          }
+  //        ]
+  //      },
+  //    ]
+  //  }
+// payload --- { merchant: {_id, name}, product:{_id, price, cost, taxRate }, delivery: {date, time, quantity} }
 const updateQuantity = (state, payload) => {
   const product = payload.product;
   const date = payload.delivery.date;
   const time = payload.delivery.time;
-  const quantity = payload.delivery.quantity;
+  const quantity = +payload.delivery.quantity;
+  const merchantId = payload.merchant._id;
+  const merchant = payload.merchant;
+  const productId = payload.product._id;
 
-  const item = state.find(it => it.product && it.product._id === product._id);
-  if (item) {
-    let deliveries = [];
-    const found = item.deliveries.find(d => (d.date + d.time) === (date + time));
-    if (found) {
-      item.deliveries.map(d => {
-        if ((d.date + d.time) === (date + time)) {
-          deliveries.push({ ...d, quantity: quantity });
-        } else {
-          deliveries.push(d);
-        }
-      });
+  const deliverMap = {...state};
+  const dt = date + 'T' + time;
+  const deliver = deliverMap[dt];
+
+  if (deliver) {
+    const m = deliver.merchantMap[merchantId];
+    if (m) {
+      const p = m.productMap[productId];
+      if (p) {
+        p.quantity = quantity;
+      } else {
+        m.productMap[productId] = { product, quantity };
+      }
     } else {
-      deliveries = [...item.deliveries, payload.delivery];
+      const productMap = {};
+      productMap[productId] = { product, quantity };
+      deliver.merchantMap[merchantId] = { merchant,  productMap };
     }
-    deliveries = deliveries.filter(d => d.quantity > 0);
-    const remain = state.filter(it => it.product && it.product._id !== product._id);
-    return [...remain, { product, deliveries }];
+    return deliverMap;
   } else {
-    const remain = state.filter(it => it.product._id !== product._id);
-    const delivery = { ...payload.delivery, quantity: quantity };
-    const deliveries = [delivery];
-
-    return [...remain, { product, deliveries }];
+    const merchantMap = {};
+    const productMap = {};
+    productMap[productId] = { product, quantity };
+    merchantMap[merchantId] = { merchant,  productMap };
+    deliverMap[dt] = {date, time, merchantMap};
+    return deliverMap;
   }
-  // return state;
 };
+
+// state --- old: [{ product, deliveries:[{date, time, quantity}] }]
+// payload --- { merchantId, merchantName, product:{_id, price, cost, taxRate }, delivery: {date, time, quantity} }
+// const updateQuantity = (state, payload) => {
+//   const product = payload.product;
+//   const date = payload.delivery.date;
+//   const time = payload.delivery.time;
+//   const quantity = payload.delivery.quantity;
+
+//   const item = state.find(it => it.product && it.product._id === product._id);
+//   if (item) {
+//     let deliveries = [];
+//     const found = item.deliveries.find(d => (d.date + d.time) === (date + time));
+//     if (found) {
+//       item.deliveries.map(d => {
+//         if ((d.date + d.time) === (date + time)) {
+//           deliveries.push({ ...d, quantity: quantity });
+//         } else {
+//           deliveries.push(d);
+//         }
+//       });
+//     } else {
+//       deliveries = [...item.deliveries, payload.delivery];
+//     }
+//     deliveries = deliveries.filter(d => d.quantity > 0);
+//     const remain = state.filter(it => it.product && it.product._id !== product._id);
+//     return [...remain, { product, deliveries }];
+//   } else {
+//     const remain = state.filter(it => it.product._id !== product._id);
+//     const delivery = { ...payload.delivery, quantity: quantity };
+//     const deliveries = [delivery];
+
+//     return [...remain, { product, deliveries }];
+//   }
+//   // return state;
+// };
 
 // action.payload - eg. {product, delivery:{date, time, quantity}}
 export const cartReducer = (state = DEFAULT_CART, action) => {
   const payload = action.payload;
 
   switch (action.type) {
-    case 'ADD_TO_CART':
-      return updateQuantity(state, payload);
+    // case 'ADD_TO_CART':
+    //   return updateQuantity(state, payload);
 
-    case 'REMOVE_FROM_CART':
-      return updateQuantity(state, payload);
+    // case 'REMOVE_FROM_CART':
+    //   return updateQuantity(state, payload);
 
     case CartActions.UPDATE_QUANTITY:
       return updateQuantity(state, payload);
 
     case CartActions.CLEAR_CART:
-        return [];
+      return {};
     default:
       return state;
   }

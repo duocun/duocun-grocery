@@ -32,18 +32,21 @@
       </div>
     </div>
 
-    <div class="title-md merchant" *ngIf="merchant">{{merchant.name}}</div>
+    <!-- <div class="title-md merchant" *ngIf="merchant">{{merchant.name}}</div> -->
 
     <div class="row order-detail" *ngIf="cart">
-      <div class="col-7 items-col">
-        <div *ngFor="let item of chargeItems" class="text-sm row item-row">
-          <div class="col-8 product-col">{{item.name + ' ' + item.date}}</div>
-          <div class="col-2 quantity-col">x{{item.quantity}}</div>
-          <div class="col-2 price-col">${{item.price | number : '1.2-2'}}</div>
+      <div class="col-12 items-col">
+        <div *ngFor="let deliver of chargeItems" class="text-sm row item-row">
+          <div class="row col-date">送货日期:{{deliver.date}}</div>
+          <div *ngFor="let item of deliver.items" class="row">
+            <div class="col-9 product-col">{{item.name}}</div>
+            <div class="col-1 quantity-col">x{{item.quantity}}</div>
+            <div class="col-2 price-col">${{item.price | number : '1.2-2'}}</div>
+          </div>
         </div>
       </div>
-      <div class="col-5 text-sm total-col">
-        <app-charge-summary [charge]="charge" [bShowBalance]="true"></app-charge-summary>
+      <div class="col-12 text-sm total-col">
+        <app-charge-summary style="float:right;" [charge]="charge" [bShowBalance]="true"></app-charge-summary>
       </div>
     </div>
 

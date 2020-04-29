@@ -37,6 +37,8 @@ export class DeliveryPageComponent implements OnInit {
   areas;
   schedule;
   loading = false;
+  merchant;
+
   constructor(
     private productSvc: ProductService,
     private merchantSvc: MerchantService,
@@ -84,21 +86,15 @@ export class DeliveryPageComponent implements OnInit {
     }
   }
 
+
   // slots [{date, time}...]
-  // cart --- { product, deliveries:[{date, time, quantity}]}
   // return [{date, time, quantity}...]
   mergeQuantity(slots, cart, productId) {
     const ds = [];
-    const cartItem = cart.find(it => it.product && it.product._id === productId);
-
-    if (cartItem && cartItem.deliveries && cartItem.deliveries.length > 0) { // try merge
-      slots.map(slot => {
-        const updated = cartItem.deliveries.find(d => slot.date + slot.time === d.date + d.time);
-        if (updated) {
-          ds.push({ ...slot, quantity: updated.quantity });
-        } else {
-          ds.push(slot);
-        }
+    if (cart && Object.keys(cart).length !== 0) { // try merge
+      slots.forEach(slot => {
+        const quantity = this.cartSvc.getProductQuantity(cart, slot.date, slot.time, productId);
+        ds.push({...slot, quantity});
       });
       return ds.sort((a: any, b: any) => {
         if (moment(a.date).isAfter(moment(b.date))) {
@@ -117,6 +113,39 @@ export class DeliveryPageComponent implements OnInit {
       });
     }
   }
+  // slots [{date, time}...]
+  // cart --- { product, deliveries:[{date, time, quantity}]}
+  // return [{date, time, quantity}...]
+  // mergeQuantity(slots, cart, productId) {
+  //   const ds = [];
+  //   const cartItem = cart.find(it => it.product && it.product._id === productId);
+
+  //   if (cartItem && cartItem.deliveries && cartItem.deliveries.length > 0) { // try merge
+  //     slots.map(slot => {
+  //       const updated = cartItem.deliveries.find(d => slot.date + slot.time === d.date + d.time);
+  //       if (updated) {
+  //         ds.push({ ...slot, quantity: updated.quantity });
+  //       } else {
+  //         ds.push(slot);
+  //       }
+  //     });
+  //     return ds.sort((a: any, b: any) => {
+  //       if (moment(a.date).isAfter(moment(b.date))) {
+  //         return 1;
+  //       } else {
+  //         return -1;
+  //       }
+  //     });
+  //   } else {
+  //     return slots.sort((a: any, b: any) => {
+  //       if (moment(a.date).isAfter(moment(b.date))) {
+  //         return 1;
+  //       } else {
+  //         return -1;
+  //       }
+  //     });
+  //   }
+  // }
 
   // n -- dow
   getBaseDateList(orderEndList, deliverDowList) {
@@ -136,6 +165,7 @@ export class DeliveryPageComponent implements OnInit {
           const orderEndList = merchant.rules.map(r => r.orderEnd);
           const location = this.location;
           this.product = product;
+          this.merchant = { _id: merchant._id, name: merchant.name };
           this.merchantScheduleSvc.getAvailableSchedules(merchantId, location).then((schedules: any[]) => {
             if (schedules && schedules.length > 0) {
               const dows = schedules[0].rules.map(r => +r.deliver.dow);
@@ -160,10 +190,11 @@ export class DeliveryPageComponent implements OnInit {
   }
 
   onDeliveryItemChange(e) {
+    const merchant = this.merchant;
     const product = this.product;
     const delivery = e;
 
-    this.rx.dispatch({ type: CartActions.UPDATE_QUANTITY, payload: { product, delivery } });
+    this.rx.dispatch({ type: CartActions.UPDATE_QUANTITY, payload: { merchant, product, delivery } });
   }
 
   onNext() {

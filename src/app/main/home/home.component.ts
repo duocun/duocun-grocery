@@ -145,18 +145,18 @@ export class HomeComponent implements OnInit, OnDestroy {
       }
     });
 
-    this.locationSubscription = this.location$.subscribe((x) => {
-      if (window.location.pathname.indexOf('merchant/list') !== -1) {
-        if (this.cart && this.cart.length > 0) {
-          this.rx.dispatch({ type: CartActions.CLEAR_CART, payload: [] });
-          this.rx.dispatch({ type: MerchantActions.CLEAR_MERCHANT, payload: null });
-          // this.accountSvc.quitSystem();
-          this.router.navigate(['/']);
-        }
-      } else if (window.location.pathname.endsWith('order/history')) {
+    // this.locationSubscription = this.location$.subscribe((x) => {
+    //   if (window.location.pathname.indexOf('merchant/list') !== -1) {
+    //     if (this.cart) {
+    //       this.rx.dispatch({ type: CartActions.CLEAR_CART, payload: {} });
+    //       this.rx.dispatch({ type: MerchantActions.CLEAR_MERCHANT, payload: null });
+    //       // this.accountSvc.quitSystem();
+    //       this.router.navigate(['/']);
+    //     }
+    //   } else if (window.location.pathname.endsWith('order/history')) {
 
-      }
-    });
+    //   }
+    // });
   }
 
   ngOnInit() {
@@ -209,8 +209,8 @@ export class HomeComponent implements OnInit, OnDestroy {
 
         this.tokenId = tokenId;
         this.appCode = appCode ? appCode.toString() : '';
-        // whiteScreenLog += `->TokenID`; 
-        whiteScreenLog += `->TokenID: ${tokenId}, appCode: ${appCode}`; 
+        // whiteScreenLog += `->TokenID`;
+        whiteScreenLog += `->TokenID: ${tokenId}, appCode: ${appCode}`;
 
         this.rx.dispatch({ type: AppStateActions.UPDATE_APP_CODE, payload: appCode });
 
@@ -260,7 +260,7 @@ export class HomeComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy() {
-    this.locationSubscription.unsubscribe();
+    // this.locationSubscription.unsubscribe();
     this.onDestroy$.next();
     this.onDestroy$.complete();
   }

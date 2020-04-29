@@ -91,7 +91,7 @@ export class MerchantListComponent implements OnInit, OnDestroy, OnChanges {
       type: DeliveryActions.UPDATE_DESTINATION,
       payload: { destination: r.location, distance: r.distance }
     });
-    this.rx.dispatch({ type: CartActions.CLEAR_CART, payload: [] }); // important !
+    // this.rx.dispatch({ type: CartActions.CLEAR_CART, payload: [] }); // important !
     this.router.navigate(['merchant/list/' + r._id]);
   }
 

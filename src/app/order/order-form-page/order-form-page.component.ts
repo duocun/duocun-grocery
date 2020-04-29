@@ -166,7 +166,7 @@ export class OrderFormPageComponent implements OnInit, OnDestroy {
       const action = params['action'];
       if (action === OrderFormAction.NEW) { // || action === OrderFormAction.CONTINUE
 
-        if (!this.cart || this.cart.length === 0) {
+        if (!this.cart && Object.keys(this.cart).length !== 0) {
           this.router.navigate(['/']); // routing issue
         }
 

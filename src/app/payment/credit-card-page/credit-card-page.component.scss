@@ -2,6 +2,9 @@
 .page-body{
   padding: 15px;
 }
+.col-date{
+  color: #333;
+}
 .contact-block{
   padding: 10px 0px;
   border-bottom: solid 1px #eee;
@@ -54,6 +57,9 @@
 .order-detail{
   padding-top: 6px;
   font-size: 16px;
+  height: 296px;
+  overflow-y: scroll;
+
   .items-col{
     padding-left: 0px;
     padding-right: 10px;
@@ -72,42 +78,42 @@
       padding: 0px;
     }
   }
-
-  .total-col{
-    display: flex;
-    align-items: flex-end;
-    padding-left: 0px;
-    padding-right: 0px;
-    padding-bottom: 8px;
-
-    .col-12{
-      padding-bottom: 3px;
-      padding-right: 0px;
-      padding-left: 0px;
-    }
-
-    .title-xs{
-      width: 73px;
-      float: left;
-      font-size: 14px;
-      font-weight: 500;
-    }
-
-    .text-xs{
-      float: left;
-      font-size: 14px;
-      margin-left: 4px;
-    }
-
-    .total-row{
-      margin-top: 3px;
-      padding-top: 5px;
-      width: 100%;
-      // border-top: solid 1px #eee;
-    }
-  }
 }
 
+
+.total-col{
+  display: flex;
+  align-items: flex-end;
+  padding-left: 0px;
+  padding-right: 0px;
+  padding-bottom: 8px;
+
+  .col-12{
+    padding-bottom: 3px;
+    padding-right: 0px;
+    padding-left: 0px;
+  }
+
+  .title-xs{
+    width: 73px;
+    float: left;
+    font-size: 14px;
+    font-weight: 500;
+  }
+
+  .text-xs{
+    float: left;
+    font-size: 14px;
+    margin-left: 4px;
+  }
+
+  .total-row{
+    margin-top: 3px;
+    padding-top: 5px;
+    width: 100%;
+    // border-top: solid 1px #eee;
+  }
+}
 
 // credit card
 #payment-form{

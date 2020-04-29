@@ -75,7 +75,7 @@ export class CreditCardPageComponent implements OnInit, OnDestroy {
     this.accountSvc.getCurrentAccount().pipe(takeUntil(this.onDestroy$)).subscribe((account: IAccount) => {
       this.account = account;
 
-      if (!this.cart || this.cart.length === 0) {
+      if (!this.cart && Object.keys(this.cart).length !== 0) {
         this.router.navigate(['/']); // routing issue
       }
 
