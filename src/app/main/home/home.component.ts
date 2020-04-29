@@ -209,8 +209,8 @@ export class HomeComponent implements OnInit, OnDestroy {
 
         this.tokenId = tokenId;
         this.appCode = appCode ? appCode.toString() : '';
-        whiteScreenLog += `->TokenID`; 
-        // whiteScreenLog += `-> TokenID: ${tokenId}, appCode: ${appCode}`; 
+        // whiteScreenLog += `->TokenID`; 
+        whiteScreenLog += `->TokenID: ${tokenId}, appCode: ${appCode}`; 
 
         this.rx.dispatch({ type: AppStateActions.UPDATE_APP_CODE, payload: appCode });
 
@@ -240,7 +240,7 @@ export class HomeComponent implements OnInit, OnDestroy {
           whiteScreenLog += `->No URL TokenID`;
           this.loading = true;
           this.accountSvc.getCurrentAccount().pipe(takeUntil(this.onDestroy$)).subscribe((account: IAccount) => {
-            whiteScreenLog += `->Subscribe getCurrentAccount Done ${account && account.name} `;
+            whiteScreenLog += `->Subscribe getCurrentAccount Done ${account && account.username} `;
             this.logSvc.saveWhiteScreenLog(whiteScreenLog, account ? LogEventWhiteScreenType.Success : LogEventWhiteScreenType.Failure);
             self.account = account;
             // use for manage default location
