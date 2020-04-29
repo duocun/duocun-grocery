@@ -1,0 +1,131 @@
+<div class="loading-spinner" *ngIf="loading">
+    <app-progress-spinner></app-progress-spinner>
+  </div>
+  
+  <div class="page">
+    <div class="title-block">
+      <span class="title-bg" i18n="@@OrderHistory">Order History</span>
+    </div>
+  
+    <div class="page-body">
+      <div class="empty-payment" *ngIf="!loading && (!payments || payments.length===0)">
+        <div class="payment-image">
+          <img src="assets/outline-assignment-24px.svg" alt="payment" />
+        </div>
+        <span i18n="@@OrderEmptyMsg">You don't have any payment yet.</span>
+      </div>
+  
+      <div class="payment-list" *ngIf="!loading && payments && payments.length>0">
+        <div class="list-item" *ngFor="let payment of payments | paginate: { itemsPerPage: itemsPerPage, currentPage: currentPageNumber, totalItems: nOrders }"
+          (click)="onSelect(payment)" [class.highlight]="payment.paymentId === highlightedPaymentId">
+          <div class="row first-row">
+            <div class="col-12 text-col">
+              <div class="col-12">
+                <span class="title-xs" i18n="@@Order">Order</span>:
+                <span class="text-xs">{{payment.paymentId}}</span>
+              </div>
+              <!-- <div class="col-12">
+                <span class="title-xs" i18n="@@Merchant">Merchant</span>:
+                <span class="text-xs">{{payment.merchantName}}</span>
+              </div> -->
+              <!-- <div class="col-12" *ngIf="payment.type === OrderTypes.FOOD_DELIVERY || payment.type === OrderTypes.GROCERY">
+                <span class="title-xs" i18n="@@DeliveryDate">Deliver Date</span>:
+                <span class="text-xs">{{toDateString(payment.delivered)}}</span>
+              </div> -->
+              <div class="col-12">
+                <span class="title-xs" i18n="@@OrderDate">Order Date</span>:
+                <span class="text-xs">{{toDateString(payment.created)}}</span>
+              </div>
+            </div>
+          </div>
+          <div class="row" *ngIf="payment.type === OrderTypes.FOOD_DELIVERY || payment.type === OrderTypes.GROCERY">
+            <div class="col-12 address-row">
+              <span class="title-xs" i18n="@@PhoneNumber">Phone Number</span>:
+              <span class="text-xs">{{payment.client? payment.client.phone : 'N/A'}}</span>
+            </div>
+          </div>
+          <div class="row" *ngIf="payment.type === OrderTypes.FOOD_DELIVERY || payment.type === OrderTypes.GROCERY">
+            <div class="col-12 address-row">
+              <span class="title-xs" i18n="@@DeliverAddress">Deliver to</span>:
+              <span class="text-xs">{{payment.address}}</span>
+            </div>
+          </div>
+  
+          <div class="row payment-detail">
+            <div class="col-12 items-col" *ngIf="payment.type!=='MM'">
+              <div *ngFor="let deliver of payment.delivers" class="text-sm row item-row">
+                <div class="deliver-date">送货日期:{{deliver.date}}</div>
+                <div *ngFor="let merchant of deliver.merchants" class="row">
+                    <div class="merchant">商家:{{merchant.name}}</div>
+                    <div *ngFor="let product of merchant.products" class="product-row">
+                      <div class="product-col">{{product.name}}</div>
+                      <div class="quantity-col">x {{product.quantity | number : '1.0-0'}}</div>
+                      <div class="price-col">${{product.price | number : '1.2-2'}}</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="col-12 items-col">
+              <div class="description-col">{{payment.description}}</div>
+            </div>
+            <div class="col-12 text-sm total-col" *ngIf="payment.total">
+              <div class="row">
+                <div class="col-12">
+                  <div class="title-xs">
+                    <span i18n="@@ProductTotal">ProductTotal</span>:</div>
+                  <div class="text-xs">&nbsp;${{payment.price | number : '1.2-2'}}</div>
+                </div>
+                <div class="col-12" *ngIf="payment.type === OrderTypes.FOOD_DELIVERY">
+                  <div class="title-xs">
+                    <span i18n="@@DeliveryFee">Delivery Fee</span>:</div>
+                  <div class="text-xs">&nbsp;${{payment.deliveryCost | number : '1.2-2'}}</div>
+                </div>
+                <div class="col-12" *ngIf="payment.type === OrderTypes.FOOD_DELIVERY">
+                  <div class="title-xs">
+                    <span i18n="@@Subtotal">Subtotal</span>:</div>
+                  <div class="text-xs">&nbsp;${{payment.price + payment.deliveryCost | number : '1.2-2'}}</div>
+                </div>
+                <div class="col-12">
+                  <div class="title-xs">
+                    <span i18n="@@Tax">Tax</span>:</div>
+                  <div class="text-xs">&nbsp;${{payment.tax | number : '1.2-2'}}</div>
+                </div>
+                <div class="col-12" *ngIf="payment.type === OrderTypes.FOOD_DELIVERY">
+                  <div class="title-xs">
+                    <span i18n="@@Tips">Tips</span>:</div>
+                  <div class="text-xs">&nbsp;${{payment.tips | number : '1.2-2'}}</div>
+                </div>
+                <div class="col-12" *ngIf="payment.type === OrderTypes.FOOD_DELIVERY">
+                  <div class="title-xs">
+                    <span i18n="@@DeliveryDiscount">Discount</span>:</div>
+                  <div class="text-xs">-${{payment.deliveryDiscount | number : '1.2-2'}}</div>
+                </div>
+                <div class="col-12" *ngIf="payment.type === OrderTypes.FOOD_DELIVERY && payment.groupDiscount>0">
+                  <div class="title-xs">
+                    <span i18n="@@GroupDiscount">GroupDiscount</span>:</div>
+                  <div class="text-xs">-${{payment.groupDiscount | number : '1.2-2'}}</div>
+                </div>
+                <div class="col-12" *ngIf="payment.type === OrderTypes.FOOD_DELIVERY && payment.overRangeCharge">
+                  <div class="title-xs">
+                    <span i18n="@@OverRangeCharge">Over Range Charge</span>:</div>
+                  <div class="text-xs">${{payment.overRangeCharge | number : '1.2-2'}}</div>
+                </div>
+                <div class="col-12">
+                  <div class="title-xs">
+                    <span i18n="@@Total">Total</span>:</div>
+                  <div class="text-xs">&nbsp;${{ payment.total | number : '1.2-2'}}</div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="row btn-col" *ngIf="canChange(payment)">
+          </div>
+  
+        </div>
+        <div class="bottom-page-nav">
+        <pagination-controls (pageChange)="OnPageChange($event)"></pagination-controls>
+        </div>
+      </div>
+    </div>
+    <app-footer [type]="'menu'" [menu]="'payment-history'"></app-footer>
+  </div>
