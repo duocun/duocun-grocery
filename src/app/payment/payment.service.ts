@@ -23,9 +23,9 @@ export class PaymentService extends EntityService {
     this.url = super.getBaseUrl() + 'ClientPayments';
   }
 
-  getHistory(filter: any, currentPageNumber: number, itemsPerPage: number): Observable<any> {
-    const url = this.url + '/history/' + currentPageNumber + '/' + itemsPerPage;
-    return this.doGet(url, filter);
+  getHistory(clientId: string, currentPageNumber: number, itemsPerPage: number): Observable<any> {
+    const url = this.url + '/history/' + clientId + '/' + currentPageNumber + '/' + itemsPerPage;
+    return this.doGet(url);
   }
 
   getSession(): Observable<any> {
