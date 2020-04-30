@@ -16,6 +16,7 @@ import * as moment from 'moment';
 import { environment } from '../../../environments/environment';
 import { LocationService } from '../../location/location.service';
 import { ILocation } from '../../location/location.model';
+import { PaymentService } from '../payment.service';
 
 @Component({
   selector: 'app-payment-history',
@@ -36,7 +37,7 @@ export class PaymentHistoryComponent implements OnInit, OnDestroy {
 
   constructor(
     private accountSvc: AccountService,
-    private orderSvc: OrderService,
+    private paymentSvc: PaymentService,
     private sharedSvc: SharedService,
     private locationSvc: LocationService,
     private rx: NgRedux<IAppState>,
@@ -95,26 +96,26 @@ export class PaymentHistoryComponent implements OnInit, OnDestroy {
   }
 
   // openDialog(accountId: string, orderId: string, total: number, paymentMethod: string,
-    // transactionId: string, chargeId: string): void {
-    // const dialogRef = this.dialog.open(RemoveOrderDialogComponent, {
-    //   width: '300px',
-    //   data: {
-    //     title: this.lang === 'en' ? 'Hint' : '提示',
-    //     content: this.lang === 'en' ? 'Are you sure to remove this order ?' : '确认要删除该订单吗？',
-    //     buttonTextNo: this.lang === 'en' ? 'Cancel' : '取消',
-    //     buttonTextYes: this.lang === 'en' ? 'Remove' : '删除',
-    //     accountId: accountId,
-    //     orderId: orderId,
-    //     total: total,
-    //     paymentMethod: paymentMethod,
-    //     transactionId: transactionId,
-    //     chargeId: chargeId
-    //   },
-    // });
+  // transactionId: string, chargeId: string): void {
+  // const dialogRef = this.dialog.open(RemoveOrderDialogComponent, {
+  //   width: '300px',
+  //   data: {
+  //     title: this.lang === 'en' ? 'Hint' : '提示',
+  //     content: this.lang === 'en' ? 'Are you sure to remove this order ?' : '确认要删除该订单吗？',
+  //     buttonTextNo: this.lang === 'en' ? 'Cancel' : '取消',
+  //     buttonTextYes: this.lang === 'en' ? 'Remove' : '删除',
+  //     accountId: accountId,
+  //     orderId: orderId,
+  //     total: total,
+  //     paymentMethod: paymentMethod,
+  //     transactionId: transactionId,
+  //     chargeId: chargeId
+  //   },
+  // });
 
-    // dialogRef.afterClosed().pipe(takeUntil(this.onDestroy$)).subscribe(result => {
+  // dialogRef.afterClosed().pipe(takeUntil(this.onDestroy$)).subscribe(result => {
 
-    // });
+  // });
   // }
 
   onSelect(order) {
@@ -132,6 +133,8 @@ export class PaymentHistoryComponent implements OnInit, OnDestroy {
     return local.format('YYYY-MM-DD');
   }
 
+
+
   OnPageChange(pageNumber) {
     const clientId = this.account._id;
     const itemsPerPage = this.itemsPerPage;
@@ -139,43 +142,47 @@ export class PaymentHistoryComponent implements OnInit, OnDestroy {
     this.loading = true;
     this.currentPageNumber = pageNumber;
 
-    // this.orderSvc.getPaymentHistory(clientId, pageNumber, itemsPerPage)
-    //   .pipe(takeUntil(this.onDestroy$))
-    //   .subscribe((ret: any) => {
-      // this.payments = ret.payments;
-      this.payments = [{
-        paymentId: '111',
-        created: '2020-04-29',
-        client: {phone: '123456789'},
-        address: '234 Fello St, Toronto',
-        delivers: [
-          {
-            date: '2020-05-01',
-            merchants: [
-              {name: '蔬果超市', products: [{name: 'a', quantity: 2, price: 9.69}, {name: 'aa', quantity: 1, price: 6.99}] },
-              {name: '苏宁电器', products: [{name: 'b', quantity: 3, price: 7.99}] },
-            ]
-          },
-          {
-            date: '2020-05-05',
-            merchants: [
-              {name: '大娘水饺', products: [{name: 'a', quantity: 2}, {name: 'aa', quantity: 5, price: 12.99}] },
-              {name: '鸭血粉丝汤', products: [{name: 'b', quantity: 3}, {name: 'b', quantity: 13, price: 10.59}] },
-            ]
-          }
-        ],
-        total: 122,
-        price: 120,
-        tax: 15,
-        tips: 0,
-        deliveryCost: 0,
-        deliveryDiscount: 0,
-        groupDiscount: 0,
-        overRangeCharge: 0
-      }];
-      this.nOrders = 1; // ret.total;
-      this.loading = false;
-    // });
+    // getHistory(filter: any, currentPageNumber: number, itemsPerPage: number)
+    this.paymentSvc.getHistory(clientId, pageNumber, itemsPerPage)
+      .pipe(takeUntil(this.onDestroy$))
+      .subscribe((ret: any) => {
+        this.payments = ret.data;
+        // this.payments = [{
+        //   paymentId: '111111111111111',
+        //   created: '2020-04-29',
+        //   client: {phone: '123456789'},
+        //   address: '234 Fello St, Toronto',
+        //   delivers: [
+        //     {
+        //       date: '2020-05-01',
+        //       merchants: [
+        //         {name: '蔬果超市', products: [{productName: 'a', quantity: 2, price: 9.69},
+        //                                      {productName: 'aa', quantity: 1, price: 6.99}] },
+        //         {name: '苏宁电器', products: [{productName: 'b', quantity: 3, price: 7.99}] },
+        //       ]
+        //     },
+        //     {
+        //       date: '2020-05-05',
+        //       merchants: [
+        //         {name: '大娘水饺', products: [{productName: 'a', quantity: 2, price: 7.99},
+        //                                      {productName: 'aa', quantity: 5, price: 12.99}] },
+        //         {name: '鸭血粉丝汤', products: [{productName: 'b', quantity: 3, price: 7.99},
+        //                                       {productName: 'b', quantity: 13, price: 10.59}] },
+        //       ]
+        //     },
+        //   ],
+        //   total: 122,
+        //   price: 120,
+        //   tax: 15,
+        //   tips: 0,
+        //   deliveryCost: 0,
+        //   deliveryDiscount: 0,
+        //   groupDiscount: 0,
+        //   overRangeCharge: 0
+        // }];
+        this.nOrders = ret.count;
+        this.loading = false;
+      });
   }
 
   getAddress(location: ILocation) {

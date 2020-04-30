@@ -58,19 +58,19 @@
                 <div *ngFor="let merchant of deliver.merchants" class="row">
                     <div class="merchant">商家:{{merchant.name}}</div>
                     <div *ngFor="let product of merchant.products" class="product-row">
-                      <div class="product-col">{{product.name}}</div>
+                      <div class="product-col">{{product.productName}}</div>
                       <div class="quantity-col">x {{product.quantity | number : '1.0-0'}}</div>
                       <div class="price-col">${{product.price | number : '1.2-2'}}</div>
                   </div>
                 </div>
               </div>
             </div>
-            <div class="col-12 items-col">
+            <!-- <div class="col-12 items-col">
               <div class="description-col">{{payment.description}}</div>
-            </div>
+            </div> -->
             <div class="col-12 text-sm total-col" *ngIf="payment.total">
               <div class="row">
-                <div class="col-12">
+                <!-- <div class="col-12">
                   <div class="title-xs">
                     <span i18n="@@ProductTotal">ProductTotal</span>:</div>
                   <div class="text-xs">&nbsp;${{payment.price | number : '1.2-2'}}</div>
@@ -109,7 +109,7 @@
                   <div class="title-xs">
                     <span i18n="@@OverRangeCharge">Over Range Charge</span>:</div>
                   <div class="text-xs">${{payment.overRangeCharge | number : '1.2-2'}}</div>
-                </div>
+                </div> -->
                 <div class="col-12">
                   <div class="title-xs">
                     <span i18n="@@Total">Total</span>:</div>
