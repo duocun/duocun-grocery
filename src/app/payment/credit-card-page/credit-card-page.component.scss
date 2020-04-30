@@ -68,6 +68,8 @@
     .item-row{
       padding-bottom: 3px;
       padding-right: 4px;
+      display: flex;
+      flex-direction: column;
     }
 
     .product-col, .quantity-col, .price-col {
