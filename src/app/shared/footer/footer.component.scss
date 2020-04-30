@@ -4,6 +4,7 @@ $blue: #4285F3;
 $pay-btn-width: 180px;
 $bottom-bar-h: 60px;
 $menu-w: 33.3%;
+$bottom-icon-width:10%;
 
 
 a {
@@ -107,7 +108,7 @@ span{
   text-align: center;
   border-right: 1px solid $border-color;
   padding-top: 15px;
-  width: calc(100% - #{$bottom-btn-w});
+  width: calc(100% - #{$bottom-icon-width} - #{$bottom-btn-w});
 }
 
 //     // .fa-stack[data-count]:after{
@@ -138,11 +139,13 @@ span{
 //       margin-left: 0px;
 //     }
 
-//     .cart-col, .amount-col{
-//       height: 60px;
-//       float: left;
-//       padding-left:15px;
-//     }
+    .cart-col{
+      width: $bottom-icon-width;
+      height: 60px;
+      float: left;
+      padding-left:15px;
+      margin-top:15px;
+    }
 
 //     .checkout-col{
 //       color: white;
