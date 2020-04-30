@@ -214,7 +214,7 @@ export class HomeComponent implements OnInit, OnDestroy {
 
         this.rx.dispatch({ type: AppStateActions.UPDATE_APP_CODE, payload: appCode });
 
-        if (tokenId) {
+        if (tokenId && tokenId !== 'null') {
           whiteScreenLog += `->Exist URL TokenID`;
           this.accountSvc.setAccessTokenId(tokenId);
           whiteScreenLog += `->Set TokenID Done`;
